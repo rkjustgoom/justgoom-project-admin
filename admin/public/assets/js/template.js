@@ -143,19 +143,25 @@
 
     window.addEventListener("resize", toggleNavbarMini);
     toggleNavbarMini();
-    if ($.cookie('spica-pro-banner')!="true") {
-      document.querySelector('#proBanner').classList.add('d-flex');
+    const proBanner = document.querySelector('#proBanner');
+    const bannerClose = document.querySelector('#bannerClose');
+    if (proBanner) {
+      if ($.cookie('spica-pro-banner')!="true") {
+        proBanner.classList.add('d-flex');
+      }
+      else {
+        proBanner.classList.add('d-none');
+      }
     }
-    else {
-      document.querySelector('#proBanner').classList.add('d-none');
+    if (proBanner && bannerClose) {
+      bannerClose.addEventListener('click',function() {
+        proBanner.classList.add('d-none');
+        proBanner.classList.remove('d-flex');
+        var date = new Date();
+        date.setTime(date.getTime() + 24 * 60 * 60 * 1000); 
+        $.cookie('spica-pro-banner', "true", { expires: date });
+      });
     }
-    document.querySelector('#bannerClose').addEventListener('click',function() {
-      document.querySelector('#proBanner').classList.add('d-none');
-      document.querySelector('#proBanner').classList.remove('d-flex');
-      var date = new Date();
-      date.setTime(date.getTime() + 24 * 60 * 60 * 1000); 
-      $.cookie('spica-pro-banner', "true", { expires: date });
-    });
     
 
   });
@@ -166,14 +172,16 @@ const ctaBtn = document.getElementById('cta-trigger')
 const crownblack = document.querySelector('.crown-black')
 const crownwhite = document.querySelector('.crown-white')
 
-ctaBtn.addEventListener('mouseover', () => {
-  crownwhite.classList.remove('cta-hover')
-  crownblack.classList.add('cta-hover')
-})
-ctaBtn.addEventListener('mouseout', () => {
-  crownwhite.classList.add('cta-hover')
-  crownblack.classList.remove('cta-hover')
-})
+if (ctaBtn && crownblack && crownwhite) {
+  ctaBtn.addEventListener('mouseover', () => {
+    crownwhite.classList.remove('cta-hover')
+    crownblack.classList.add('cta-hover')
+  })
+  ctaBtn.addEventListener('mouseout', () => {
+    crownwhite.classList.add('cta-hover')
+    crownblack.classList.remove('cta-hover')
+  })
+}
 
 // Link redirection 
 function redirection(url) {
