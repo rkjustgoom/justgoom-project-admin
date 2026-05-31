@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Just Goom LLP — Discover Movies, Categories & More</title>
+  <meta name="description" content="JustGoom — Your destination for trending categories, movies, health tools, and expert blogs.">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">JustGoom</a>
+      <nav class="main-nav">
+        <a href="index.html" class="active">Home</a>
+        <a href="about.html">About Us</a>
+        <a href="categories.html">Categories</a>
+        <a href="all_profiles.html">All Profiles</a>
+        <a href="health-calculator.html">Health Calculator</a>
+        <a href="blogs.html">Blogs</a>
+        <a href="contact.html">Contact Us</a>
+      </nav>
+      <div class="header-actions">
+        <a href="login.html" class="btn btn-outline btn-sm">Login</a>
+        <a href="register.html" class="btn btn-accent btn-sm">Register</a>
+      </div>
+      <button class="mobile-toggle" aria-label="Open menu">☰</button>
+    </div>
+  </header>
+
+  <!-- Mobile Nav -->
+  <div class="mobile-nav">
+    <div class="mobile-nav-panel">
+      <button class="mobile-nav-close" aria-label="Close menu">✕</button>
+      <nav class="mobile-nav-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About Us</a>
+        <a href="categories.html">Categories</a>
+        <a href="all_profiles.html">All Profiles</a>
+        <a href="health-calculator.html">Health Calculator</a>
+        <a href="blogs.html">Blogs</a>
+        <a href="contact.html">Contact Us</a>
+      </nav>
+      <div class="mobile-nav-actions">
+        <a href="login.html" class="btn btn-outline btn-block">Login</a>
+        <a href="register.html" class="btn btn-accent btn-block">Register</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hero Banner -->
+  <section class="hero">
+    <div class="container hero-layout">
+      <div class="hero-content">
+        <div class="hero-badge">India's Local Discovery Platform</div>
+        <h1>Discover Everything You Need in One Place</h1>
+        <p>Explore trending categories, latest movies, health tools, and expert blogs — all curated for you on JustGoom.</p>
+        <div class="hero-search">
+          <input type="text" placeholder="Search categories, movies, blogs...">
+          <button class="btn btn-accent">Search</button>
+        </div>
+      </div>
+      <div class="hero-image">
+        <img src="assets/images/hero-banner.jpg" alt="Discover on JustGoom">
+      </div>
+    </div>
+  </section>
+
+  <!-- Company Profiles (card grid) -->
+  <section class="company-profiles-section" id="companies">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Company Profiles</h2>
+          <p class="section-subtitle">Browse verified business profiles — showing 12 listings</p>
+        </div>
+        <a href="all_profiles.html" class="view-all-link">View All →</a>
+      </div>
+
+      <div class="company-toolbar">
+        <div class="company-search-wrap">
+          <span class="company-search-icon">🔍</span>
+          <input type="text" id="homeCompanySearch" placeholder="Search for name or designation...">
+        </div>
+        <div class="company-toolbar-actions">
+          <div class="view-toggle">
+            <button type="button" id="homeViewGrid" class="active" title="Grid view">▦</button>
+            <button type="button" id="homeViewList" title="List view">☰</button>
+          </div>
+          <button type="button" class="btn-filters" onclick="location.href='all_profiles.html'">+ Filters</button>
+        </div>
+      </div>
+
+      <p class="company-count" id="homeCompanyCount">Showing 12 of 12 company profiles</p>
+      <div class="company-grid" id="homeCompanyGrid"></div>
+    </div>
+  </section>
+
+  <!-- Stats Bar -->
+  <div class="stats-bar">
+    <div class="container stats-grid">
+      <div class="stat-item">
+        <div class="stat-num">2M+</div>
+        <div class="stat-label">Listings</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">500+</div>
+        <div class="stat-label">Categories</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">10K+</div>
+        <div class="stat-label">Movies</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">1.5M+</div>
+        <div class="stat-label">Happy Users</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Trending Categories -->
+  <section class="section" id="categories">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Top Trending Categories</h2>
+          <p class="section-subtitle">Most popular categories this week</p>
+        </div>
+        <a href="categories.html" class="view-all-link">View All →</a>
+      </div>
+      <div class="category-grid">
+        <a href="all_profiles.html" class="category-card">
+          <div class="category-thumb"><img src="assets/images/cat-real-estate.jpg" alt="Real Estate"></div>
+          <h3>Real Estate</h3>
+          <span>1,240 listings</span>
+        </a>
+        <a href="all_profiles.html" class="category-card">
+          <div class="category-thumb"><img src="assets/images/cat-health.jpg" alt="Health & Wellness"></div>
+          <h3>Health & Wellness</h3>
+          <span>890 listings</span>
+        </a>
+        <a href="all_profiles.html" class="category-card">
+          <div class="category-thumb"><img src="assets/images/cat-entertainment.jpg" alt="Entertainment"></div>
+          <h3>Entertainment</h3>
+          <span>2,100 listings</span>
+        </a>
+        <a href="all_profiles.html" class="category-card">
+          <div class="category-thumb"><img src="assets/images/cat-education.jpg" alt="Education"></div>
+          <h3>Education</h3>
+          <span>650 listings</span>
+        </a>
+        <a href="all_profiles.html" class="category-card">
+          <div class="category-thumb"><img src="assets/images/cat-shopping.jpg" alt="Shopping"></div>
+          <h3>Shopping</h3>
+          <span>1,580 listings</span>
+        </a>
+        <a href="all_profiles.html" class="category-card">
+          <div class="category-thumb"><img src="assets/images/cat-automobile.jpg" alt="Automobile"></div>
+          <h3>Automobile</h3>
+          <span>720 listings</span>
+        </a>
+        <a href="all_profiles.html" class="category-card">
+          <div class="category-thumb"><img src="assets/images/cat-food.jpg" alt="Food & Dining"></div>
+          <h3>Food & Dining</h3>
+          <span>980 listings</span>
+        </a>
+        <a href="all_profiles.html" class="category-card">
+          <div class="category-thumb"><img src="assets/images/cat-business.jpg" alt="Business Services"></div>
+          <h3>Business Services</h3>
+          <span>430 listings</span>
+        </a>
+        <a href="all_profiles.html" class="category-card">
+          <div class="category-thumb"><img src="assets/images/cat-business.jpg" alt="Business Services"></div>
+          <h3>Business Services</h3>
+          <span>430 listings</span>
+        </a>
+        <a href="all_profiles.html" class="category-card">
+          <div class="category-thumb"><img src="assets/images/cat-business.jpg" alt="Business Services"></div>
+          <h3>Business Services</h3>
+          <span>430 listings</span>
+        </a>
+        <a href="all_profiles.html" class="category-card">
+          <div class="category-thumb"><img src="assets/images/cat-business.jpg" alt="Business Services"></div>
+          <h3>Business Services</h3>
+          <span>430 listings</span>
+        </a>
+        <a href="all_profiles.html" class="category-card">
+          <div class="category-thumb"><img src="assets/images/cat-business.jpg" alt="Business Services"></div>
+          <h3>Business Services</h3>
+          <span>430 listings</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Movies Listing -->
+  <section class="section section-alt" id="movies">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Latest Movies</h2>
+          <p class="section-subtitle">Trending movies you shouldn't miss</p>
+        </div>
+        <a href="#" class="view-all-link">View All →</a>
+      </div>
+      <div class="movie-grid">
+        <article class="movie-card">
+          <div class="movie-poster">
+            <img src="assets/images/movie-1.jpg" alt="Interstellar">
+            <span class="movie-badge">New</span>
+            <span class="movie-rating">★ 8.7</span>
+          </div>
+          <div class="movie-info">
+            <h3>Interstellar</h3>
+            <div class="movie-meta">
+              <span>🎭 Sci-Fi</span>
+              <span>2024</span>
+            </div>
+          </div>
+        </article>
+        <article class="movie-card">
+          <div class="movie-poster">
+            <img src="assets/images/movie-2.jpg" alt="The Dark Knight">
+            <span class="movie-rating">★ 9.0</span>
+          </div>
+          <div class="movie-info">
+            <h3>The Dark Knight</h3>
+            <div class="movie-meta">
+              <span>🎭 Action</span>
+              <span>2024</span>
+            </div>
+          </div>
+        </article>
+        <article class="movie-card">
+          <div class="movie-poster">
+            <img src="assets/images/movie-3.jpg" alt="Inception">
+            <span class="movie-badge">Hot</span>
+            <span class="movie-rating">★ 8.8</span>
+          </div>
+          <div class="movie-info">
+            <h3>Inception</h3>
+            <div class="movie-meta">
+              <span>🎭 Thriller</span>
+              <span>2024</span>
+            </div>
+          </div>
+        </article>
+        <article class="movie-card">
+          <div class="movie-poster">
+            <img src="assets/images/movie-4.jpg" alt="Avatar">
+            <span class="movie-rating">★ 7.9</span>
+          </div>
+          <div class="movie-info">
+            <h3>Avatar: The Way of Water</h3>
+            <div class="movie-meta">
+              <span>🎭 Adventure</span>
+              <span>2024</span>
+            </div>
+          </div>
+        </article>
+        <article class="movie-card">
+          <div class="movie-poster">
+            <img src="assets/images/movie-5.jpg" alt="Oppenheimer">
+            <span class="movie-badge">New</span>
+            <span class="movie-rating">★ 8.5</span>
+          </div>
+          <div class="movie-info">
+            <h3>Oppenheimer</h3>
+            <div class="movie-meta">
+              <span>🎭 Drama</span>
+              <span>2024</span>
+            </div>
+          </div>
+        </article>
+        <article class="movie-card">
+          <div class="movie-poster">
+            <img src="assets/images/movie-6.jpg" alt="Dune">
+            <span class="movie-rating">★ 8.2</span>
+          </div>
+          <div class="movie-info">
+            <h3>Dune: Part Two</h3>
+            <div class="movie-meta">
+              <span>🎭 Sci-Fi</span>
+              <span>2024</span>
+            </div>
+          </div>
+        </article>
+        <article class="movie-card">
+          <div class="movie-poster">
+            <img src="assets/images/movie-6.jpg" alt="Dune">
+            <span class="movie-rating">★ 8.2</span>
+          </div>
+          <div class="movie-info">
+            <h3>Dune: Part Two</h3>
+            <div class="movie-meta">
+              <span>🎭 Sci-Fi</span>
+              <span>2024</span>
+            </div>
+          </div>
+        </article>
+        <article class="movie-card">
+          <div class="movie-poster">
+            <img src="assets/images/movie-6.jpg" alt="Dune">
+            <span class="movie-rating">★ 8.2</span>
+          </div>
+          <div class="movie-info">
+            <h3>Dune: Part Two</h3>
+            <div class="movie-meta">
+              <span>🎭 Sci-Fi</span>
+              <span>2024</span>
+            </div>
+          </div>
+        </article>
+        <article class="movie-card">
+          <div class="movie-poster">
+            <img src="assets/images/movie-6.jpg" alt="Dune">
+            <span class="movie-rating">★ 8.2</span>
+          </div>
+          <div class="movie-info">
+            <h3>Dune: Part Two</h3>
+            <div class="movie-meta">
+              <span>🎭 Sci-Fi</span>
+              <span>2024</span>
+            </div>
+          </div>
+        </article>
+        <article class="movie-card">
+          <div class="movie-poster">
+            <img src="assets/images/movie-6.jpg" alt="Dune">
+            <span class="movie-rating">★ 8.2</span>
+          </div>
+          <div class="movie-info">
+            <h3>Dune: Part Two</h3>
+            <div class="movie-meta">
+              <span>🎭 Sci-Fi</span>
+              <span>2024</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Health Calculator CTA -->
+  <section class="section" id="calculator">
+    <div class="container">
+      <div class="cta-banner">
+        <div>
+          <h2>Health Calculator</h2>
+          <p>Calculate BMI, track your wellness journey, and get personalized health tips — completely free.</p>
+        </div>
+        <a href="health-calculator.html" class="btn btn-accent btn-lg">Try Health Calculator →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Blogs -->
+  <section class="section" id="blogs">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Latest Blogs</h2>
+          <p class="section-subtitle">Insights, tips, and stories from our experts</p>
+        </div>
+        <a href="blogs.html" class="view-all-link">View All →</a>
+      </div>
+      <div class="blog-grid">
+        <a href="blogs.html" class="blog-card blog-card-link">
+          <div class="blog-thumb">
+            <img src="assets/images/blog-1.jpg" alt="Real estate tips">
+          </div>
+          <div class="blog-body">
+            <span class="blog-tag">Real Estate</span>
+            <h3>10 Tips for First-Time Home Buyers in 2026</h3>
+            <p>Buying your first home can be overwhelming. Here are expert tips to help you navigate the process smoothly.</p>
+            <div class="blog-footer">
+              <div class="blog-author">
+                <span class="blog-author-avatar">RK</span>
+                <span>Raj Kumar · May 28, 2026</span>
+              </div>
+              <span>5 min read</span>
+            </div>
+          </div>
+        </a>
+        <a href="blogs.html" class="blog-card blog-card-link">
+          <div class="blog-thumb">
+            <img src="assets/images/blog-2.jpg" alt="Health tips">
+          </div>
+          <div class="blog-body">
+            <span class="blog-tag">Health</span>
+            <h3>Understanding BMI: A Complete Guide to Body Mass Index</h3>
+            <p>Learn what BMI means, how to calculate it, and what the numbers tell you about your overall health.</p>
+            <div class="blog-footer">
+              <div class="blog-author">
+                <span class="blog-author-avatar">PS</span>
+                <span>Dr. Priya Sharma · May 25, 2026</span>
+              </div>
+              <span>7 min read</span>
+            </div>
+          </div>
+        </a>
+        <a href="blogs.html" class="blog-card blog-card-link">
+          <div class="blog-thumb">
+            <img src="assets/images/blog-3.jpg" alt="Movie review">
+          </div>
+          <div class="blog-body">
+            <span class="blog-tag">Entertainment</span>
+            <h3>Top 15 Must-Watch Movies Releasing This Summer</h3>
+            <p>From blockbuster sequels to indie gems, here's our curated list of the hottest movies hitting screens.</p>
+            <div class="blog-footer">
+              <div class="blog-author">
+                <span class="blog-author-avatar">AM</span>
+                <span>Amit Mehta · May 22, 2026</span>
+              </div>
+              <span>4 min read</span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- About CTA -->
+  <section class="section section-alt">
+    <div class="container section-blurb">
+      <h2 class="section-title">About Just Goom LLP</h2>
+      <p class="section-subtitle">
+        Just Goom LLP is India's leading local discovery platform — connecting millions of users with trusted categories, movies, health resources, and expert content.
+      </p>
+      <a href="about.html" class="btn btn-outline-primary" style="margin-top:24px;">Learn More About Us</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="logo logo-footer">JustGoom</a>
+          <p>Just Goom LLP — Your trusted platform for discovering categories, movies, health tools, and expert blogs across India.</p>
+          <div class="footer-social">
+            <a href="#" aria-label="Facebook">f</a>
+            <a href="#" aria-label="Twitter">𝕏</a>
+            <a href="#" aria-label="Instagram">📷</a>
+            <a href="#" aria-label="LinkedIn">in</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="categories.html">Categories</a></li>
+            <li><a href="all_profiles.html">All Profiles</a></li>
+            <li><a href="health-calculator.html">Health Calculator</a></li>
+            <li><a href="blogs.html">Blogs</a></li>
+            <li><a href="contact.html">Contact Us</a></li>
+            <li><a href="login.html">Login</a></li>
+            <li><a href="register.html">Register</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Profile Categories</h4>
+          <ul>
+            <li><a href="all_profiles.html">Real Estate</a></li>
+            <li><a href="all_profiles.html">Health & Wellness</a></li>
+            <li><a href="all_profiles.html">Entertainment</a></li>
+            <li><a href="all_profiles.html">Education</a></li>
+            <li><a href="all_profiles.html">Business Services</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Support</h4>
+          <ul>
+            <li><a href="contact.html">Contact Us</a></li>
+            <li><a href="#">FAQ</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms & Conditions</a></li>
+            <li><a href="#">Advertise</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Just Goom LLP. All rights reserved.</span>
+        <div class="footer-bottom-links">
+          <a href="#">Privacy</a>
+          <a href="#">Terms</a>
+          <a href="#">Sitemap</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/company-profiles.js"></script>
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
