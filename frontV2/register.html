@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register — Just Goom LLP</title>
+  <meta name="description" content="Create your free Just Goom account — list your business, receive buyer inquiries, and grow your B2B presence.">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="auth-page-body">
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="container top-bar-inner">
+      <div class="top-bar-left">
+        <a href="tel:+919876543210">📞 +91 98765 43210</a>
+        <a href="mailto:info@justgoom.com">✉ info@justgoom.com</a>
+      </div>
+      <div class="top-bar-right">
+        <a href="register.html" class="top-bar-cta">+ List Your Business Free</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo logo-wrap">
+        <img src="assets/images/justgoom-logo.png" alt="JustGoom" class="logo-img">
+      </a>
+      <nav class="main-nav">
+        <a href="index.html">Home</a>
+        <a href="about.html">About Us</a>
+        <a href="categories.html">Categories</a>
+        <a href="all_profiles.html">All Profiles</a>
+        <a href="calculators.html">Calculators</a>
+        <a href="blogs.html">Blogs</a>
+        <a href="contact.html">Contact Us</a>
+      </nav>
+      <div class="header-actions">
+        <a href="login.html" class="btn btn-outline btn-sm">Login</a>
+        <a href="register.html" class="btn btn-accent btn-sm active-nav-btn">Register</a>
+      </div>
+      <button class="mobile-toggle" aria-label="Open menu">☰</button>
+    </div>
+  </header>
+
+  <!-- Mobile Nav -->
+  <div class="mobile-nav">
+    <div class="mobile-nav-panel">
+      <button class="mobile-nav-close" aria-label="Close menu">✕</button>
+      <nav class="mobile-nav-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About Us</a>
+        <a href="categories.html">Categories</a>
+        <a href="all_profiles.html">All Profiles</a>
+        <a href="calculators.html">Calculators</a>
+        <a href="blogs.html">Blogs</a>
+        <a href="contact.html">Contact Us</a>
+      </nav>
+      <div class="mobile-nav-actions">
+        <a href="login.html" class="btn btn-outline btn-block">Login</a>
+        <a href="register.html" class="btn btn-accent btn-block">Register</a>
+      </div>
+    </div>
+  </div>
+
+  <section class="auth-page">
+    <div class="container">
+      <div class="auth-layout auth-layout-v2 auth-layout-register">
+
+        <div class="auth-visual">
+          <img src="assets/images/hero-banner.jpg" alt="Join Just Goom B2B">
+          <div class="auth-visual-overlay">
+            <span class="auth-visual-badge">Free Listing</span>
+            <h2>Join India's B2B Platform</h2>
+            <p>Create your free account to list your business, reach verified buyers, and grow across 24+ industry sectors.</p>
+            <ul class="auth-benefits">
+              <li>✓ Free business profile listing</li>
+              <li>✓ Receive buyer inquiries directly</li>
+              <li>✓ 24+ B2B categories covered</li>
+              <li>✓ Verification badge available</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="auth-form-wrap">
+          <div class="auth-form-header">
+            <h1>Create Your Account</h1>
+            <p>Register in minutes — it's free for businesses</p>
+          </div>
+
+          <div class="auth-type-toggle">
+            <button type="button" class="active" data-type="seller">I'm a Seller / Business</button>
+            <button type="button" data-type="buyer">I'm a Buyer</button>
+          </div>
+
+          <form class="auth-form" id="registerForm">
+            <div class="form-group auth-field-business">
+              <label for="regCompany">Business / Company Name</label>
+              <input type="text" id="regCompany" class="form-input" placeholder="Your company name">
+            </div>
+            <div class="form-group">
+              <label for="regName">Full Name <span class="req">*</span></label>
+              <input type="text" id="regName" class="form-input" placeholder="Your full name" required>
+            </div>
+            <div class="form-group">
+              <label for="regEmail">Email Address <span class="req">*</span></label>
+              <input type="email" id="regEmail" class="form-input" placeholder="you@example.com" required>
+            </div>
+            <div class="form-group">
+              <label for="regPhone">Mobile Number <span class="req">*</span></label>
+              <div class="phone-input">
+                <span class="phone-prefix">+91</span>
+                <input type="tel" id="regPhone" class="form-input" placeholder="Mobile number" required>
+              </div>
+            </div>
+            <div class="auth-form-row">
+              <div class="form-group">
+                <label for="regPassword">Password <span class="req">*</span></label>
+                <input type="password" id="regPassword" class="form-input" placeholder="Create password" required>
+              </div>
+              <div class="form-group">
+                <label for="regConfirm">Confirm Password <span class="req">*</span></label>
+                <input type="password" id="regConfirm" class="form-input" placeholder="Confirm password" required>
+              </div>
+            </div>
+            <label class="auth-terms">
+              <input type="checkbox" required>
+              I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+            </label>
+            <button type="submit" class="btn btn-accent btn-block btn-lg">Create Free Account</button>
+          </form>
+          <div class="auth-divider">or</div>
+          <p class="auth-switch">Already have an account? <a href="login.html">Login here →</a></p>
+          <div class="auth-trust">
+            <span>🔒 Secure signup</span>
+            <span>✓ No credit card required</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Mini Footer -->
+  <footer class="auth-mini-footer">
+    <div class="container auth-mini-footer-inner">
+      <span>© 2026 Just Goom LLP</span>
+      <div class="auth-mini-links">
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

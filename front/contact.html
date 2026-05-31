@@ -4,10 +4,23 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Contact Us — Just Goom LLP</title>
-  <meta name="description" content="Contact Just Goom LLP — email, phone, address, and enquiry form for support and business queries.">
+  <meta name="description" content="Contact Just Goom LLP for business listings, buyer inquiries, partnerships, and platform support.">
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body>
+<body class="contact-page">
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="container top-bar-inner">
+      <div class="top-bar-left">
+        <a href="tel:+919876543210">📞 +91 98765 43210</a>
+        <a href="mailto:info@justgoom.com">✉ info@justgoom.com</a>
+      </div>
+      <div class="top-bar-right">
+        <a href="register.html" class="top-bar-cta">+ List Your Business Free</a>
+      </div>
+    </div>
+  </div>
 
   <!-- Header -->
   <header class="site-header">
@@ -20,8 +33,9 @@
         <a href="about.html">About Us</a>
         <a href="categories.html">Categories</a>
         <a href="all_profiles.html">All Profiles</a>
-        <a href="health-calculator.html">Health Calculator</a>
-        <a href="blogs.html">Blogs</a>
+        <a href="calculators.html">Calculators</a>
+        <a href="health.html">Health</a>
+        <a href="articles.html">Articles</a>
         <a href="contact.html" class="active">Contact Us</a>
       </nav>
       <div class="header-actions">
@@ -41,8 +55,9 @@
         <a href="about.html">About Us</a>
         <a href="categories.html">Categories</a>
         <a href="all_profiles.html">All Profiles</a>
-        <a href="health-calculator.html">Health Calculator</a>
-        <a href="blogs.html">Blogs</a>
+        <a href="calculators.html">Calculators</a>
+        <a href="health.html">Health</a>
+        <a href="articles.html">Articles</a>
         <a href="contact.html">Contact Us</a>
       </nav>
       <div class="mobile-nav-actions">
@@ -53,26 +68,49 @@
   </div>
 
   <!-- Page Hero -->
-  <section class="page-hero">
+  <section class="page-hero contact-hero">
     <div class="container">
       <nav class="breadcrumb">
         <a href="index.html">Home</a>
         <span class="breadcrumb-sep">›</span>
         <span>Contact Us</span>
       </nav>
-      <h1>Contact Us</h1>
-      <p>Have a question or need help? Reach out to the Just Goom team — we're here to assist you.</p>
+      <h1>Contact Just Goom</h1>
+      <p>Questions about listings, buyer inquiries, or partnerships? Our team is here to help you grow on India's B2B platform.</p>
     </div>
     <div class="pixel-deco orange"><span></span><span></span><span></span><span></span></div>
   </section>
+
+  <!-- Quick Stats -->
+  <div class="stats-bar contact-stats">
+    <div class="container stats-grid">
+      <div class="stat-item">
+        <div class="stat-num">24–48h</div>
+        <div class="stat-label">Response Time</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">Mon–Sat</div>
+        <div class="stat-label">Support Available</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">Ahmedabad</div>
+        <div class="stat-label">Head Office</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">Pan-India</div>
+        <div class="stat-label">Business Coverage</div>
+      </div>
+    </div>
+  </div>
 
   <!-- Contact Section -->
   <section class="section contact-page-section">
     <div class="container contact-page-layout">
 
       <div class="contact-form-card">
-        <h2>Send Us a Message</h2>
-        <p>Fill in the form below and our team will get back to you within 24–48 hours.</p>
+        <span class="about-tag">Send a Message</span>
+        <h2>How Can We Help?</h2>
+        <p>Fill in the form below and our team will get back to you within 24–48 business hours.</p>
         <form class="contact-form" id="contactForm">
           <div class="contact-form-row">
             <div class="form-group">
@@ -97,18 +135,20 @@
               <select id="contactSubject" class="form-input" required>
                 <option value="">Select a subject</option>
                 <option>General Enquiry</option>
-                <option>Business Listing</option>
+                <option>List My Business</option>
+                <option>Buyer Inquiry Support</option>
+                <option>Profile Verification</option>
+                <option>Partnership / Advertising</option>
                 <option>Technical Support</option>
-                <option>Partnership</option>
                 <option>Feedback</option>
               </select>
             </div>
           </div>
           <div class="form-group">
             <label for="contactMessage">Message <span class="req">*</span></label>
-            <textarea id="contactMessage" class="form-input contact-textarea" rows="5" placeholder="Write your message here..." required></textarea>
+            <textarea id="contactMessage" class="form-input contact-textarea" rows="5" placeholder="Tell us about your business or enquiry…" required></textarea>
           </div>
-          <button type="submit" class="btn btn-primary">Send Message</button>
+          <button type="submit" class="btn btn-accent btn-lg">Send Message</button>
           <p class="contact-note">By submitting this form, you agree to our <a href="#">Privacy Policy</a> and <a href="#">Terms of Use</a>.</p>
         </form>
       </div>
@@ -146,12 +186,51 @@
             <li><span>Sunday</span><strong>Closed</strong></li>
           </ul>
         </div>
+
+        <div class="contact-quick-card">
+          <h4>Quick Actions</h4>
+          <div class="contact-quick-links">
+            <a href="register.html" class="btn btn-accent btn-block">List Your Business</a>
+            <a href="all_profiles.html" class="btn btn-outline-primary btn-block">Browse Profiles</a>
+            <a href="calculators.html" class="btn btn-outline btn-block">Free Calculators</a>
+          </div>
+        </div>
       </aside>
 
     </div>
   </section>
 
-  <!-- Map Placeholder -->
+  <!-- FAQ -->
+  <section class="section section-alt contact-faq-section">
+    <div class="container">
+      <div class="section-header text-center about-section-head">
+        <div>
+          <h2 class="section-title">Frequently Asked Questions</h2>
+          <p class="section-subtitle">Quick answers before you reach out</p>
+        </div>
+      </div>
+      <div class="contact-faq-grid">
+        <div class="contact-faq-item">
+          <h4>How do I list my business for free?</h4>
+          <p>Click Register, create your account, and complete your business profile. Listing on Just Goom is free for MSMEs and local businesses.</p>
+        </div>
+        <div class="contact-faq-item">
+          <h4>How do buyers send inquiries?</h4>
+          <p>Buyers browse All Profiles, open a company profile, and submit an inquiry form. Verified businesses receive leads directly.</p>
+        </div>
+        <div class="contact-faq-item">
+          <h4>What is profile verification?</h4>
+          <p>Verified badges help buyers trust your business. Contact us with your GST, registration, or business documents to apply.</p>
+        </div>
+        <div class="contact-faq-item">
+          <h4>Do you cover businesses outside Ahmedabad?</h4>
+          <p>Yes. Just Goom serves businesses and buyers across India with 24+ industry sectors and growing city coverage.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Map -->
   <section class="contact-map-section">
     <div class="container">
       <div class="contact-map-wrap">
@@ -159,6 +238,26 @@
         <div class="contact-map-overlay">
           <strong>Just Goom LLP</strong>
           <span>Ahmedabad, Gujarat — 380014</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dual CTA -->
+  <section class="section">
+    <div class="container">
+      <div class="b2b-cta-grid">
+        <div class="b2b-cta-card b2b-cta-buyer">
+          <span class="b2b-cta-label">For Buyers</span>
+          <h3>Find Verified Businesses</h3>
+          <p>Browse profiles across 24+ sectors and connect with trusted suppliers.</p>
+          <a href="all_profiles.html" class="btn btn-accent">Browse Profiles →</a>
+        </div>
+        <div class="b2b-cta-card b2b-cta-seller">
+          <span class="b2b-cta-label">For Sellers</span>
+          <h3>Grow Your Business</h3>
+          <p>List your profile for free and start receiving buyer inquiries today.</p>
+          <a href="register.html" class="btn btn-primary">Register Free →</a>
         </div>
       </div>
     </div>
@@ -172,7 +271,7 @@
           <a href="index.html" class="logo logo-footer logo-wrap">
             <img src="assets/images/justgoom-logo.png" alt="JustGoom" class="logo-img logo-img-footer">
           </a>
-          <p>Just Goom LLP — Your trusted platform for discovering profiles, movies, health tools, and expert blogs across India.</p>
+          <p>Just Goom LLP — Your trusted B2B platform for discovering verified business profiles, categories, and expert content across India.</p>
           <div class="footer-social">
             <a href="#" aria-label="Facebook">f</a>
             <a href="#" aria-label="Twitter">𝕏</a>
@@ -185,17 +284,19 @@
           <ul>
             <li><a href="index.html">Home</a></li>
             <li><a href="about.html">About Us</a></li>
+            <li><a href="categories.html">Categories</a></li>
             <li><a href="all_profiles.html">All Profiles</a></li>
-            <li><a href="contact.html">Contact Us</a></li>
-            <li><a href="blogs.html">Blogs</a></li>
+            <li><a href="calculators.html">Calculators</a></li>
+            <li><a href="health.html">Health</a></li>
+            <li><a href="articles.html">Articles</a></li>
           </ul>
         </div>
         <div class="footer-col">
           <h4>Profile Categories</h4>
           <ul>
             <li><a href="all_profiles.html">Real Estate</a></li>
-            <li><a href="all_profiles.html">Health & Wellness</a></li>
-            <li><a href="all_profiles.html">Entertainment</a></li>
+            <li><a href="all_profiles.html">Manufacturing</a></li>
+            <li><a href="all_profiles.html">Business Services</a></li>
             <li><a href="all_profiles.html">Education</a></li>
           </ul>
         </div>

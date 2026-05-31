@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>All Categories — Just Goom LLP</title>
+  <meta name="description" content="Browse 24+ B2B business sectors and 170+ subcategories on JustGoom — find verified suppliers across India.">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="categories-page">
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="container top-bar-inner">
+      <div class="top-bar-left">
+        <a href="tel:+919876543210">📞 +91 98765 43210</a>
+        <a href="mailto:info@justgoom.com">✉ info@justgoom.com</a>
+      </div>
+      <div class="top-bar-right">
+        <a href="register.html" class="top-bar-cta">+ List Your Business Free</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo logo-wrap">
+        <img src="assets/images/justgoom-logo.png" alt="JustGoom" class="logo-img">
+      </a>
+      <nav class="main-nav">
+        <a href="index.html">Home</a>
+        <a href="about.html">About Us</a>
+        <a href="categories.html" class="active">Categories</a>
+        <a href="all_profiles.html">All Profiles</a>
+        <a href="calculators.html">Calculators</a>
+        <a href="blogs.html">Blogs</a>
+        <a href="contact.html">Contact Us</a>
+      </nav>
+      <div class="header-actions">
+        <a href="login.html" class="btn btn-outline btn-sm">Login</a>
+        <a href="register.html" class="btn btn-accent btn-sm">Register</a>
+      </div>
+      <button class="mobile-toggle" aria-label="Open menu">☰</button>
+    </div>
+  </header>
+
+  <!-- Mobile Nav -->
+  <div class="mobile-nav">
+    <div class="mobile-nav-panel">
+      <button class="mobile-nav-close" aria-label="Close menu">✕</button>
+      <nav class="mobile-nav-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About Us</a>
+        <a href="categories.html">Categories</a>
+        <a href="all_profiles.html">All Profiles</a>
+        <a href="calculators.html">Calculators</a>
+        <a href="blogs.html">Blogs</a>
+        <a href="contact.html">Contact Us</a>
+      </nav>
+      <div class="mobile-nav-actions">
+        <a href="login.html" class="btn btn-outline btn-block">Login</a>
+        <a href="register.html" class="btn btn-accent btn-block">Register</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page Hero -->
+  <section class="page-hero categories-hero">
+    <div class="container">
+      <nav class="breadcrumb">
+        <a href="index.html">Home</a>
+        <span class="breadcrumb-sep">›</span>
+        <span>All Categories</span>
+      </nav>
+      <h1>Browse All Categories</h1>
+      <p>Explore 24+ business sectors and 170+ subcategories — find verified suppliers and service providers across India.</p>
+    </div>
+    <div class="pixel-deco orange"><span></span><span></span><span></span><span></span></div>
+  </section>
+
+  <!-- Stats -->
+  <div class="stats-bar categories-stats">
+    <div class="container stats-grid">
+      <div class="stat-item">
+        <div class="stat-num" id="statSectors">24+</div>
+        <div class="stat-label">Business Sectors</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" id="statSubs">170+</div>
+        <div class="stat-label">Subcategories</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">30+</div>
+        <div class="stat-label">Verified Profiles</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">50+</div>
+        <div class="stat-label">Cities Covered</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popular Categories Strip -->
+  <section class="categories-popular-strip">
+    <div class="container">
+      <div class="categories-popular-head">
+        <h2>Popular Sectors</h2>
+        <span>Quick access to top categories</span>
+      </div>
+      <div class="categories-popular-scroll" id="popularSectorsStrip"></div>
+    </div>
+  </section>
+
+  <!-- Main Categories Layout -->
+  <section class="categories-main-section">
+    <div class="container categories-main-layout">
+
+      <!-- Sidebar -->
+      <aside class="categories-sidebar" id="categoriesSidebar">
+        <div class="categories-sidebar-head">
+          <h3>Filter by Sector</h3>
+          <button type="button" class="categories-sidebar-reset" id="sectorReset">Clear</button>
+        </div>
+        <div class="categories-sidebar-search">
+          <input type="text" id="sidebarSearch" placeholder="Filter sectors...">
+        </div>
+        <nav class="categories-sidebar-list" id="sectorSidebarList" aria-label="Sector filters"></nav>
+      </aside>
+
+      <!-- Content -->
+      <div class="categories-main-content">
+        <div class="categories-toolbar">
+          <div class="globy-sectors-search categories-search-wide">
+            <span class="globy-sectors-search-icon">🔍</span>
+            <input type="text" id="sectorSearch" placeholder="Search categories or subcategories...">
+          </div>
+          <a href="all_profiles.html" class="btn btn-primary btn-sm">View All Profiles</a>
+        </div>
+        <p class="globy-sectors-count" id="sectorsCount"></p>
+        <div class="globy-sectors-grid categories-sectors-grid" id="allSectorsGrid"></div>
+        <p class="globy-sectors-empty categories-no-results" id="sectorsEmpty" hidden>No categories match your search. Try a different keyword.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section section-alt">
+    <div class="container">
+      <div class="b2b-cta-grid">
+        <div class="b2b-cta-card b2b-cta-buyer">
+          <span class="b2b-cta-label">For Buyers</span>
+          <h3>Can't Find Your Category?</h3>
+          <p>Post your requirement and we'll help you connect with the right verified businesses.</p>
+          <a href="contact.html" class="btn btn-accent">Post Requirement →</a>
+        </div>
+        <div class="b2b-cta-card b2b-cta-seller">
+          <span class="b2b-cta-label">For Sellers</span>
+          <h3>List Under Any Category</h3>
+          <p>Register your business for free and choose the sector that fits your services.</p>
+          <a href="register.html" class="btn btn-primary">Register Free →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="logo logo-footer logo-wrap">
+            <img src="assets/images/justgoom-logo.png" alt="JustGoom" class="logo-img logo-img-footer">
+          </a>
+          <p>Just Goom LLP — Your trusted B2B platform for discovering verified business profiles, categories, and expert content across India.</p>
+          <div class="footer-social">
+            <a href="#" aria-label="Facebook">f</a>
+            <a href="#" aria-label="Twitter">𝕏</a>
+            <a href="#" aria-label="Instagram">📷</a>
+            <a href="#" aria-label="LinkedIn">in</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="categories.html">Categories</a></li>
+            <li><a href="all_profiles.html">All Profiles</a></li>
+            <li><a href="calculators.html">Calculators</a></li>
+            <li><a href="blogs.html">Blogs</a></li>
+            <li><a href="contact.html">Contact Us</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Top Sectors</h4>
+          <ul>
+            <li><a href="all_profiles.html?category=construction">Construction</a></li>
+            <li><a href="all_profiles.html?category=health-medical">Health & Medical</a></li>
+            <li><a href="all_profiles.html?category=food-beverage">Food & Beverage</a></li>
+            <li><a href="all_profiles.html?category=business-services">Business Services</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Top Cities</h4>
+          <ul>
+            <li><a href="all_profiles.html">Ahmedabad</a></li>
+            <li><a href="all_profiles.html">Delhi</a></li>
+            <li><a href="all_profiles.html">Mumbai</a></li>
+            <li><a href="all_profiles.html">Bangalore</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Just Goom LLP. All rights reserved.</span>
+        <div class="footer-bottom-links">
+          <a href="#">Privacy</a>
+          <a href="#">Terms</a>
+          <a href="#">Sitemap</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/categories-data.js"></script>
+  <script src="assets/js/categories-render.js"></script>
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

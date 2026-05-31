@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirm Delete — Just Goom</title>
+  <link rel="stylesheet" href="../assets/css/users.css">
+</head>
+<body class="user-panel-body user-crud-delete" data-page="dashboard" data-title="Confirm Delete">
+
+<div class="user-sidebar-overlay"></div>
+<div class="user-wrap">
+  <aside class="user-sidebar" id="userSidebar"></aside>
+  <div class="user-main">
+    <header class="user-page-header">
+      <div class="user-page-header-left">
+        <button type="button" class="user-menu-btn" aria-label="Menu">☰</button>
+        <h1 class="user-greeting"><strong data-user-name>Shree Gold Jewellers</strong></h1>
+      </div>
+      <span class="user-page-title">Confirm Delete</span>
+    </header>
+    <div class="user-content">
+      <div class="user-form-card user-delete-card">
+        <div class="user-delete-icon">🗑</div>
+        <h2>Delete <span data-delete-label>Item</span>?</h2>
+        <p>This will permanently remove <strong data-delete-name>this item</strong>. This action cannot be undone.</p>
+        <div class="user-form-actions" style="border:none;padding:0;margin:0;justify-content:center">
+          <a href="index.html" data-delete-cancel class="user-btn user-btn-default">Cancel</a>
+          <button type="button" class="user-btn user-btn-danger" data-delete-confirm>Yes, Delete</button>
+        </div>
+      </div>
+    </div>
+    <footer class="user-footer">© 2026 Just Goom LLP.</footer>
+  </div>
+</div>
+<script src="../assets/js/users-nav.js"></script>
+<script src="../assets/js/users.js"></script>
+<script src="../assets/js/user-crud.js"></script>
+</body>
+</html>

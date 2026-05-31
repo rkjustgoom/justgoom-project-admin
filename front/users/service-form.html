@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="refresh" content="0;url=service-add.html">
+  <title>Redirect — Service Form</title>
+  <script>
+    var id = new URLSearchParams(location.search).get('id');
+    location.replace(id ? 'service-edit.html?id=' + id : 'service-add.html');
+  </script>
+</head>
+<body><p>Redirecting...</p></body>
+</html>
