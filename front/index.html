@@ -3,16 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Just Goom LLP — Discover Movies, Categories & More</title>
-  <meta name="description" content="JustGoom — Your destination for trending categories, movies, health tools, and expert blogs.">
+  <title>Just Goom LLP — India's B2B Business Discovery Platform</title>
+  <meta name="description" content="JustGoom — Connect with verified business profiles, browse categories, and grow your business across India.">
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body>
+<body class="home-b2b">
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="container top-bar-inner">
+      <div class="top-bar-left">
+        <a href="tel:+919876543210">📞 +91 98765 43210</a>
+        <a href="mailto:info@justgoom.com">✉ info@justgoom.com</a>
+      </div>
+      <div class="top-bar-right">
+        <a href="register.html" class="top-bar-cta">+ List Your Business Free</a>
+      </div>
+    </div>
+  </div>
 
   <!-- Header -->
   <header class="site-header">
     <div class="container header-inner">
-      <a href="index.html" class="logo">JustGoom</a>
+      <a href="index.html" class="logo logo-wrap">
+        <img src="assets/images/justgoom-logo.png" alt="JustGoom" class="logo-img">
+      </a>
       <nav class="main-nav">
         <a href="index.html" class="active">Home</a>
         <a href="about.html">About Us</a>
@@ -50,30 +65,88 @@
     </div>
   </div>
 
-  <!-- Hero Banner -->
-  <section class="hero">
-    <div class="container hero-layout">
-      <div class="hero-content">
-        <div class="hero-badge">India's Local Discovery Platform</div>
-        <h1>Discover Everything You Need in One Place</h1>
-        <p>Explore trending categories, latest movies, health tools, and expert blogs — all curated for you on JustGoom.</p>
-        <div class="hero-search">
-          <input type="text" placeholder="Search categories, movies, blogs...">
-          <button class="btn btn-accent">Search</button>
+  <!-- B2B Hero -->
+  <section class="hero b2b-hero">
+    <div class="container">
+      <div class="b2b-hero-inner">
+        <div class="b2b-hero-content">
+          <div class="hero-badge">India's B2B Business Discovery Platform</div>
+          <h1>Connect Buyers with Verified Business Profiles</h1>
+          <p>Discover trusted suppliers, service providers, and local businesses — all in one place. Search by category, city, or business name.</p>
+
+          <div class="b2b-search-box">
+            <div class="b2b-search-tabs">
+              <button type="button" class="active" data-tab="find">Find Businesses</button>
+              <button type="button" data-tab="post">Post Requirement</button>
+            </div>
+            <form class="b2b-search-form" action="all_profiles.html" method="get">
+              <div class="b2b-search-field">
+                <label for="b2bKeyword">What are you looking for?</label>
+                <input type="text" id="b2bKeyword" name="q" placeholder="Business name, category, or service...">
+              </div>
+              <div class="b2b-search-field b2b-search-location">
+                <label for="b2bCity">City</label>
+                <input type="text" id="b2bCity" name="city" placeholder="Enter city...">
+              </div>
+              <button type="submit" class="btn btn-accent b2b-search-btn">Search</button>
+            </form>
+          </div>
+
+          <div class="b2b-hero-actions">
+            <a href="all_profiles.html" class="btn btn-primary btn-lg">Browse All Profiles</a>
+            <a href="register.html" class="btn btn-outline-light btn-lg">Register Your Business</a>
+          </div>
+
+          <div class="b2b-trust-badges">
+            <span>✓ Verified Profiles</span>
+            <span>✓ Free Business Listing</span>
+            <span>✓ Pan-India Coverage</span>
+          </div>
         </div>
-      </div>
-      <div class="hero-image">
-        <img src="assets/images/hero-banner.jpg" alt="Discover on JustGoom">
+        <div class="b2b-hero-visual">
+          <div class="b2b-hero-card b2b-hero-card-1">
+            <span class="b2b-card-icon">🏢</span>
+            <strong>30+</strong>
+            <span>Verified Businesses</span>
+          </div>
+          <div class="b2b-hero-card b2b-hero-card-2">
+            <span class="b2b-card-icon">📂</span>
+            <strong>24+</strong>
+            <span>Business Sectors</span>
+          </div>
+          <div class="b2b-hero-card b2b-hero-card-3">
+            <span class="b2b-card-icon">📍</span>
+            <strong>50+</strong>
+            <span>Cities Covered</span>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Company Profiles (card grid) -->
+  <!-- All Categories — Globy-style sectors -->
+  <section class="globy-sectors-section home-sectors" id="categories">
+    <div class="container">
+      <div class="globy-sectors-header">
+        <div>
+          <h2 class="globy-sectors-title">Wide range of business sectors</h2>
+          <p class="globy-sectors-subtitle">Explore categories with offers from verified suppliers across India</p>
+        </div>
+      </div>
+      <div class="globy-sectors-grid" id="homeSectorsGrid"></div>
+      <div class="globy-sectors-footer">
+        <span id="homeSectorsFooterCount"></span>
+        <a href="categories.html" class="globy-view-all">View all categories →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Company Profiles -->
   <section class="company-profiles-section" id="companies">
     <div class="container">
       <div class="section-header">
         <div>
-          <h2 class="section-title">Company Profiles</h2>
+          <h2 class="section-title">Featured Business Profiles</h2>
           <p class="section-subtitle">Browse verified business profiles — showing 12 listings</p>
         </div>
         <a href="all_profiles.html" class="view-all-link">View All →</a>
@@ -98,253 +171,144 @@
     </div>
   </section>
 
-  <!-- Stats Bar -->
-  <div class="stats-bar">
-    <div class="container stats-grid">
-      <div class="stat-item">
-        <div class="stat-num">2M+</div>
-        <div class="stat-label">Listings</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-num">500+</div>
-        <div class="stat-label">Categories</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-num">10K+</div>
-        <div class="stat-label">Movies</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-num">1.5M+</div>
-        <div class="stat-label">Happy Users</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Top Trending Categories -->
-  <section class="section" id="categories">
+  <!-- Profile Steps Flow -->
+  <section class="profile-flow-section">
     <div class="container">
-      <div class="section-header">
+      <div class="profile-flow-header">
         <div>
-          <h2 class="section-title">Top Trending Categories</h2>
-          <p class="section-subtitle">Most popular categories this week</p>
+          <h2 class="section-title">How the Profile Journey Works</h2>
+          <p class="section-subtitle">From registration to listing to inquiry — grow your business in 3 simple steps</p>
         </div>
-        <a href="categories.html" class="view-all-link">View All →</a>
+        <div class="profile-flow-tabs" role="tablist">
+          <button type="button" class="active" data-flow="seller" role="tab" aria-selected="true">For Sellers</button>
+          <button type="button" data-flow="buyer" role="tab" aria-selected="false">For Buyers</button>
+        </div>
       </div>
-      <div class="category-grid">
-        <a href="all_profiles.html" class="category-card">
-          <div class="category-thumb"><img src="assets/images/cat-real-estate.jpg" alt="Real Estate"></div>
-          <h3>Real Estate</h3>
-          <span>1,240 listings</span>
-        </a>
-        <a href="all_profiles.html" class="category-card">
-          <div class="category-thumb"><img src="assets/images/cat-health.jpg" alt="Health & Wellness"></div>
-          <h3>Health & Wellness</h3>
-          <span>890 listings</span>
-        </a>
-        <a href="all_profiles.html" class="category-card">
-          <div class="category-thumb"><img src="assets/images/cat-entertainment.jpg" alt="Entertainment"></div>
-          <h3>Entertainment</h3>
-          <span>2,100 listings</span>
-        </a>
-        <a href="all_profiles.html" class="category-card">
-          <div class="category-thumb"><img src="assets/images/cat-education.jpg" alt="Education"></div>
-          <h3>Education</h3>
-          <span>650 listings</span>
-        </a>
-        <a href="all_profiles.html" class="category-card">
-          <div class="category-thumb"><img src="assets/images/cat-shopping.jpg" alt="Shopping"></div>
-          <h3>Shopping</h3>
-          <span>1,580 listings</span>
-        </a>
-        <a href="all_profiles.html" class="category-card">
-          <div class="category-thumb"><img src="assets/images/cat-automobile.jpg" alt="Automobile"></div>
-          <h3>Automobile</h3>
-          <span>720 listings</span>
-        </a>
-        <a href="all_profiles.html" class="category-card">
-          <div class="category-thumb"><img src="assets/images/cat-food.jpg" alt="Food & Dining"></div>
-          <h3>Food & Dining</h3>
-          <span>980 listings</span>
-        </a>
-        <a href="all_profiles.html" class="category-card">
-          <div class="category-thumb"><img src="assets/images/cat-business.jpg" alt="Business Services"></div>
-          <h3>Business Services</h3>
-          <span>430 listings</span>
-        </a>
-        <a href="all_profiles.html" class="category-card">
-          <div class="category-thumb"><img src="assets/images/cat-business.jpg" alt="Business Services"></div>
-          <h3>Business Services</h3>
-          <span>430 listings</span>
-        </a>
-        <a href="all_profiles.html" class="category-card">
-          <div class="category-thumb"><img src="assets/images/cat-business.jpg" alt="Business Services"></div>
-          <h3>Business Services</h3>
-          <span>430 listings</span>
-        </a>
-        <a href="all_profiles.html" class="category-card">
-          <div class="category-thumb"><img src="assets/images/cat-business.jpg" alt="Business Services"></div>
-          <h3>Business Services</h3>
-          <span>430 listings</span>
-        </a>
-        <a href="all_profiles.html" class="category-card">
-          <div class="category-thumb"><img src="assets/images/cat-business.jpg" alt="Business Services"></div>
-          <h3>Business Services</h3>
-          <span>430 listings</span>
-        </a>
+
+      <!-- Seller Flow -->
+      <div class="profile-flow-track active" id="flowSeller" data-flow-panel="seller">
+        <div class="profile-flow-steps">
+          <div class="profile-flow-step">
+            <div class="profile-flow-step-badge">Step 1</div>
+            <div class="profile-flow-step-icon">📝</div>
+            <h3>Register Profile</h3>
+            <p>Create your free business account. Add company details, category, services, and contact information.</p>
+            <a href="register.html" class="profile-flow-link">Register Now →</a>
+          </div>
+          <div class="profile-flow-connector" aria-hidden="true">
+            <span class="profile-flow-line"></span>
+            <span class="profile-flow-arrow">→</span>
+          </div>
+          <div class="profile-flow-step">
+            <div class="profile-flow-step-badge">Step 2</div>
+            <div class="profile-flow-step-icon">📋</div>
+            <h3>Get Listed</h3>
+            <p>Your profile goes live on JustGoom. Appear in category search, city filters, and featured listings.</p>
+            <a href="all_profiles.html" class="profile-flow-link">View Listings →</a>
+          </div>
+          <div class="profile-flow-connector" aria-hidden="true">
+            <span class="profile-flow-line"></span>
+            <span class="profile-flow-arrow">→</span>
+          </div>
+          <div class="profile-flow-step profile-flow-step-highlight">
+            <div class="profile-flow-step-badge">Step 3</div>
+            <div class="profile-flow-step-icon">📩</div>
+            <h3>Receive Inquiries</h3>
+            <p>Buyers discover your profile and send inquiries. Connect directly and convert leads into customers.</p>
+            <a href="contact.html" class="profile-flow-link">Learn More →</a>
+          </div>
+        </div>
+        <div class="profile-flow-cta">
+          <a href="register.html" class="btn btn-accent btn-lg">List Your Business Free</a>
+          <span class="profile-flow-cta-note">100% Free · No credit card required</span>
+        </div>
+      </div>
+
+      <!-- Buyer Flow -->
+      <div class="profile-flow-track" id="flowBuyer" data-flow-panel="buyer" hidden>
+        <div class="profile-flow-steps">
+          <div class="profile-flow-step">
+            <div class="profile-flow-step-badge">Step 1</div>
+            <div class="profile-flow-step-icon">🔍</div>
+            <h3>Browse Profiles</h3>
+            <p>Search by category, city, or business name. Explore verified profiles across 24+ business sectors.</p>
+            <a href="all_profiles.html" class="profile-flow-link">Browse Profiles →</a>
+          </div>
+          <div class="profile-flow-connector" aria-hidden="true">
+            <span class="profile-flow-line"></span>
+            <span class="profile-flow-arrow">→</span>
+          </div>
+          <div class="profile-flow-step">
+            <div class="profile-flow-step-badge">Step 2</div>
+            <div class="profile-flow-step-icon">👁️</div>
+            <h3>View Listing Details</h3>
+            <p>Check services, location, verification status, and business info before you reach out.</p>
+            <a href="all_profiles.html" class="profile-flow-link">View a Profile →</a>
+          </div>
+          <div class="profile-flow-connector" aria-hidden="true">
+            <span class="profile-flow-line"></span>
+            <span class="profile-flow-arrow">→</span>
+          </div>
+          <div class="profile-flow-step profile-flow-step-highlight">
+            <div class="profile-flow-step-badge">Step 3</div>
+            <div class="profile-flow-step-icon">💬</div>
+            <h3>Send Inquiry</h3>
+            <p>Contact the business directly or post your requirement to get matched with the right supplier.</p>
+            <a href="contact.html" class="profile-flow-link">Post Requirement →</a>
+          </div>
+        </div>
+        <div class="profile-flow-cta">
+          <a href="contact.html" class="btn btn-primary btn-lg">Post Your Requirement</a>
+          <span class="profile-flow-cta-note">Get matched with verified businesses</span>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Movies Listing -->
-  <section class="section section-alt" id="movies">
-    <div class="container">
-      <div class="section-header">
-        <div>
-          <h2 class="section-title">Latest Movies</h2>
-          <p class="section-subtitle">Trending movies you shouldn't miss</p>
-        </div>
-        <a href="#" class="view-all-link">View All →</a>
+  <!-- Stats Bar -->
+  <div class="stats-bar">
+    <div class="container stats-grid">
+      <div class="stat-item">
+        <div class="stat-num">30+</div>
+        <div class="stat-label">Verified Businesses</div>
       </div>
-      <div class="movie-grid">
-        <article class="movie-card">
-          <div class="movie-poster">
-            <img src="assets/images/movie-1.jpg" alt="Interstellar">
-            <span class="movie-badge">New</span>
-            <span class="movie-rating">★ 8.7</span>
-          </div>
-          <div class="movie-info">
-            <h3>Interstellar</h3>
-            <div class="movie-meta">
-              <span>🎭 Sci-Fi</span>
-              <span>2024</span>
-            </div>
-          </div>
-        </article>
-        <article class="movie-card">
-          <div class="movie-poster">
-            <img src="assets/images/movie-2.jpg" alt="The Dark Knight">
-            <span class="movie-rating">★ 9.0</span>
-          </div>
-          <div class="movie-info">
-            <h3>The Dark Knight</h3>
-            <div class="movie-meta">
-              <span>🎭 Action</span>
-              <span>2024</span>
-            </div>
-          </div>
-        </article>
-        <article class="movie-card">
-          <div class="movie-poster">
-            <img src="assets/images/movie-3.jpg" alt="Inception">
-            <span class="movie-badge">Hot</span>
-            <span class="movie-rating">★ 8.8</span>
-          </div>
-          <div class="movie-info">
-            <h3>Inception</h3>
-            <div class="movie-meta">
-              <span>🎭 Thriller</span>
-              <span>2024</span>
-            </div>
-          </div>
-        </article>
-        <article class="movie-card">
-          <div class="movie-poster">
-            <img src="assets/images/movie-4.jpg" alt="Avatar">
-            <span class="movie-rating">★ 7.9</span>
-          </div>
-          <div class="movie-info">
-            <h3>Avatar: The Way of Water</h3>
-            <div class="movie-meta">
-              <span>🎭 Adventure</span>
-              <span>2024</span>
-            </div>
-          </div>
-        </article>
-        <article class="movie-card">
-          <div class="movie-poster">
-            <img src="assets/images/movie-5.jpg" alt="Oppenheimer">
-            <span class="movie-badge">New</span>
-            <span class="movie-rating">★ 8.5</span>
-          </div>
-          <div class="movie-info">
-            <h3>Oppenheimer</h3>
-            <div class="movie-meta">
-              <span>🎭 Drama</span>
-              <span>2024</span>
-            </div>
-          </div>
-        </article>
-        <article class="movie-card">
-          <div class="movie-poster">
-            <img src="assets/images/movie-6.jpg" alt="Dune">
-            <span class="movie-rating">★ 8.2</span>
-          </div>
-          <div class="movie-info">
-            <h3>Dune: Part Two</h3>
-            <div class="movie-meta">
-              <span>🎭 Sci-Fi</span>
-              <span>2024</span>
-            </div>
-          </div>
-        </article>
-        <article class="movie-card">
-          <div class="movie-poster">
-            <img src="assets/images/movie-6.jpg" alt="Dune">
-            <span class="movie-rating">★ 8.2</span>
-          </div>
-          <div class="movie-info">
-            <h3>Dune: Part Two</h3>
-            <div class="movie-meta">
-              <span>🎭 Sci-Fi</span>
-              <span>2024</span>
-            </div>
-          </div>
-        </article>
-        <article class="movie-card">
-          <div class="movie-poster">
-            <img src="assets/images/movie-6.jpg" alt="Dune">
-            <span class="movie-rating">★ 8.2</span>
-          </div>
-          <div class="movie-info">
-            <h3>Dune: Part Two</h3>
-            <div class="movie-meta">
-              <span>🎭 Sci-Fi</span>
-              <span>2024</span>
-            </div>
-          </div>
-        </article>
-        <article class="movie-card">
-          <div class="movie-poster">
-            <img src="assets/images/movie-6.jpg" alt="Dune">
-            <span class="movie-rating">★ 8.2</span>
-          </div>
-          <div class="movie-info">
-            <h3>Dune: Part Two</h3>
-            <div class="movie-meta">
-              <span>🎭 Sci-Fi</span>
-              <span>2024</span>
-            </div>
-          </div>
-        </article>
-        <article class="movie-card">
-          <div class="movie-poster">
-            <img src="assets/images/movie-6.jpg" alt="Dune">
-            <span class="movie-rating">★ 8.2</span>
-          </div>
-          <div class="movie-info">
-            <h3>Dune: Part Two</h3>
-            <div class="movie-meta">
-              <span>🎭 Sci-Fi</span>
-              <span>2024</span>
-            </div>
-          </div>
-        </article>
+      <div class="stat-item">
+        <div class="stat-num">24+</div>
+        <div class="stat-label">Business Sectors</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">50+</div>
+        <div class="stat-label">Cities Covered</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">10K+</div>
+        <div class="stat-label">Monthly Inquiries</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dual CTA -->
+  <section class="section b2b-dual-cta">
+    <div class="container">
+      <div class="b2b-cta-grid">
+        <div class="b2b-cta-card b2b-cta-buyer">
+          <span class="b2b-cta-label">For Buyers</span>
+          <h3>Post Your Requirement</h3>
+          <p>Tell us what you need and connect with verified businesses across India.</p>
+          <a href="contact.html" class="btn btn-accent">Post Requirement →</a>
+        </div>
+        <div class="b2b-cta-card b2b-cta-seller">
+          <span class="b2b-cta-label">For Sellers</span>
+          <h3>List Your Business Free</h3>
+          <p>Reach thousands of buyers. Create your profile and grow your business on JustGoom.</p>
+          <a href="register.html" class="btn btn-primary">Register Now →</a>
+        </div>
       </div>
     </div>
   </section>
 
   <!-- Health Calculator CTA -->
-  <section class="section" id="calculator">
+  <section class="section section-alt" id="calculator">
     <div class="container">
       <div class="cta-banner">
         <div>
@@ -361,8 +325,8 @@
     <div class="container">
       <div class="section-header">
         <div>
-          <h2 class="section-title">Latest Blogs</h2>
-          <p class="section-subtitle">Insights, tips, and stories from our experts</p>
+          <h2 class="section-title">Business Insights & Blogs</h2>
+          <p class="section-subtitle">Tips, trends, and stories for growing your business</p>
         </div>
         <a href="blogs.html" class="view-all-link">View All →</a>
       </div>
@@ -403,12 +367,12 @@
         </a>
         <a href="blogs.html" class="blog-card blog-card-link">
           <div class="blog-thumb">
-            <img src="assets/images/blog-3.jpg" alt="Movie review">
+            <img src="assets/images/blog-3.jpg" alt="Business growth">
           </div>
           <div class="blog-body">
-            <span class="blog-tag">Entertainment</span>
-            <h3>Top 15 Must-Watch Movies Releasing This Summer</h3>
-            <p>From blockbuster sequels to indie gems, here's our curated list of the hottest movies hitting screens.</p>
+            <span class="blog-tag">Business</span>
+            <h3>5 Ways to Grow Your Local Business Online in 2026</h3>
+            <p>From listing optimization to customer engagement — practical strategies for MSMEs and startups.</p>
             <div class="blog-footer">
               <div class="blog-author">
                 <span class="blog-author-avatar">AM</span>
@@ -427,7 +391,7 @@
     <div class="container section-blurb">
       <h2 class="section-title">About Just Goom LLP</h2>
       <p class="section-subtitle">
-        Just Goom LLP is India's leading local discovery platform — connecting millions of users with trusted categories, movies, health resources, and expert content.
+        Just Goom LLP is India's leading B2B business discovery platform — connecting buyers with verified suppliers, service providers, and local businesses across the country.
       </p>
       <a href="about.html" class="btn btn-outline-primary" style="margin-top:24px;">Learn More About Us</a>
     </div>
@@ -438,8 +402,10 @@
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
-          <a href="index.html" class="logo logo-footer">JustGoom</a>
-          <p>Just Goom LLP — Your trusted platform for discovering categories, movies, health tools, and expert blogs across India.</p>
+          <a href="index.html" class="logo logo-footer logo-wrap">
+            <img src="assets/images/justgoom-logo.png" alt="JustGoom" class="logo-img logo-img-footer">
+          </a>
+          <p>Just Goom LLP — Your trusted B2B platform for discovering verified business profiles, categories, and expert content across India.</p>
           <div class="footer-social">
             <a href="#" aria-label="Facebook">f</a>
             <a href="#" aria-label="Twitter">𝕏</a>
@@ -493,7 +459,42 @@
     </div>
   </footer>
 
+  <script src="assets/js/categories-data.js"></script>
+  <script src="assets/js/categories-render.js"></script>
   <script src="assets/js/company-profiles.js"></script>
   <script src="assets/js/main.js"></script>
+  <script>
+    document.querySelectorAll('.b2b-search-tabs button').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.b2b-search-tabs button').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        var form = document.querySelector('.b2b-search-form');
+        if (btn.dataset.tab === 'post') {
+          form.action = 'contact.html';
+          document.getElementById('b2bKeyword').placeholder = 'Describe your requirement...';
+        } else {
+          form.action = 'all_profiles.html';
+          document.getElementById('b2bKeyword').placeholder = 'Business name, category, or service...';
+        }
+      });
+    });
+
+    document.querySelectorAll('.profile-flow-tabs button').forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        var flow = tab.dataset.flow;
+        document.querySelectorAll('.profile-flow-tabs button').forEach(function(t) {
+          t.classList.remove('active');
+          t.setAttribute('aria-selected', 'false');
+        });
+        tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
+        document.querySelectorAll('.profile-flow-track').forEach(function(panel) {
+          var isActive = panel.dataset.flowPanel === flow;
+          panel.classList.toggle('active', isActive);
+          panel.hidden = !isActive;
+        });
+      });
+    });
+  </script>
 </body>
 </html>
