@@ -985,8 +985,18 @@ html[data-theme="dark"] .user-delete-card h2 {
   font-size: 32px;
   font-weight: 800;
   color: var(--user-primary);
-  margin-bottom: 16px;
+  margin-bottom: 8px;
   letter-spacing: -0.03em;
+}
+.user-plan-discount {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--user-accent, #e67e22);
+  margin: 0 0 16px;
+}
+.user-plan-discount s {
+  color: var(--user-muted);
+  font-weight: 400;
 }
 .user-plan-card ul {
   text-align: left;

@@ -4636,6 +4636,13 @@ a.categories-menu-item { color: inherit; }
   color: var(--primary);
 }
 .plan-price span { font-size: 14px; font-weight: 500; color: var(--text-muted); }
+.plan-discount {
+  font-size: 13px;
+  color: var(--accent);
+  font-weight: 600;
+  margin-top: 6px;
+}
+.plan-discount s { color: var(--text-muted); font-weight: 400; margin-right: 4px; }
 .plan-features {
   list-style: none;
   flex: 1;
