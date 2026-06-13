@@ -205,18 +205,36 @@ function initContactForm() {
 }
 
 function initAuthRegister() {
-  const toggle = document.querySelector('.auth-type-toggle');
-  const companyField = document.querySelector('.auth-field-business');
-  if (!toggle || !companyField) return;
+  initRegisterCategories();
+}
 
-  const companyInput = companyField.querySelector('input');
-  toggle.querySelectorAll('button').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      toggle.querySelectorAll('button').forEach(function(b) { b.classList.remove('active'); });
-      btn.classList.add('active');
-      var isSeller = btn.dataset.type === 'seller';
-      companyField.style.display = isSeller ? '' : 'none';
-      if (companyInput) companyInput.required = isSeller;
+function initRegisterCategories() {
+  var categorySelect = document.getElementById('regCategory');
+  var subCategorySelect = document.getElementById('regSubCategory');
+  if (!categorySelect || !subCategorySelect || typeof CATEGORY_SECTORS === 'undefined') return;
+
+  CATEGORY_SECTORS.forEach(function(sector) {
+    var option = document.createElement('option');
+    option.value = sector.slug;
+    option.textContent = sector.name;
+    categorySelect.appendChild(option);
+  });
+
+  categorySelect.addEventListener('change', function() {
+    var slug = categorySelect.value;
+    subCategorySelect.innerHTML = '<option value="">Select sub category</option>';
+    subCategorySelect.disabled = !slug;
+
+    if (!slug) return;
+
+    var sector = CATEGORY_SECTORS.find(function(s) { return s.slug === slug; });
+    if (!sector) return;
+
+    sector.subs.forEach(function(sub) {
+      var option = document.createElement('option');
+      option.value = sub.slug;
+      option.textContent = sub.name;
+      subCategorySelect.appendChild(option);
     });
   });
 }
@@ -242,6 +260,11 @@ function initAuthForms() {
       }
       alert('Account created successfully! (Demo — connect to backend API)');
       registerForm.reset();
+      var subCategorySelect = document.getElementById('regSubCategory');
+      if (subCategorySelect) {
+        subCategorySelect.innerHTML = '<option value="">Select sub category</option>';
+        subCategorySelect.disabled = true;
+      }
     });
   }
 }
