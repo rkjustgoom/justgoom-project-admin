@@ -1,0 +1,83 @@
+<?php
+
+namespace App\Http\Controllers\Front\Auth;
+
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Front\RegisterRequest;
+use App\Models\Category;
+use App\Models\CompanyProfile;
+use App\Services\Front\RegisterService;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+
+class RegisterController extends Controller
+{
+    public function __construct(private RegisterService $registerService)
+    {
+    }
+
+    public function show()
+    {
+        $categories = Category::query()
+            ->where('status', 1)
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
+        $registerOld = [
+            'category_id' => old('category_id'),
+            'sub_category_id' => old('sub_category_id'),
+        ];
+
+        return view('front.auth.register', compact('categories', 'registerOld'));
+    }
+
+    public function subCategories(Category $category): JsonResponse
+    {
+        $subCategories = $category->subCategories()
+            ->where('status', 1)
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
+        return response()->json($subCategories);
+    }
+
+    public function checkSlug(Request $request): JsonResponse
+    {
+        $slug = strtolower(trim((string) $request->query('slug', '')));
+
+        if ($slug === '') {
+            return response()->json([
+                'available' => false,
+                'message' => 'Company slug is required.',
+            ]);
+        }
+
+        if (! preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $slug)) {
+            return response()->json([
+                'available' => false,
+                'message' => 'Slug may only contain lowercase letters, numbers, and hyphens.',
+            ]);
+        }
+
+        $exists = CompanyProfile::query()->where('slug', $slug)->exists();
+
+        return response()->json([
+            'available' => ! $exists,
+            'message' => $exists
+                ? 'This company slug is already taken. Please choose another.'
+                : 'This slug is available.',
+        ]);
+    }
+
+    public function store(RegisterRequest $request)
+    {
+        $user = $this->registerService->register($request->validated());
+
+        event(new Registered($user));
+
+        return redirect()
+            ->route('front.login')
+            ->with('success', 'Registration successful! Please verify your email — we sent a verification link to your inbox.');
+    }
+}

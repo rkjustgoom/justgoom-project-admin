@@ -156,7 +156,8 @@ function initUserTheme() {
 }
 
 function initUserSession() {
-  var name = sessionStorage.getItem('jg_user_name') || 'Shree Gold Jewellers';
+  var user = window.JG_USER || {};
+  var name = user.name || sessionStorage.getItem('jg_user_name') || 'User';
   document.querySelectorAll('[data-user-name]').forEach(function(el) {
     el.textContent = name;
   });
@@ -170,10 +171,12 @@ function initUserSession() {
 }
 
 function userLogout() {
-  sessionStorage.removeItem('jg_user_name');
-  sessionStorage.removeItem('jg_user_email');
-  sessionStorage.removeItem('jg_user_logged_in');
-  window.location.href = '../login.html';
+  var form = document.getElementById('frontLogoutForm');
+  if (form) {
+    form.submit();
+    return;
+  }
+  window.location.href = '/login';
 }
 
 function userSaveLogin(email) {

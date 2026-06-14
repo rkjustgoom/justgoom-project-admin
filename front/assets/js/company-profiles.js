@@ -56,6 +56,7 @@ function getCompanyInitials(name) {
 }
 
 function formatAddedTime(days) {
+  days = Math.max(0, Math.floor(Number(days) || 0));
   if (days === 0) return 'Added today';
   if (days === 1) return 'Added yesterday';
   if (days <= 7) return 'Added ' + days + ' days ago';

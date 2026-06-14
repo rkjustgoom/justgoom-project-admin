@@ -20,9 +20,15 @@
         </div>
 
         <form class="auth-form auth-form-compact" id="registerForm">
-          <div class="form-group">
-            <label for="regCompany">Company Name <span class="req">*</span></label>
-            <input type="text" id="regCompany" name="company_name" class="form-input" placeholder="Your company name" required>
+          <div class="auth-form-row">
+            <div class="form-group">
+              <label for="regCompany">Company Name <span class="req">*</span></label>
+              <input type="text" id="regCompany" name="company_name" class="form-input" placeholder="Your company name" required>
+            </div>
+            <div class="form-group">
+              <label for="regSlug">Company Slug <span class="req">*</span></label>
+              <input type="text" id="regSlug" name="company_slug" class="form-input" placeholder="your-company-name" required>
+            </div>
           </div>
           <div class="auth-form-row">
             <div class="form-group">
@@ -70,6 +76,10 @@
               <label for="regConfirm">Confirm Password <span class="req">*</span></label>
               <input type="password" id="regConfirm" name="password_confirmation" class="form-input" placeholder="Confirm password" required>
             </div>
+          </div>
+          <div class="form-group">
+            <label for="regReferral">Referral Code</label>
+            <input type="text" id="regReferral" name="referral_code" class="form-input" placeholder="Enter referral code (optional)">
           </div>
           <label class="auth-terms">
             <input type="checkbox" required>
