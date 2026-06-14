@@ -1,5 +1,6 @@
 /* JustGoom Front — Main JS */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadIncludes();
   initMobileNav();
   initTabs();
   initProfileTabs();
@@ -244,6 +245,13 @@ function initAuthForms() {
   if (loginForm) {
     loginForm.addEventListener('submit', function(e) {
       e.preventDefault();
+      var emailEl = document.getElementById('loginEmail');
+      var email = emailEl ? emailEl.value.trim() : '';
+      if (typeof userSaveLogin === 'function' && email) {
+        userSaveLogin(email);
+        window.location.href = 'users/index.html';
+        return;
+      }
       alert('Login successful! (Demo — connect to backend API)');
     });
   }

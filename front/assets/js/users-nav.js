@@ -5,51 +5,11 @@
     document.documentElement.setAttribute('data-theme', 'dark');
   }
 
-  var NAV = [
-    {
-      heading: 'Overview',
-      items: [
-        { page: 'dashboard', href: 'index.html', icon: '📊', label: 'Dashboard' },
-        { page: 'analytics', href: 'analytics.html', icon: '📈', label: 'Visitor Analytics' }
-      ]
-    },
-    {
-      heading: 'My Business',
-      items: [
-        { page: 'profile', href: 'profile.html', icon: '👤', label: 'My Profile' },
-        { page: 'team', href: 'team.html', icon: '👥', label: 'My Team' },
-        { page: 'services', href: 'services.html', icon: '💼', label: 'My Services' },
-        { page: 'documents', href: 'documents.html', icon: '📄', label: 'My Document' }
-      ]
-    },
-    {
-      heading: 'Marketing',
-      items: [
-        { page: 'banners', href: 'banners.html', icon: '🖼', label: 'My Banner' },
-        { page: 'videos', href: 'videos.html', icon: '🎬', label: 'My Video' },
-        { page: 'articles', href: 'articles.html', icon: '📝', label: 'My Articles' }
-      ]
-    },
-    {
-      heading: 'Engagement',
-      items: [
-        { page: 'inquiries', href: 'inquiries.html', icon: '💬', label: 'My Inquiry' },
-        { page: 'notifications', href: 'notifications.html', icon: '✉', label: 'My Notification' },
-        { page: 'reviews', href: 'reviews.html', icon: '⭐', label: 'My Review' }
-      ]
-    },
-    {
-      heading: 'Account',
-      items: [
-        { page: 'subscription', href: 'subscription.html', icon: '💎', label: 'Subscription' },
-        { page: 'change-password', href: 'change-password.html', icon: '🔑', label: 'Change Password' }
-      ]
+  document.addEventListener('DOMContentLoaded', async function() {
+    if (typeof loadUserIncludes === 'function') {
+      await loadUserIncludes();
     }
-  ];
-
-  document.addEventListener('DOMContentLoaded', function() {
     renderTopBar();
-    renderSidebar();
     renderHeaderExtras();
     setPageTitle();
   });
@@ -72,36 +32,6 @@
       '</div>';
 
     main.insertBefore(bar, main.firstChild);
-  }
-
-  function renderSidebar() {
-    var el = document.getElementById('userSidebar');
-    if (!el) return;
-
-    var current = document.body.getAttribute('data-page') || 'dashboard';
-    var html = '';
-
-    html += '<button type="button" class="user-sidebar-close" aria-label="Close menu">✕</button>';
-    html += '<div class="user-sidebar-brand"><a href="index.html"><img src="../assets/images/justgoom-logo.png" alt="JustGoom"></a></div>';
-    html += '<div class="user-sidebar-plan"><span class="user-sidebar-plan-icon">💎</span><div><strong>Platinum Plan</strong><span>All features unlocked</span></div></div>';
-    html += '<nav>';
-
-    NAV.forEach(function(section) {
-      html += '<div class="user-nav-section"><div class="user-nav-heading">' + section.heading + '</div>';
-      section.items.forEach(function(item) {
-        var cls = 'user-nav-link' + (item.page === current ? ' active' : '');
-        html += '<a href="' + item.href + '" class="' + cls + '"><span class="nav-icon">' + item.icon + '</span>' + item.label + '</a>';
-      });
-      html += '</div>';
-    });
-
-    html += '</nav>';
-    html += '<div class="user-sidebar-footer">';
-    html += '<a href="../index.html">🌐 View Public Site</a>';
-    html += '<a href="../login.html" onclick="userLogout(); return false;">🚪 Logout</a>';
-    html += '</div>';
-
-    el.innerHTML = html;
   }
 
   function renderHeaderExtras() {

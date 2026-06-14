@@ -8,17 +8,8 @@
 </head>
 <body class="user-panel-body user-crud-form" data-page="team" data-module="team" data-title="My Team">
 
-<div class="user-sidebar-overlay"></div>
-<div class="user-wrap">
-  <aside class="user-sidebar" id="userSidebar"></aside>
-  <div class="user-main">
-    <header class="user-page-header">
-      <div class="user-page-header-left">
-        <button type="button" class="user-menu-btn" aria-label="Menu">☰</button>
-        <h1 class="user-greeting"><strong data-user-name>Shree Gold Jewellers</strong></h1>
-      </div>
-      <span class="user-page-title">My Team</span>
-    </header>
+<div data-user-layout="header" data-include="header.html"></div>
+
     <div class="user-content">
       <nav class="user-form-breadcrumb"><a href="team.html">My Team</a> <span>/</span> <span>Add Member</span></nav>
       <h2 class="user-form-page-title">Add Team Member</h2>
@@ -84,9 +75,9 @@
         </form>
       </div>
     </div>
-    <footer class="user-footer">© 2026 Just Goom LLP.</footer>
-  </div>
-</div>
+<div data-user-layout="footer" data-include="footer.html"></div>
+
+<script src="../assets/js/users-includes.js"></script>
 <script src="../assets/js/users-nav.js"></script>
 <script src="../assets/js/users.js"></script>
 <script src="../assets/js/user-crud.js"></script>

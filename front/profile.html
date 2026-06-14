@@ -7,62 +7,9 @@
   <meta name="description" content="View business profile, QR code sharing, and visitor analytics on JustGoom.">
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body class="profile-page">
+<body class="profile-page" data-page="all-profiles">
 
-  <div class="top-bar">
-    <div class="container top-bar-inner">
-      <div class="top-bar-left">
-        <a href="tel:+919876543210">📞 +91 98765 43210</a>
-        <a href="mailto:info@justgoom.com">✉ info@justgoom.com</a>
-      </div>
-      <div class="top-bar-right">
-        <a href="register.html" class="top-bar-cta">+ List Your Business Free</a>
-      </div>
-    </div>
-  </div>
-
-  <header class="site-header">
-    <div class="container header-inner">
-      <a href="index.html" class="logo logo-wrap">
-        <img src="assets/images/justgoom-logo.png" alt="JustGoom" class="logo-img">
-      </a>
-      <nav class="main-nav">
-        <a href="index.html">Home</a>
-        <a href="about.html">About Us</a>
-        <a href="categories.html">Categories</a>
-        <a href="all_profiles.html">All Profiles</a>
-        <a href="calculators.html">Calculators</a>
-        <a href="health.html">Health</a>
-        <a href="articles.html">Articles</a>
-        <a href="contact.html">Contact Us</a>
-      </nav>
-      <div class="header-actions">
-        <a href="login.html" class="btn btn-outline btn-sm">Login</a>
-        <a href="register.html" class="btn btn-accent btn-sm">Register</a>
-      </div>
-      <button class="mobile-toggle" aria-label="Open menu">☰</button>
-    </div>
-  </header>
-
-  <div class="mobile-nav">
-    <div class="mobile-nav-panel">
-      <button class="mobile-nav-close" aria-label="Close menu">✕</button>
-      <nav class="mobile-nav-links">
-        <a href="index.html">Home</a>
-        <a href="about.html">About Us</a>
-        <a href="categories.html">Categories</a>
-        <a href="all_profiles.html">All Profiles</a>
-        <a href="calculators.html">Calculators</a>
-        <a href="health.html">Health</a>
-        <a href="articles.html">Articles</a>
-        <a href="contact.html">Contact Us</a>
-      </nav>
-      <div class="mobile-nav-actions">
-        <a href="login.html" class="btn btn-outline btn-block">Login</a>
-        <a href="register.html" class="btn btn-accent btn-block">Register</a>
-      </div>
-    </div>
-  </div>
+  <div id="site-header" data-include="header.html"></div>
 
   <!-- Profile Completion Banner (Silver Plan onboarding) -->
   <div class="profile-completion-banner">
@@ -243,56 +190,9 @@
     </aside>
   </div>
 
-  <footer class="site-footer">
-    <div class="container">
-      <div class="footer-grid">
-        <div class="footer-brand">
-          <a href="index.html" class="logo logo-footer logo-wrap">
-            <img src="assets/images/justgoom-logo.png" alt="JustGoom" class="logo-img logo-img-footer">
-          </a>
-          <p>Just Goom LLP — Business profiles with QR sharing and visitor analytics.</p>
-          <div class="footer-social">
-            <a href="#" aria-label="Facebook">f</a>
-            <a href="#" aria-label="Twitter">𝕏</a>
-            <a href="#" aria-label="Instagram">📷</a>
-            <a href="#" aria-label="LinkedIn">in</a>
-          </div>
-        </div>
-        <div class="footer-col">
-          <h4>Quick Links</h4>
-          <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="all_profiles.html">All Profiles</a></li>
-            <li><a href="articles.html">Articles</a></li>
-            <li><a href="index.html#plans">Plans</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>Profile Features</h4>
-          <ul>
-            <li><a href="profile.html">Profile Homepage</a></li>
-            <li><a href="profile.html">QR Code Sharing</a></li>
-            <li><a href="profile.html">Visitor Analytics</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>Contact</h4>
-          <ul>
-            <li><a href="mailto:info@justgoom.com">info@justgoom.com</a></li>
-            <li><a href="contact.html">Contact Us</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <span>© 2026 Just Goom LLP. All rights reserved.</span>
-        <div class="footer-bottom-links">
-          <a href="#">Privacy</a>
-          <a href="#">Terms</a>
-        </div>
-      </div>
-    </div>
-  </footer>
+  <div id="site-footer" data-include="footer.html"></div>
 
+  <script src="assets/js/includes.js"></script>
   <script src="assets/js/main.js"></script>
 </body>
 </html>

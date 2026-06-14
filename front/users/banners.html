@@ -8,17 +8,8 @@
 </head>
 <body class="user-panel-body" data-page="banners" data-title="My Banner">
 
-<div class="user-sidebar-overlay"></div>
-<div class="user-wrap">
-  <aside class="user-sidebar" id="userSidebar"></aside>
-  <div class="user-main">
-    <header class="user-page-header">
-      <div class="user-page-header-left">
-        <button type="button" class="user-menu-btn" aria-label="Menu">☰</button>
-        <h1 class="user-greeting"><strong data-user-name>Shree Gold Jewellers</strong></h1>
-      </div>
-      <span class="user-page-title">My Banner</span>
-    </header>
+<div data-user-layout="header" data-include="header.html"></div>
+
     <div class="user-content">
       <div class="user-stat-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
         <div class="user-stat-card green"><span class="user-stat-icon">🖼</span><div class="user-stat-info"><h3>3</h3><span>Active Banners</span></div></div>
@@ -72,9 +63,9 @@
         </div>
       </div>
     </div>
-    <footer class="user-footer">© 2026 Just Goom LLP. Trademarks and brands are the property of their respective owners.</footer>
-  </div>
-</div>
+<div data-user-layout="footer" data-include="footer.html"></div>
+
+<script src="../assets/js/users-includes.js"></script>
 <script src="../assets/js/users-nav.js"></script>
 <script src="../assets/js/users.js"></script>
 </body>

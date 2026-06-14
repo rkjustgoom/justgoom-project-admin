@@ -7,52 +7,9 @@
   <meta name="description" content="Just Goom company profile — IT services, team, projects, and contact information on JustGoom.">
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body class="profile-page">
+<body class="profile-page" data-page="all-profiles">
 
-  <!-- Header -->
-  <header class="site-header">
-    <div class="container header-inner">
-      <a href="index.html" class="logo logo-wrap">
-        <img src="assets/images/justgoom-logo.png" alt="JustGoom" class="logo-img">
-      </a>
-      <nav class="main-nav">
-        <a href="index.html">Home</a>
-        <a href="about.html">About Us</a>
-        <a href="categories.html">Categories</a>
-        <a href="all_profiles.html" class="active">All Profiles</a>
-        <a href="calculators.html">Calculators</a>
-        <a href="health.html">Health</a>
-        <a href="articles.html">Articles</a>
-        <a href="contact.html">Contact Us</a>
-      </nav>
-      <div class="header-actions">
-        <a href="login.html" class="btn btn-outline btn-sm">Login</a>
-        <a href="register.html" class="btn btn-accent btn-sm">Register</a>
-      </div>
-      <button class="mobile-toggle" aria-label="Open menu">☰</button>
-    </div>
-  </header>
-
-  <!-- Mobile Nav -->
-  <div class="mobile-nav">
-    <div class="mobile-nav-panel">
-      <button class="mobile-nav-close" aria-label="Close menu">✕</button>
-      <nav class="mobile-nav-links">
-        <a href="index.html">Home</a>
-        <a href="about.html">About Us</a>
-        <a href="categories.html">Categories</a>
-        <a href="all_profiles.html">All Profiles</a>
-        <a href="calculators.html">Calculators</a>
-        <a href="health.html">Health</a>
-        <a href="articles.html">Articles</a>
-        <a href="contact.html">Contact Us</a>
-      </nav>
-      <div class="mobile-nav-actions">
-        <a href="login.html" class="btn btn-outline btn-block">Login</a>
-        <a href="register.html" class="btn btn-accent btn-block">Register</a>
-      </div>
-    </div>
-  </div>
+  <div id="site-header" data-include="header.html"></div>
 
   <!-- Profile Hero -->
   <section class="profile-hero">
@@ -329,61 +286,9 @@
 
   <button type="button" class="profile-fab" aria-label="Settings">⚙</button>
 
-  <!-- Footer -->
-  <footer class="site-footer">
-    <div class="container">
-      <div class="footer-grid">
-        <div class="footer-brand">
-          <a href="index.html" class="logo logo-footer logo-wrap">
-            <img src="assets/images/justgoom-logo.png" alt="JustGoom" class="logo-img logo-img-footer">
-          </a>
-          <p>Just Goom LLP — Your trusted platform for discovering categories, movies, health tools, and expert blogs across India.</p>
-          <div class="footer-social">
-            <a href="#">f</a>
-            <a href="#">𝕏</a>
-            <a href="#">📷</a>
-            <a href="#">in</a>
-          </div>
-        </div>
-        <div class="footer-col">
-          <h4>Quick Links</h4>
-          <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="all_profiles.html">All Profiles</a></li>
-            <li><a href="contact.html">Contact Us</a></li>
-            <li><a href="articles.html">Articles</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>Profile Categories</h4>
-          <ul>
-            <li><a href="all_profiles.html">Real Estate</a></li>
-            <li><a href="all_profiles.html">Health</a></li>
-            <li><a href="all_profiles.html">Entertainment</a></li>
-            <li><a href="all_profiles.html">Business</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>Top Cities</h4>
-          <ul>
-            <li><a href="all_profiles.html">Ahmedabad</a></li>
-            <li><a href="all_profiles.html">Delhi</a></li>
-            <li><a href="all_profiles.html">Mumbai</a></li>
-            <li><a href="all_profiles.html">Bangalore</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <span>© 2026 Just Goom LLP. All rights reserved.</span>
-        <div class="footer-bottom-links">
-          <a href="#">Privacy</a>
-          <a href="#">Terms</a>
-          <a href="#">Sitemap</a>
-        </div>
-      </div>
-    </div>
-  </footer>
+  <div id="site-footer" data-include="footer.html"></div>
 
+  <script src="assets/js/includes.js"></script>
   <script src="assets/js/main.js"></script>
 </body>
 </html>

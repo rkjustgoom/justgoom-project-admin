@@ -1,5 +1,8 @@
 /* JustGoom User Panel JS */
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
+  if (typeof loadUserIncludes === 'function') {
+    await loadUserIncludes();
+  }
   initUserSidebar();
   initUserTheme();
   initUserSession();
