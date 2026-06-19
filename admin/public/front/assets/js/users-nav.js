@@ -11,7 +11,7 @@
     }
     renderTopBar();
     renderHeaderExtras();
-    setPageTitle();
+    setActiveUserNav();
   });
 
   function renderTopBar() {
@@ -38,7 +38,6 @@
     var header = document.querySelector('.user-page-header');
     if (!header || header.querySelector('.user-page-header-end')) return;
 
-    var title = header.querySelector('.user-page-title');
     var end = document.createElement('div');
     end.className = 'user-page-header-end';
 
@@ -49,17 +48,21 @@
       '<button type="button" class="user-theme-btn" aria-label="Toggle dark mode" title="Toggle dark mode">' +
         (isDark ? '☀️' : '🌙') +
       '</button>' +
-      '<span class="user-plan-chip">Platinum</span>' +
+      '<span class="user-plan-chip">Free</span>' +
       '<a href="/users/profile" class="user-topbar-avatar" title="My Profile">SG</a>';
 
-    if (title) end.appendChild(title);
     end.appendChild(actions);
     header.appendChild(end);
   }
 
-  function setPageTitle() {
-    var titleEl = document.querySelector('.user-page-title');
-    var pageTitle = document.body.getAttribute('data-title');
-    if (titleEl && pageTitle) titleEl.textContent = pageTitle;
+  function setActiveUserNav() {
+    if (document.querySelector('.user-nav-link.active')) return;
+
+    var page = document.body.getAttribute('data-page');
+    if (!page) return;
+
+    document.querySelectorAll('.user-nav-link[data-nav="' + page + '"]').forEach(function(link) {
+      link.classList.add('active');
+    });
   }
 })();

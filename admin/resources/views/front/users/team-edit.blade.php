@@ -10,68 +10,97 @@
       <h2 class="user-form-page-title">Edit Team Member</h2>
       <p class="user-form-page-desc">Update team member details shown on your business profile.</p>
 
+      @if($errors->any())
+        <div class="user-alert user-alert-error" style="margin-bottom:16px;padding:12px 14px;border-radius:8px;background:#fdecea;color:#c0392b;border:1px solid #f5c6cb;">
+          @foreach($errors->all() as $error)
+            <p style="margin:0 0 4px;">{{ $error }}</p>
+          @endforeach
+        </div>
+      @endif
+
       <div class="user-form-card user-form-card-wide">
-        <form onsubmit="return false">
+        <form method="POST" action="{{ route('front.users.team.update', $team) }}" enctype="multipart/form-data">
+          @csrf
+          @method('PUT')
           <div class="user-form-row">
             <div class="user-form-group">
               <label>Full Name *</label>
-              <input type="text" class="user-form-control" data-crud-field="name" required>
+              <input type="text" name="name" class="user-form-control @error('name') is-invalid @enderror" value="{{ old('name', $team->name) }}" required>
+              @error('name')<small class="user-field-error">{{ $message }}</small>@enderror
             </div>
             <div class="user-form-group">
               <label>Designation / Role *</label>
-              <input type="text" class="user-form-control" data-crud-field="role" required>
+              <input type="text" name="designation" class="user-form-control @error('designation') is-invalid @enderror" value="{{ old('designation', $team->designation) }}" required>
+              @error('designation')<small class="user-field-error">{{ $message }}</small>@enderror
             </div>
           </div>
           <div class="user-form-row">
             <div class="user-form-group">
               <label>Email *</label>
-              <input type="email" class="user-form-control" data-crud-field="email" required>
+              <input type="email" name="email" class="user-form-control @error('email') is-invalid @enderror" value="{{ old('email', $team->email) }}" required>
+              @error('email')<small class="user-field-error">{{ $message }}</small>@enderror
             </div>
             <div class="user-form-group">
               <label>Phone *</label>
-              <input type="tel" class="user-form-control" data-crud-field="phone" required>
+              <input type="tel" name="phone" class="user-form-control @error('phone') is-invalid @enderror" value="{{ old('phone', $team->phone) }}" maxlength="10" inputmode="numeric" pattern="[0-9]{10}" required>
+              @error('phone')<small class="user-field-error">{{ $message }}</small>@enderror
             </div>
           </div>
           <div class="user-form-row">
-            <div class="user-form-group">
-              <label>Department</label>
-              <select class="user-form-control" data-crud-field="department">
-                <option value="">Select department</option>
-                <option>Management</option>
-                <option>Sales</option>
-                <option>Operations</option>
-                <option>Wholesale</option>
-                <option>Customer Support</option>
-              </select>
-            </div>
+            @include('front.partials.users.team-department-fields', ['currentDepartment' => old('department', $team->department)])
             <div class="user-form-group">
               <label>Status</label>
-              <select class="user-form-control" data-crud-field="status">
-                <option>Active</option>
-                <option>Inactive</option>
+              <select name="status" class="user-form-control @error('status') is-invalid @enderror">
+                <option value="1" @selected(old('status', (string) $team->status) === '1')>Active</option>
+                <option value="0" @selected(old('status', (string) $team->status) === '0')>Inactive</option>
               </select>
+              @error('status')<small class="user-field-error">{{ $message }}</small>@enderror
             </div>
           </div>
           <div class="user-form-group">
             <label>Profile Photo</label>
-            <div class="user-upload-zone"><input type="file" accept="image/*" hidden><p>Replace photo (optional)</p></div>
+            @if($team->image)
+              <img src="{{ asset($team->image) }}" alt="{{ $team->name }}" class="user-preview-thumb" style="display:block;margin-bottom:12px;max-width:80px;max-height:80px;object-fit:cover;border-radius:50%;">
+            @endif
+            <div class="user-upload-zone">
+              <input type="file" name="image" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
+              <p>@if($team->image)Replace photo (optional)@else Upload team member photo (optional)@endif</p>
+            </div>
+            @error('image')<small class="user-field-error">{{ $message }}</small>@enderror
           </div>
           <div class="user-form-group">
             <label>Bio / Responsibilities</label>
-            <textarea class="user-form-control" rows="3" data-crud-field="bio"></textarea>
+            <textarea name="short_info" class="user-form-control @error('short_info') is-invalid @enderror" rows="3">{{ old('short_info', $team->short_info) }}</textarea>
+            @error('short_info')<small class="user-field-error">{{ $message }}</small>@enderror
           </div>
           <label class="user-form-check">
-            <input type="checkbox" data-crud-field="primary"> Show as primary contact on public profile
+            <input type="checkbox" name="is_primary" value="1" @checked(old('is_primary', $team->is_primary))> Show as primary contact on public profile
           </label>
           <div class="user-form-actions">
             <div class="user-form-actions-left">
-              <a href="#" data-crud-delete class="user-btn user-btn-danger">Remove Member</a>
+              <button type="submit" form="teamDeleteForm" class="user-btn user-btn-danger" onclick="return confirm('Remove this team member?');">Remove Member</button>
             </div>
             <a href="{{ route('front.users.team') }}" class="user-btn user-btn-default">Cancel</a>
-            <button type="button" class="user-btn user-btn-primary" data-crud-save>Update Member</button>
+            <button type="submit" class="user-btn user-btn-primary">Update Member</button>
           </div>
+        </form>
+        <form id="teamDeleteForm" method="POST" action="{{ route('front.users.team.destroy', $team) }}">
+          @csrf
+          @method('DELETE')
         </form>
       </div>
     </div>
-<script src="{{ asset('front/assets/js/user-crud.js') }}"></script>
 @endsection
+
+@push('scripts')
+<script>
+  (function () {
+    var phoneInput = document.querySelector('input[name="phone"]');
+    if (phoneInput) {
+      phoneInput.addEventListener('input', function () {
+        phoneInput.value = phoneInput.value.replace(/\D+/g, '').slice(0, 10);
+      });
+    }
+  })();
+</script>
+@endpush

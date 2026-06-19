@@ -7,7 +7,7 @@
 @section('content')
 <div class="user-content">
       <div class="user-toolbar">
-        <p class="user-text-muted">Profile completion required for Silver Plan onboarding — <strong class="user-text-accent">{{ $completionPercent }}%</strong> complete</p>
+        <p class="user-text-muted">Profile completion required for Free Plan onboarding — <strong class="user-text-accent">{{ $completionPercent }}%</strong> complete</p>
         <a href="{{ $previewUrl }}" target="_blank" class="user-btn user-btn-default">Preview Public Profile</a>
       </div>
 
@@ -20,9 +20,21 @@
       @endif
 
       <div class="user-form-card">
-        <form method="POST" action="{{ route('front.users.profile.update') }}" id="profileForm">
+        <form method="POST" action="{{ route('front.users.profile.update') }}" id="profileForm" enctype="multipart/form-data">
           @csrf
           @method('PUT')
+          <div class="user-form-group">
+            <label>Company Logo</label>
+            @if($profile->logo)
+              <img src="{{ asset($profile->logo) }}" alt="{{ $profile->company_name }} logo" class="user-preview-thumb" style="display:block;margin-bottom:12px;max-width:120px;max-height:120px;object-fit:contain;border-radius:8px;">
+            @endif
+            <div class="user-upload-zone">
+              <input type="file" name="logo" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
+              <p>@if($profile->logo)Replace logo (optional)@else Drag &amp; drop or <strong>click to upload</strong> logo (optional)@endif</p>
+            </div>
+            @error('logo')<small class="user-field-error">{{ $message }}</small>@enderror
+            <p class="user-form-hint">JPG, PNG, WebP or GIF · max 2 MB · square image recommended</p>
+          </div>
           <div class="user-form-row">
             <div class="user-form-group">
               <label>Business Name *</label>

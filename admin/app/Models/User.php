@@ -90,6 +90,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(UserPlan::class);
     }
 
+    public function teams(): HasMany
+    {
+        return $this->hasMany(Team::class);
+    }
+
     public function fullName(): string
     {
         return trim("{$this->fname} {$this->lname}");

@@ -4,7 +4,10 @@ namespace App\Services\Front;
 
 use App\Models\SubCategory;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class ProfileService
@@ -40,7 +43,7 @@ class ProfileService
                 ]);
             }
 
-            $profile->update([
+            $profileData = [
                 'company_name' => $data['company_name'],
                 'tagline' => $data['tagline'] ?? null,
                 'business_desc' => $data['business_desc'],
@@ -48,7 +51,14 @@ class ProfileService
                 'email' => $data['email'],
                 'address' => $data['address'] ?? null,
                 'city' => $data['city'],
-            ]);
+            ];
+
+            if (($data['logo'] ?? null) instanceof UploadedFile) {
+                $this->deleteLogo($profile->logo);
+                $profileData['logo'] = $this->uploadLogo($data['logo']);
+            }
+
+            $profile->update($profileData);
 
             return $user->fresh(['companyProfile', 'category', 'subCategory', 'userPlans.plan']);
         });
@@ -62,6 +72,7 @@ class ProfileService
             filled($profile?->company_name),
             filled($user->category_id),
             filled($user->sub_category_id),
+            filled($profile?->logo),
             filled($profile?->tagline),
             filled($profile?->business_desc),
             filled($profile?->phone),
@@ -84,5 +95,30 @@ class ProfileService
             ?->plan;
 
         return $plan?->name ? $plan->name.' Plan' : 'Free Plan';
+    }
+
+    private function uploadLogo(UploadedFile $file): string
+    {
+        $destination = public_path('uploads/company-logos');
+        if (! File::isDirectory($destination)) {
+            File::makeDirectory($destination, 0755, true);
+        }
+
+        $filename = time().'-'.Str::random(12).'.'.$file->getClientOriginalExtension();
+        $file->move($destination, $filename);
+
+        return 'uploads/company-logos/'.$filename;
+    }
+
+    private function deleteLogo(?string $logo): void
+    {
+        if (! $logo) {
+            return;
+        }
+
+        $path = public_path($logo);
+        if (File::exists($path)) {
+            File::delete($path);
+        }
     }
 }

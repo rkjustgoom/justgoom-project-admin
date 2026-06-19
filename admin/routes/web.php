@@ -4,11 +4,13 @@ use App\Http\Controllers\Auth\LoginController as AdminLoginController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\Front\Auth\LoginController as FrontLoginController;
 use App\Http\Controllers\Front\Auth\RegisterController;
+use App\Http\Controllers\Front\Auth\ResendVerificationController;
 use App\Http\Controllers\Front\Auth\VerifyEmailController;
 use App\Http\Controllers\Front\CategoryController as FrontCategoryController;
 use App\Http\Controllers\Front\PageController;
 use App\Http\Controllers\Front\ProfileController;
 use App\Http\Controllers\Front\PublicProfileController;
+use App\Http\Controllers\Front\TeamController;
 use App\Http\Controllers\SubCategoryController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +23,9 @@ Route::get('/register/check-slug', [RegisterController::class, 'checkSlug'])->na
 Route::middleware('guest')->group(function () {
     Route::get('/login', [FrontLoginController::class, 'show'])->name('front.login');
     Route::post('/login', [FrontLoginController::class, 'login'])->name('front.login.submit');
+    Route::post('/email/verification-notification', ResendVerificationController::class)
+        ->middleware('throttle:6,1')
+        ->name('front.verification.send');
     Route::get('/register', [RegisterController::class, 'show'])->name('front.register');
     Route::post('/register', [RegisterController::class, 'store'])->name('front.register.submit');
 });
@@ -66,10 +71,14 @@ Route::prefix('users')->name('front.users.')->middleware(['auth', 'front.user'])
     Route::get('/service-form', fn () => app(PageController::class)->userPage('service-form'))->name('service-form');
     Route::get('/services', fn () => app(PageController::class)->userPage('services'))->name('services');
     Route::get('/subscription', fn () => app(PageController::class)->userPage('subscription'))->name('subscription');
-    Route::get('/team', fn () => app(PageController::class)->userPage('team'))->name('team');
-    Route::get('/team-add', fn () => app(PageController::class)->userPage('team-add'))->name('team-add');
-    Route::get('/team-edit', fn () => app(PageController::class)->userPage('team-edit'))->name('team-edit');
-    Route::get('/team-form', fn () => app(PageController::class)->userPage('team-form'))->name('team-form');
+    Route::get('/team', [TeamController::class, 'index'])->name('team');
+    Route::get('/team-add', [TeamController::class, 'create'])->name('team-add');
+    Route::post('/team', [TeamController::class, 'store'])->name('team.store');
+    Route::get('/team/{team}/edit', [TeamController::class, 'edit'])->name('team.edit');
+    Route::put('/team/{team}', [TeamController::class, 'update'])->name('team.update');
+    Route::delete('/team/{team}', [TeamController::class, 'destroy'])->name('team.destroy');
+    Route::redirect('/team-edit', '/users/team')->name('team-edit');
+    Route::redirect('/team-form', '/users/team')->name('team-form');
     Route::get('/videos', fn () => app(PageController::class)->userPage('videos'))->name('videos');
     Route::get('/video-form', fn () => app(PageController::class)->userPage('video-form'))->name('video-form');
 });

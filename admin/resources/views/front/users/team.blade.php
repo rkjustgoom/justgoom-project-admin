@@ -7,9 +7,9 @@
 @section('content')
 <div class="user-content">
       <div class="user-stat-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
-        <div class="user-stat-card green"><span class="user-stat-icon">👥</span><div class="user-stat-info"><h3>3</h3><span>Team Members</span></div></div>
-        <div class="user-stat-card yellow"><span class="user-stat-icon">✅</span><div class="user-stat-info"><h3>3</h3><span>Active</span></div></div>
-        <div class="user-stat-card grey"><span class="user-stat-icon">⭐</span><div class="user-stat-info"><h3>1</h3><span>Primary Contact</span></div></div>
+        <div class="user-stat-card green"><span class="user-stat-icon">👥</span><div class="user-stat-info"><h3>{{ $stats['total'] }}</h3><span>Team Members</span></div></div>
+        <div class="user-stat-card yellow"><span class="user-stat-icon">✅</span><div class="user-stat-info"><h3>{{ $stats['active'] }}</h3><span>Active</span></div></div>
+        <div class="user-stat-card grey"><span class="user-stat-icon">⭐</span><div class="user-stat-info"><h3>{{ $stats['primary'] }}</h3><span>Primary Contact</span></div></div>
       </div>
       <div class="user-toolbar">
         <span class="user-text-muted">Manage staff shown on your public profile</span>
@@ -19,24 +19,40 @@
         <table class="user-table">
           <thead><tr><th>Name</th><th>Role</th><th>Department</th><th>Email</th><th>Phone</th><th>Status</th><th>Action</th></tr></thead>
           <tbody>
+            @forelse($members as $member)
             <tr>
-              <td><strong>Patel Ramesh</strong> <span class="user-badge user-badge-success" style="margin-left:4px;font-size:10px">Primary</span></td>
-              <td>Owner</td><td>Management</td><td>ramesh@shreegold.com</td><td>+91 98765 43210</td>
-              <td><span class="user-badge user-badge-success">Active</span></td>
-              <td><a href="team-edit.html?id=1" class="user-table-action">Edit</a> · <a href="delete.html?module=team&id=1&return=team.html" class="user-table-action-muted">Delete</a></td>
+              <td>
+                <strong>{{ $member->name }}</strong>
+                @if($member->is_primary)
+                  <span class="user-badge user-badge-success" style="margin-left:4px;font-size:10px">Primary</span>
+                @endif
+              </td>
+              <td>{{ $member->designation }}</td>
+              <td>{{ $member->department ?: '—' }}</td>
+              <td>{{ $member->email }}</td>
+              <td>{{ $member->phone }}</td>
+              <td>
+                @if($member->isActive())
+                  <span class="user-badge user-badge-success">Active</span>
+                @else
+                  <span class="user-badge user-badge-warning">Inactive</span>
+                @endif
+              </td>
+              <td>
+                <a href="{{ route('front.users.team.edit', $member) }}" class="user-table-action">Edit</a>
+                ·
+                <form method="POST" action="{{ route('front.users.team.destroy', $member) }}" style="display:inline" onsubmit="return confirm('Remove this team member?');">
+                  @csrf
+                  @method('DELETE')
+                  <button type="submit" class="user-table-action-muted" style="background:none;border:none;padding:0;cursor:pointer;font:inherit;">Delete</button>
+                </form>
+              </td>
             </tr>
+            @empty
             <tr>
-              <td><strong>Shah Priya</strong></td>
-              <td>Sales Manager</td><td>Sales</td><td>priya@shreegold.com</td><td>+91 98765 43211</td>
-              <td><span class="user-badge user-badge-success">Active</span></td>
-              <td><a href="team-edit.html?id=2" class="user-table-action">Edit</a> · <a href="delete.html?module=team&id=2&return=team.html" class="user-table-action-muted">Delete</a></td>
+              <td colspan="7" class="user-text-muted" style="text-align:center;padding:24px;">No team members yet. Add your first team member to show them on your public profile.</td>
             </tr>
-            <tr>
-              <td><strong>Mehta Vikram</strong></td>
-              <td>Wholesale Lead</td><td>Wholesale</td><td>vikram@shreegold.com</td><td>+91 98765 43212</td>
-              <td><span class="user-badge user-badge-success">Active</span></td>
-              <td><a href="team-edit.html?id=3" class="user-table-action">Edit</a> · <a href="delete.html?module=team&id=3&return=team.html" class="user-table-action-muted">Delete</a></td>
-            </tr>
+            @endforelse
           </tbody>
         </table>
       </div>

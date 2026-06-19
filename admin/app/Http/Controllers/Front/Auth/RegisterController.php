@@ -10,6 +10,8 @@ use App\Services\Front\RegisterService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class RegisterController extends Controller
 {
@@ -74,10 +76,24 @@ class RegisterController extends Controller
     {
         $user = $this->registerService->register($request->validated());
 
-        event(new Registered($user));
+        try {
+            event(new Registered($user));
+        } catch (Throwable $e) {
+            Log::error('Registration verification email failed.', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'message' => $e->getMessage(),
+            ]);
+
+            return redirect()
+                ->route('front.login')
+                ->withInput(['email' => $user->email])
+                ->with('error', 'Registration successful, but we could not send the verification email. Use "Resend verification link" on the login page or check your SMTP settings.');
+        }
 
         return redirect()
             ->route('front.login')
+            ->withInput(['email' => $user->email])
             ->with('success', 'Registration successful! Please verify your email — we sent a verification link to your inbox.');
     }
 }

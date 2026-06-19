@@ -10,7 +10,7 @@
     <div class="container profile-completion-inner">
       <div class="profile-completion-text">
         <strong>Profile Completion Required</strong>
-        <span>Complete all profile sections to activate your Silver Plan listing.</span>
+        <span>Complete all profile sections to activate your Free Plan listing.</span>
       </div>
       <div class="profile-completion-progress">
         <div class="progress-bar"><div class="progress-fill" style="width:{{ $completionPercent }}%"></div></div>

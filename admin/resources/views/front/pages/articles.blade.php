@@ -47,7 +47,7 @@
         <p>Articles published globally — visible to all platform users.</p>
       </div>
       <div class="access-notice-item">
-        <span class="plan-badge plan-silver plan-badge-sm">Silver</span>
+        <span class="plan-badge plan-silver plan-badge-sm">Free</span>
         <p>Articles stored privately — visible only to the author.</p>
       </div>
     </div>
@@ -213,12 +213,12 @@
             <span class="blog-author-avatar">RK</span>
             <div>
               <strong>Raj Kumar Industries</strong>
-              <span class="plan-badge plan-silver plan-badge-sm">Silver · Private</span>
+              <span class="plan-badge plan-silver plan-badge-sm">Free · Private</span>
             </div>
           </div>
           <span class="blog-tag">B2B Trade</span>
           <h3>Internal Supplier Quality Checklist</h3>
-          <p class="article-private-note">🔒 Private article — visible only to author (Silver Plan).</p>
+          <p class="article-private-note">🔒 Private article — visible only to author (Free Plan).</p>
           <div class="blog-footer">
             <span>May 18, 2026</span>
             <span>4 min read</span>
