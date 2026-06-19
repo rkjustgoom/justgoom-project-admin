@@ -12,6 +12,13 @@ body.sidebar-icon-only.navbar-fixed-top .navbar.navbar-mini.fixed-top {
   width: calc(100% - 70px);
 }
 
+.navbar .navbar-menu-wrapper .nav-item.nav-profile .nav-link .admin-nav-profile-img {
+  width: 2.187rem;
+  height: 2.187rem;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
 @media (max-width: 991px) {
   body.navbar-fixed-top .main-panel {
     padding-top: 65px;
@@ -19,5 +26,20 @@ body.sidebar-icon-only.navbar-fixed-top .navbar.navbar-mini.fixed-top {
 
   body.navbar-fixed-top .navbar.navbar-mini.fixed-top {
     width: 100%;
+  }
+
+  .navbar .navbar-menu-wrapper .nav-item.nav-profile .dropdown-menu {
+    min-width: 10rem;
+  }
+
+  .navbar .navbar-menu-wrapper .nav-item.nav-profile .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    border: 0;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
   }
 }

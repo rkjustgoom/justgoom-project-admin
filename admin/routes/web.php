@@ -23,12 +23,13 @@ Route::get('/register/check-slug', [RegisterController::class, 'checkSlug'])->na
 Route::middleware('guest')->group(function () {
     Route::get('/login', [FrontLoginController::class, 'show'])->name('front.login');
     Route::post('/login', [FrontLoginController::class, 'login'])->name('front.login.submit');
-    Route::post('/email/verification-notification', ResendVerificationController::class)
-        ->middleware('throttle:6,1')
-        ->name('front.verification.send');
     Route::get('/register', [RegisterController::class, 'show'])->name('front.register');
     Route::post('/register', [RegisterController::class, 'store'])->name('front.register.submit');
 });
+
+Route::post('/email/verification-notification', ResendVerificationController::class)
+    ->middleware('throttle:6,1')
+    ->name('front.verification.send');
 
 Route::get('/email/verify/{id}/{hash}', VerifyEmailController::class)
     ->middleware('signed')
