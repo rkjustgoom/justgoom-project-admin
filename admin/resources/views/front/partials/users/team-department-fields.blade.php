@@ -5,9 +5,9 @@
   $departmentSelectValue = old('department_select', $isOtherDepartment ? '__other__' : $savedDepartment);
   $departmentOtherValue = old('department_other', $isOtherDepartment ? $savedDepartment : '');
 @endphp
-<div class="user-form-group">
+<div class="user-form-group" data-field="department">
   <label>Department</label>
-  <select name="department_select" id="teamDepartmentSelect" class="user-form-control @error('department') is-invalid @enderror">
+  <select name="department_select" id="teamDepartmentSelect" class="user-form-control @error('department') is-invalid @enderror @error('department_other') is-invalid @enderror">
     <option value="">Select department</option>
     @foreach($departmentOptions as $option)
       <option value="{{ $option }}" @selected($departmentSelectValue === $option)>{{ $option }}</option>
@@ -18,12 +18,12 @@
     type="text"
     name="department_other"
     id="teamDepartmentOther"
-    class="user-form-control @error('department') is-invalid @enderror"
+    class="user-form-control @error('department') is-invalid @enderror @error('department_other') is-invalid @enderror"
     value="{{ $departmentOtherValue }}"
     placeholder="Enter department name"
     style="margin-top:8px;{{ $departmentSelectValue === '__other__' ? '' : 'display:none;' }}"
   >
-  @error('department')<small class="user-field-error">{{ $message }}</small>@enderror
+  <small class="user-field-error">@error('department'){{ $message }}@enderror @error('department_other'){{ $message }}@enderror</small>
 </div>
 
 @once

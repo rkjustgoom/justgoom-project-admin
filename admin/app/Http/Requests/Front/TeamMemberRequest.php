@@ -14,11 +14,18 @@ class TeamMemberRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $departmentSelect = $this->input('department_select');
+        $departmentOther = trim((string) $this->input('department_other', ''));
         $department = $departmentSelect === '__other__'
-            ? trim((string) $this->input('department_other'))
+            ? $departmentOther
             : trim((string) ($departmentSelect ?? ''));
 
         $this->merge([
+            'name' => trim((string) $this->input('name', '')),
+            'designation' => trim((string) $this->input('designation', '')),
+            'email' => strtolower(trim((string) $this->input('email', ''))),
+            'phone' => preg_replace('/\D+/', '', (string) $this->input('phone', '')),
+            'short_info' => $this->filled('short_info') ? trim((string) $this->input('short_info')) : null,
+            'department_other' => $departmentOther !== '' ? $departmentOther : null,
             'is_primary' => $this->boolean('is_primary'),
             'status' => $this->input('status', 1),
             'department' => $department !== '' ? $department : null,
@@ -31,7 +38,7 @@ class TeamMemberRequest extends FormRequest
             'name' => ['required', 'string', 'max:150'],
             'designation' => ['required', 'string', 'max:150'],
             'email' => ['required', 'email', 'max:191'],
-            'phone' => ['required', 'string', 'regex:/^\d{10}$/'],
+            'phone' => ['required', 'digits:10'],
             'department_select' => ['nullable', 'string'],
             'department_other' => ['nullable', 'required_if:department_select,__other__', 'string', 'max:100'],
             'department' => ['nullable', 'string', 'max:100'],
@@ -45,9 +52,34 @@ class TeamMemberRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'phone.regex' => 'Phone number must be exactly 10 digits.',
+            'name.required' => 'Full name is required.',
+            'name.max' => 'Full name must not exceed 150 characters.',
+            'designation.required' => 'Designation / role is required.',
+            'designation.max' => 'Designation must not exceed 150 characters.',
+            'email.required' => 'Email is required.',
+            'email.email' => 'Enter a valid email address.',
+            'email.max' => 'Email must not exceed 191 characters.',
+            'phone.required' => 'Phone number is required.',
+            'phone.digits' => 'Phone number must be exactly 10 digits.',
             'department_other.required_if' => 'Please enter a department name when Other is selected.',
+            'department_other.max' => 'Department name must not exceed 100 characters.',
+            'short_info.max' => 'Bio must not exceed 5000 characters.',
+            'image.image' => 'Profile photo must be JPG, PNG, WebP, or GIF.',
+            'image.mimes' => 'Profile photo must be JPG, PNG, WebP, or GIF.',
             'image.max' => 'Profile photo must not be larger than 2 MB.',
+        ];
+    }
+
+    public function attributes(): array
+    {
+        return [
+            'name' => 'full name',
+            'designation' => 'designation / role',
+            'email' => 'email',
+            'phone' => 'phone number',
+            'department_other' => 'department name',
+            'short_info' => 'bio',
+            'image' => 'profile photo',
         ];
     }
 }

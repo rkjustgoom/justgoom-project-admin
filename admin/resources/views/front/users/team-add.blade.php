@@ -19,30 +19,30 @@
       @endif
 
       <div class="user-form-card user-form-card-wide">
-        <form method="POST" action="{{ route('front.users.team.store') }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ route('front.users.team.store') }}" enctype="multipart/form-data" id="teamForm" novalidate>
           @csrf
           <div class="user-form-row">
-            <div class="user-form-group">
+            <div class="user-form-group" data-field="name">
               <label>Full Name *</label>
-              <input type="text" name="name" class="user-form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" placeholder="Patel Ramesh" required>
-              @error('name')<small class="user-field-error">{{ $message }}</small>@enderror
+              <input type="text" name="name" class="user-form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" placeholder="Enter Full Name" maxlength="150">
+              <small class="user-field-error">@error('name'){{ $message }}@enderror</small>
             </div>
-            <div class="user-form-group">
+            <div class="user-form-group" data-field="designation">
               <label>Designation / Role *</label>
-              <input type="text" name="designation" class="user-form-control @error('designation') is-invalid @enderror" value="{{ old('designation') }}" placeholder="Sales Manager" required>
-              @error('designation')<small class="user-field-error">{{ $message }}</small>@enderror
+              <input type="text" name="designation" class="user-form-control @error('designation') is-invalid @enderror" value="{{ old('designation') }}" placeholder="Enter Designation / Role" maxlength="150">
+              <small class="user-field-error">@error('designation'){{ $message }}@enderror</small>
             </div>
           </div>
           <div class="user-form-row">
-            <div class="user-form-group">
+            <div class="user-form-group" data-field="email">
               <label>Email *</label>
-              <input type="email" name="email" class="user-form-control @error('email') is-invalid @enderror" value="{{ old('email') }}" placeholder="name@company.com" required>
-              @error('email')<small class="user-field-error">{{ $message }}</small>@enderror
+              <input type="email" name="email" class="user-form-control @error('email') is-invalid @enderror" value="{{ old('email') }}" placeholder="Enter Email" maxlength="191">
+              <small class="user-field-error">@error('email'){{ $message }}@enderror</small>
             </div>
-            <div class="user-form-group">
+            <div class="user-form-group" data-field="phone">
               <label>Phone *</label>
-              <input type="tel" name="phone" class="user-form-control @error('phone') is-invalid @enderror" value="{{ old('phone') }}" maxlength="10" inputmode="numeric" pattern="[0-9]{10}" placeholder="9876543210" required>
-              @error('phone')<small class="user-field-error">{{ $message }}</small>@enderror
+              <input type="tel" name="phone" class="user-form-control @error('phone') is-invalid @enderror" value="{{ old('phone') }}" maxlength="10" inputmode="numeric" placeholder="Enter Phone Number">
+              <small class="user-field-error">@error('phone'){{ $message }}@enderror</small>
             </div>
           </div>
           <div class="user-form-row">
@@ -56,18 +56,18 @@
               @error('status')<small class="user-field-error">{{ $message }}</small>@enderror
             </div>
           </div>
-          <div class="user-form-group">
+          <div class="user-form-group" data-field="image">
             <label>Profile Photo</label>
             <div class="user-upload-zone">
               <input type="file" name="image" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
               <p>Upload team member photo (optional)</p>
             </div>
-            @error('image')<small class="user-field-error">{{ $message }}</small>@enderror
+            <small class="user-field-error">@error('image'){{ $message }}@enderror</small>
           </div>
-          <div class="user-form-group">
+          <div class="user-form-group" data-field="short_info">
             <label>Bio / Responsibilities</label>
-            <textarea name="short_info" class="user-form-control @error('short_info') is-invalid @enderror" rows="3" placeholder="Brief description of their role and responsibilities...">{{ old('short_info') }}</textarea>
-            @error('short_info')<small class="user-field-error">{{ $message }}</small>@enderror
+            <textarea name="short_info" class="user-form-control @error('short_info') is-invalid @enderror" rows="3" maxlength="5000" placeholder="Brief description of their role and responsibilities...">{{ old('short_info') }}</textarea>
+            <small class="user-field-error">@error('short_info'){{ $message }}@enderror</small>
           </div>
           <label class="user-form-check">
             <input type="checkbox" name="is_primary" value="1" @checked(old('is_primary'))> Show as primary contact on public profile
@@ -82,14 +82,5 @@
 @endsection
 
 @push('scripts')
-<script>
-  (function () {
-    var phoneInput = document.querySelector('input[name="phone"]');
-    if (phoneInput) {
-      phoneInput.addEventListener('input', function () {
-        phoneInput.value = phoneInput.value.replace(/\D+/g, '').slice(0, 10);
-      });
-    }
-  })();
-</script>
+<script src="{{ asset('front/assets/js/team-form.js') }}"></script>
 @endpush

@@ -40,6 +40,6 @@
   <a href="{{ route('front.home') }}">🌐 View Public Site</a>
   <form method="POST" action="{{ route('front.logout') }}" id="frontLogoutForm" style="display:block;">
     @csrf
-    <button type="submit" class="user-logout-btn">🚪 Logout</button>
+    <button type="submit" class="user-logout-btn" style="color: #fff;">🚪 Logout</button>
   </form>
 </div>
