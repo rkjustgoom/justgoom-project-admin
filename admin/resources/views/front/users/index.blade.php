@@ -14,28 +14,28 @@
           <a href="{{ route('front.users.services') }}" class="user-stat-card green">
             <span class="user-stat-icon">💼</span>
             <div class="user-stat-info">
-              <h3>7</h3>
-              <span>Services Listed</span>
+              <h3>{{ $stats['services'] }}</h3>
+              <span>My Services</span>
             </div>
           </a>
-          <a href="{{ route('front.users.videos') }}" class="user-stat-card yellow">
-            <span class="user-stat-icon">🎬</span>
+          <a href="{{ route('front.users.team') }}" class="user-stat-card yellow">
+            <span class="user-stat-icon">👥</span>
             <div class="user-stat-info">
-              <h3>4</h3>
-              <span>Promo Videos</span>
+              <h3>{{ $stats['team'] }}</h3>
+              <span>My Team</span>
             </div>
           </a>
           <a href="{{ route('front.users.inquiries') }}" class="user-stat-card red">
             <span class="user-stat-icon">💬</span>
             <div class="user-stat-info">
-              <h3>3</h3>
+              <h3>{{ $stats['new_inquiries'] }}</h3>
               <span>New Inquiries</span>
             </div>
           </a>
           <a href="{{ route('front.users.notifications') }}" class="user-stat-card grey">
             <span class="user-stat-icon">🔔</span>
             <div class="user-stat-info">
-              <h3>2</h3>
+              <h3>{{ $stats['notifications'] }}</h3>
               <span>Notifications</span>
             </div>
           </a>
@@ -45,52 +45,46 @@
           <div class="user-panel">
             <div class="user-panel-head">Recent Inquiries</div>
             <div class="user-panel-body">
+              @forelse($recentInquiries as $inquiry)
               <div class="user-list-item">
                 <div>
-                  <strong>Raj Kumar — Gold Bulk Order</strong>
-                  <span>Looking for 22K wedding collection wholesale pricing</span>
+                  <strong>{{ $inquiry->sender_name }} — {{ $inquiry->subject }}</strong>
+                  <span>{{ Str::limit($inquiry->message, 80) ?: 'No message provided' }}</span>
                 </div>
-                <span class="user-badge user-badge-warning">New</span>
+                <span class="user-badge {{ $inquiry->statusBadgeClass() }}">{{ $inquiry->statusLabel() }}</span>
               </div>
+              @empty
               <div class="user-list-item">
                 <div>
-                  <strong>Priya Sharma — Custom Design</strong>
-                  <span>Request for custom necklace design inquiry</span>
+                  <strong>No inquiries yet</strong>
+                  <span>Buyer inquiries will appear here when someone contacts your profile.</span>
                 </div>
-                <span class="user-badge user-badge-success">Replied</span>
               </div>
-              <div class="user-list-item">
-                <div>
-                  <strong>Amit Mehta — B2B Partnership</strong>
-                  <span>Interested in long-term supply partnership</span>
-                </div>
-                <span class="user-badge user-badge-warning">New</span>
-              </div>
+              @endforelse
               <a href="{{ route('front.users.inquiries') }}" class="user-link-more">View all inquiries →</a>
             </div>
           </div>
           <div class="user-panel">
             <div class="user-panel-head">Recent Notifications</div>
             <div class="user-panel-body">
+              @forelse($recentNotifications as $notification)
               <div class="user-list-item">
                 <div>
-                  <strong>Profile viewed 28 times today</strong>
-                  <span>Visitor analytics update · 2 hours ago</span>
+                  <strong>{{ $notification->title }}</strong>
+                  <span>{{ Str::limit($notification->body, 80) ?: ucfirst(str_replace('_', ' ', $notification->type)) }} · {{ $notification->created_at?->diffForHumans() }}</span>
                 </div>
+                @unless($notification->isRead())
+                  <span class="user-badge user-badge-warning">New</span>
+                @endunless
               </div>
+              @empty
               <div class="user-list-item">
                 <div>
-                  <strong>Homepage banner approved</strong>
-                  <span>Your promotional banner is now live · Yesterday</span>
-                </div>
-                <span class="user-badge user-badge-success">Live</span>
-              </div>
-              <div class="user-list-item">
-                <div>
-                  <strong>Article published globally</strong>
-                  <span>22K Gold Guide is now public · May 28</span>
+                  <strong>No notifications yet</strong>
+                  <span>Updates about your profile and activity will show here.</span>
                 </div>
               </div>
+              @endforelse
               <a href="{{ route('front.users.notifications') }}" class="user-link-more">View all notifications →</a>
             </div>
           </div>

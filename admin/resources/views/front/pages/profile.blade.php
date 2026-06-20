@@ -142,7 +142,7 @@
                   <p class="team-location">{{ $member->department }}</p>
                 @endif
                 @if($member->short_info)
-                  <p class="team-bio">{{ Str::limit($member->short_info, 100) }}</p>
+                  <p class="team-bio">{{ Str::limit($member->short_info, 50) }}</p>
                 @endif
               </article>
             @endforeach
