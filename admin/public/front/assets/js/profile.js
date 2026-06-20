@@ -1,51 +1,271 @@
+/* JustGoom — Profile form: sub-categories, logo preview, client validation */
 (function () {
-  var categorySelect = document.getElementById('profileCategory');
-  var subCategorySelect = document.getElementById('profileSubCategory');
-  var phoneInput = document.querySelector('#profileForm input[name="phone"]');
+  var ALLOWED_LOGO_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+  var MAX_LOGO_BYTES = 2 * 1024 * 1024;
 
-  if (phoneInput) {
-    phoneInput.addEventListener('input', function () {
-      phoneInput.value = phoneInput.value.replace(/\D+/g, '').slice(0, 10);
-    });
-  }
-
-  if (!categorySelect || !subCategorySelect) {
-    return;
-  }
-
-  function setSubCategories(items, selectedId) {
-    subCategorySelect.innerHTML = '<option value="">Select sub category</option>';
-    items.forEach(function (item) {
-      var option = document.createElement('option');
-      option.value = item.id;
-      option.textContent = item.name;
-      if (String(selectedId) === String(item.id)) {
-        option.selected = true;
+  var rules = {
+    company_name: {
+      test: function (v) { return v.trim().length >= 4 && v.trim().length <= 200; },
+      message: function (v) {
+        if (v.trim().length === 0) return 'Business name is required.';
+        if (v.trim().length < 4) return 'Business name must be at least 4 characters.';
+        return 'Business name must not exceed 200 characters.';
       }
-      subCategorySelect.appendChild(option);
-    });
-    subCategorySelect.disabled = items.length === 0;
+    },
+    category_id: {
+      test: function (v) { return v.length > 0; },
+      message: function () { return 'Please select a category.'; }
+    },
+    sub_category_id: {
+      test: function (v) { return v.length > 0; },
+      message: function () { return 'Please select a sub category.'; }
+    },
+    tagline: {
+      test: function (v) { return v.length <= 255; },
+      message: function () { return 'Tagline must not exceed 255 characters.'; }
+    },
+    business_desc: {
+      test: function (v) { return v.trim().length >= 20 && v.trim().length <= 5000; },
+      message: function (v) {
+        if (v.trim().length === 0) return 'About business is required.';
+        if (v.trim().length < 20) return 'About business must be at least 20 characters.';
+        return 'About business must not exceed 5000 characters.';
+      }
+    },
+    phone: {
+      test: function (v) { return /^\d{10}$/.test(v); },
+      message: function (v) {
+        if (v.length === 0) return 'Phone number is required.';
+        return 'Phone number must be exactly 10 digits.';
+      }
+    },
+    email: {
+      test: function (v) { return v.length > 0 && v.length <= 191 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); },
+      message: function (v) {
+        if (v.length === 0) return 'Email is required.';
+        if (v.length > 191) return 'Email must not exceed 191 characters.';
+        return 'Enter a valid email address.';
+      }
+    },
+    address: {
+      test: function (v) { return v.length <= 500; },
+      message: function () { return 'Address must not exceed 500 characters.'; }
+    },
+    city: {
+      test: function (v) { return v.trim().length > 0 && v.trim().length <= 100; },
+      message: function (v) {
+        if (v.trim().length === 0) return 'City is required.';
+        return 'City must not exceed 100 characters.';
+      }
+    },
+    logo: {
+      test: function (file) {
+        if (!file) return true;
+        if (ALLOWED_LOGO_TYPES.indexOf(file.type) === -1) return false;
+        return file.size <= MAX_LOGO_BYTES;
+      },
+      message: function (file) {
+        if (!file) return '';
+        if (ALLOWED_LOGO_TYPES.indexOf(file.type) === -1) {
+          return 'Logo must be JPG, PNG, WebP, or GIF.';
+        }
+        return 'Logo must not be larger than 2 MB.';
+      }
+    }
+  };
+
+  function normalizePhone(value) {
+    return value.replace(/\D+/g, '').slice(0, 10);
   }
 
-  function loadSubCategories(categoryId, selectedId) {
-    if (!categoryId) {
-      setSubCategories([], '');
-      return;
+  function setFieldError(form, fieldName, message) {
+    var group = form.querySelector('[data-field="' + fieldName + '"]');
+    if (!group) return;
+    group.querySelectorAll('input:not([type="hidden"]):not([readonly]), select, textarea').forEach(function (el) {
+      el.classList.add('is-invalid');
+    });
+    var errorEl = group.querySelector('.user-field-error');
+    if (errorEl) {
+      errorEl.textContent = message || '';
+      errorEl.style.display = message ? 'block' : 'none';
+    }
+  }
+
+  function clearFieldError(form, fieldName) {
+    var group = form.querySelector('[data-field="' + fieldName + '"]');
+    if (!group) return;
+    group.querySelectorAll('input:not([type="hidden"]):not([readonly]), select, textarea').forEach(function (el) {
+      el.classList.remove('is-invalid');
+    });
+    var errorEl = group.querySelector('.user-field-error');
+    if (errorEl && !errorEl.dataset.serverError) {
+      errorEl.textContent = '';
+      errorEl.style.display = 'none';
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    var form = document.getElementById('profileForm');
+    if (!form) return;
+
+    var categorySelect = document.getElementById('profileCategory');
+    var subCategorySelect = document.getElementById('profileSubCategory');
+    var phoneInput = form.querySelector('input[name="phone"]');
+    var logoInput = form.querySelector('input[name="logo"]');
+    var logoPreview = document.getElementById('profileLogoPreview');
+
+    form.querySelectorAll('.user-field-error').forEach(function (el) {
+      if (el.textContent.trim()) {
+        el.dataset.serverError = '1';
+        el.style.display = 'block';
+      } else {
+        el.style.display = 'none';
+      }
+    });
+
+    function getFieldValue(fieldName) {
+      switch (fieldName) {
+        case 'company_name': return form.querySelector('input[name="company_name"]')?.value || '';
+        case 'category_id': return categorySelect ? categorySelect.value : '';
+        case 'sub_category_id': return subCategorySelect ? subCategorySelect.value : '';
+        case 'tagline': return form.querySelector('input[name="tagline"]')?.value || '';
+        case 'business_desc': return form.querySelector('textarea[name="business_desc"]')?.value || '';
+        case 'phone': return phoneInput ? phoneInput.value : '';
+        case 'email': return (form.querySelector('input[name="email"]')?.value || '').trim();
+        case 'address': return form.querySelector('input[name="address"]')?.value || '';
+        case 'city': return form.querySelector('input[name="city"]')?.value || '';
+        case 'logo': return logoInput && logoInput.files.length ? logoInput.files[0] : null;
+        default: return '';
+      }
     }
 
-    fetch(window.PROFILE_SUBCATEGORIES_URL + '/' + categoryId, {
-      headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
-    })
-      .then(function (response) { return response.json(); })
-      .then(function (data) { setSubCategories(data, selectedId); })
-      .catch(function () { setSubCategories([], ''); });
-  }
+    function validateField(fieldName, showError) {
+      var rule = rules[fieldName];
+      if (!rule) return true;
 
-  categorySelect.addEventListener('change', function () {
-    loadSubCategories(categorySelect.value, '');
+      var value = fieldName === 'phone'
+        ? normalizePhone(getFieldValue('phone'))
+        : getFieldValue(fieldName);
+
+      if (fieldName === 'phone' && phoneInput) phoneInput.value = value;
+
+      if (!rule.test(value)) {
+        if (showError) setFieldError(form, fieldName, rule.message(value));
+        return false;
+      }
+
+      clearFieldError(form, fieldName);
+      return true;
+    }
+
+    function validateForm() {
+      var fields = [
+        'company_name', 'category_id', 'sub_category_id', 'tagline',
+        'business_desc', 'phone', 'email', 'address', 'city', 'logo'
+      ];
+      var valid = true;
+
+      fields.forEach(function (field) {
+        if (!validateField(field, true)) valid = false;
+      });
+
+      if (!valid) {
+        var firstInvalid = form.querySelector('.user-form-control.is-invalid');
+        if (firstInvalid) firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+
+      return valid;
+    }
+
+    if (logoInput && logoPreview) {
+      logoInput.addEventListener('change', function () {
+        if (logoInput.files.length) {
+          var reader = new FileReader();
+          reader.onload = function (event) {
+            logoPreview.src = event.target.result;
+            logoPreview.style.display = 'block';
+          };
+          reader.readAsDataURL(logoInput.files[0]);
+        }
+        validateField('logo', true);
+      });
+    }
+
+    if (phoneInput) {
+      phoneInput.addEventListener('input', function () {
+        phoneInput.value = normalizePhone(phoneInput.value);
+        validateField('phone', false);
+      });
+      phoneInput.addEventListener('blur', function () { validateField('phone', true); });
+    }
+
+    ['company_name', 'tagline', 'business_desc', 'email', 'address', 'city'].forEach(function (field) {
+      var group = form.querySelector('[data-field="' + field + '"]');
+      if (!group) return;
+      var input = group.querySelector('input, textarea');
+      if (!input) return;
+      input.addEventListener('blur', function () { validateField(field, true); });
+      input.addEventListener('input', function () { validateField(field, false); });
+    });
+
+    if (categorySelect) {
+      categorySelect.addEventListener('change', function () {
+        validateField('category_id', true);
+        validateField('sub_category_id', true);
+      });
+      categorySelect.addEventListener('blur', function () { validateField('category_id', true); });
+    }
+
+    if (subCategorySelect) {
+      subCategorySelect.addEventListener('change', function () { validateField('sub_category_id', true); });
+      subCategorySelect.addEventListener('blur', function () { validateField('sub_category_id', true); });
+    }
+
+    form.addEventListener('submit', function (e) {
+      if (phoneInput) phoneInput.value = normalizePhone(phoneInput.value);
+      if (!validateForm()) {
+        e.preventDefault();
+      }
+    });
+
+    function setSubCategories(items, selectedId) {
+      if (!subCategorySelect) return;
+      subCategorySelect.innerHTML = '<option value="">Select sub category</option>';
+      items.forEach(function (item) {
+        var option = document.createElement('option');
+        option.value = item.id;
+        option.textContent = item.name;
+        if (String(selectedId) === String(item.id)) {
+          option.selected = true;
+        }
+        subCategorySelect.appendChild(option);
+      });
+      subCategorySelect.disabled = items.length === 0;
+    }
+
+    function loadSubCategories(categoryId, selectedId) {
+      if (!categorySelect || !subCategorySelect) return;
+      if (!categoryId) {
+        setSubCategories([], '');
+        return;
+      }
+
+      fetch(window.PROFILE_SUBCATEGORIES_URL + '/' + categoryId, {
+        headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+      })
+        .then(function (response) { return response.json(); })
+        .then(function (data) { setSubCategories(data, selectedId); })
+        .catch(function () { setSubCategories([], ''); });
+    }
+
+    if (categorySelect && subCategorySelect) {
+      categorySelect.addEventListener('change', function () {
+        loadSubCategories(categorySelect.value, '');
+      });
+
+      if (categorySelect.value && subCategorySelect.options.length <= 1) {
+        loadSubCategories(categorySelect.value, window.PROFILE_OLD?.sub_category_id || '');
+      }
+    }
   });
-
-  if (categorySelect.value && subCategorySelect.options.length <= 1) {
-    loadSubCategories(categorySelect.value, window.PROFILE_OLD?.sub_category_id || '');
-  }
 })();

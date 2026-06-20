@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Front;
 
 use App\Http\Controllers\Controller;
 use App\Services\Front\CategoryCatalogService;
+use App\Services\Front\DocumentService;
 use App\Services\Front\ProfileService;
 use App\Services\Front\PublicProfileListingService;
+use App\Services\Front\ServiceService;
+use App\Services\Front\TeamService;
 use Illuminate\Http\Request;
 
 class PublicProfileController extends Controller
@@ -14,6 +17,9 @@ class PublicProfileController extends Controller
         private PublicProfileListingService $listingService,
         private CategoryCatalogService $categoryCatalogService,
         private ProfileService $profileService,
+        private TeamService $teamService,
+        private ServiceService $serviceService,
+        private DocumentService $documentService,
     ) {
     }
 
@@ -37,6 +43,9 @@ class PublicProfileController extends Controller
         return view('front.pages.profile', [
             'profile' => $profile,
             'user' => $user,
+            'teams' => $this->teamService->listForPublicProfile($user),
+            'services' => $this->serviceService->listForPublicProfile($user),
+            'documents' => $this->documentService->listForPublicProfile($user),
             'completionPercent' => $this->profileService->completionPercent($user),
             'planName' => $this->profileService->planName($user),
             'isOwner' => auth()->check() && auth()->id() === $user->id,

@@ -10,60 +10,45 @@
       <h2 class="user-form-page-title">Add Service</h2>
       <p class="user-form-page-desc">List a product or service offering on your JustGoom business profile.</p>
 
+      @if($errors->any())
+        <div class="user-alert user-alert-error" style="margin-bottom:16px;padding:12px 14px;border-radius:8px;background:#fdecea;color:#c0392b;border:1px solid #f5c6cb;">
+          @foreach($errors->all() as $error)
+            <p style="margin:0 0 4px;">{{ $error }}</p>
+          @endforeach
+        </div>
+      @endif
+
       <div class="user-form-card user-form-card-wide">
-        <form onsubmit="return false">
-          <div class="user-form-group">
+        <form method="POST" action="{{ route('front.users.services.store') }}" enctype="multipart/form-data" id="serviceForm" novalidate>
+          @csrf
+          <div class="user-form-group" data-field="product_name">
             <label>Service Name *</label>
-            <input type="text" class="user-form-control" data-crud-field="name" placeholder="e.g. 22K Gold Jewellery" required>
+            <input type="text" name="product_name" class="user-form-control @error('product_name') is-invalid @enderror" value="{{ old('product_name') }}" placeholder="e.g. Solar Panel Installation" maxlength="200">
+            <small class="user-field-error">@error('product_name'){{ $message }}@enderror</small>
           </div>
-          <div class="user-form-row">
-            <div class="user-form-group">
-              <label>Category *</label>
-              <select class="user-form-control" data-crud-field="category" required>
-                <option value="">Select category</option>
-                <option>Retail</option>
-                <option>Wholesale</option>
-                <option>Service</option>
-                <option>Finance</option>
-                <option>Tool</option>
-                <option>Manufacturing</option>
-              </select>
-            </div>
-            <div class="user-form-group">
-              <label>Status</label>
-              <select class="user-form-control" data-crud-field="status">
-                <option selected>Active</option>
-                <option>Inactive</option>
-              </select>
-            </div>
+          <div class="user-form-group" data-field="product_desc">
+            <label>Short Description</label>
+            <textarea name="product_desc" class="user-form-control @error('product_desc') is-invalid @enderror" rows="3" maxlength="5000" placeholder="Describe this service in 2–3 lines...">{{ old('product_desc') }}</textarea>
+            <small class="user-field-error">@error('product_desc'){{ $message }}@enderror</small>
           </div>
-          <div class="user-form-row">
-            <div class="user-form-group">
-              <label>Price Range (optional)</label>
-              <input type="text" class="user-form-control" data-crud-field="price" placeholder="e.g. ₹5,000 – ₹2,00,000">
-            </div>
-            <div class="user-form-group">
-              <label>Display Order</label>
-              <input type="number" class="user-form-control" data-crud-field="order" placeholder="1" min="1" value="1">
-            </div>
-          </div>
-          <div class="user-form-group">
-            <label>Short Description *</label>
-            <textarea class="user-form-control" rows="3" data-crud-field="description" placeholder="Describe this service in 2–3 lines..." required></textarea>
-          </div>
-          <div class="user-form-group">
+          <div class="user-form-group" data-field="product_image">
             <label>Service Image</label>
-            <div class="user-upload-zone"><input type="file" accept="image/*" hidden><p>Upload service image (optional)</p></div>
+            <div class="user-upload-zone">
+              <input type="file" name="product_image" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
+              <p>Upload service image (optional)</p>
+            </div>
+            <p class="user-form-hint">JPG, PNG, WebP or GIF · max 2 MB</p>
+            <small class="user-field-error">@error('product_image'){{ $message }}@enderror</small>
           </div>
-          <label class="user-form-check">
-            <input type="checkbox" data-crud-field="featured"> Feature this service on profile homepage
-          </label>
           <div class="user-form-actions">
             <a href="{{ route('front.users.services') }}" class="user-btn user-btn-default">Cancel</a>
-            <button type="button" class="user-btn user-btn-primary" data-crud-save>Add Service</button>
+            <button type="submit" class="user-btn user-btn-primary">Add Service</button>
           </div>
         </form>
       </div>
     </div>
-<script src="{{ asset('front/assets/js/user-crud.js') }}"></script>
 @endsection
+
+@push('scripts')
+<script src="{{ asset('front/assets/js/service-form.js') }}"></script>
+@endpush

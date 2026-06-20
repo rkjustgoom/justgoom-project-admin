@@ -23,7 +23,7 @@
 
   <section class="profile-hero">
     <div class="profile-hero-banner">
-      <img src="{{ $profile->logo ? asset($profile->logo) : asset('front/assets/images/cat-business.jpg') }}" alt="{{ $profile->company_name }} banner">
+      <img src="{{ asset('front/assets/images/hero-banner.jpg') }}" alt="{{ $profile->company_name }} banner">
     </div>
     <div class="container profile-hero-content">
       <div class="profile-hero-main">
@@ -88,6 +88,82 @@
             <span>{{ $user->category->name ?? 'General' }}</span>
             <span>{{ $user->subCategory->name }}</span>
           </div>
+        </section>
+      @endif
+
+      @if($services->isNotEmpty())
+        <section class="profile-section">
+          <h2>My Services</h2>
+          <div class="profile-services-grid profile-services-cards">
+            @foreach($services as $service)
+              <article class="profile-service-card">
+                @if($service->product_image)
+                  <img src="{{ asset($service->product_image) }}" alt="{{ $service->product_name }}">
+                @else
+                  <div class="profile-service-card-placeholder">💼</div>
+                @endif
+                <div class="profile-service-card-body">
+                  <h4>{{ $service->product_name }}</h4>
+                  @if($service->product_desc)
+                    <p>{{ $service->product_desc }}</p>
+                  @endif
+                </div>
+              </article>
+            @endforeach
+          </div>
+        </section>
+      @endif
+
+      @if($teams->isNotEmpty())
+        <section class="profile-section">
+          <h2>My Team</h2>
+          <div class="profile-team-grid">
+            @foreach($teams as $member)
+              @php
+                $initials = collect(explode(' ', $member->name))
+                  ->filter()
+                  ->take(2)
+                  ->map(fn ($part) => strtoupper(substr($part, 0, 1)))
+                  ->implode('');
+                $avatarColors = ['#6366f1', '#ec4899', '#14b8a6', '#f59e0b', '#0ea5e9', '#8b5cf6'];
+                $avatarColor = $avatarColors[crc32($member->name) % count($avatarColors)];
+              @endphp
+              <article class="team-member-card">
+                @if($member->image)
+                  <img src="{{ asset($member->image) }}" alt="{{ $member->name }}" class="team-avatar-img">
+                @else
+                  <div class="team-avatar" style="background:{{ $avatarColor }}">{{ $initials }}</div>
+                @endif
+                <h4>{{ $member->name }}</h4>
+                @if($member->designation)
+                  <p class="team-role">{{ $member->designation }}</p>
+                @endif
+                @if($member->department)
+                  <p class="team-location">{{ $member->department }}</p>
+                @endif
+                @if($member->short_info)
+                  <p class="team-bio">{{ Str::limit($member->short_info, 100) }}</p>
+                @endif
+              </article>
+            @endforeach
+          </div>
+        </section>
+      @endif
+
+      @if($documents->isNotEmpty())
+        <section class="profile-section">
+          <h2>My Documents</h2>
+          <ul class="profile-doc-list">
+            @foreach($documents as $document)
+              <li>
+                <span>
+                  <strong>{{ $document->title }}</strong>
+                  <small>{{ $document->fileTypeLabel() }} · {{ $document->created_at?->format('M j, Y') }}</small>
+                </span>
+                <a href="{{ asset($document->attachment) }}" target="_blank" rel="noopener">Download</a>
+              </li>
+            @endforeach
+          </ul>
         </section>
       @endif
     </main>

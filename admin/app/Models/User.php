@@ -95,6 +95,16 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Team::class);
     }
 
+    public function services(): HasMany
+    {
+        return $this->hasMany(Service::class);
+    }
+
+    public function documents(): HasMany
+    {
+        return $this->hasMany(Document::class);
+    }
+
     public function fullName(): string
     {
         return trim("{$this->fname} {$this->lname}");

@@ -19,6 +19,14 @@ class TeamService
             ->get();
     }
 
+    public function listForPublicProfile(User $user): Collection
+    {
+        return $user->teams()
+            ->where('status', 1)
+            ->latest()
+            ->get();
+    }
+
     public function statsForUser(User $user): array
     {
         $members = $user->teams()->get(['status', 'is_primary']);

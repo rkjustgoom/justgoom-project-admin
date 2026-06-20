@@ -20,81 +20,85 @@
       @endif
 
       <div class="user-form-card">
-        <form method="POST" action="{{ route('front.users.profile.update') }}" id="profileForm" enctype="multipart/form-data">
+        <form method="POST" action="{{ route('front.users.profile.update') }}" id="profileForm" enctype="multipart/form-data" novalidate>
           @csrf
           @method('PUT')
-          <div class="user-form-group">
+          <div class="user-form-group" data-field="logo">
             <label>Company Logo</label>
-            @if($profile->logo)
-              <img src="{{ asset($profile->logo) }}" alt="{{ $profile->company_name }} logo" class="user-preview-thumb" style="display:block;margin-bottom:12px;max-width:120px;max-height:120px;object-fit:contain;border-radius:8px;">
-            @endif
+            <img
+              src="{{ $profile->logo ? asset($profile->logo) : '' }}"
+              alt="{{ $profile->company_name }} logo"
+              class="company-logo-box"
+              id="profileLogoPreview"
+              @if(!$profile->logo) style="display:none" @endif
+            >
             <div class="user-upload-zone">
               <input type="file" name="logo" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
               <p>@if($profile->logo)Replace logo (optional)@else Drag &amp; drop or <strong>click to upload</strong> logo (optional)@endif</p>
             </div>
-            @error('logo')<small class="user-field-error">{{ $message }}</small>@enderror
-            <p class="user-form-hint">JPG, PNG, WebP or GIF · max 2 MB · square image recommended</p>
+            <p class="user-form-hint">JPG, PNG, WebP or GIF · max 2 MB · displays at 120×120 px on your public profile</p>
+            <small class="user-field-error">@error('logo'){{ $message }}@enderror</small>
           </div>
           <div class="user-form-row">
-            <div class="user-form-group">
+            <div class="user-form-group" data-field="company_name">
               <label>Business Name *</label>
-              <input type="text" name="company_name" class="user-form-control @error('company_name') is-invalid @enderror" value="{{ old('company_name', $profile->company_name) }}" required>
-              @error('company_name')<small class="user-field-error">{{ $message }}</small>@enderror
+              <input type="text" name="company_name" class="user-form-control @error('company_name') is-invalid @enderror" value="{{ old('company_name', $profile->company_name) }}" maxlength="200">
+              <small class="user-field-error">@error('company_name'){{ $message }}@enderror</small>
             </div>
-            <div class="user-form-group">
+            <div class="user-form-group" data-field="category_id">
               <label>Category *</label>
-              <select name="category_id" id="profileCategory" class="user-form-control @error('category_id') is-invalid @enderror" required>
+              <select name="category_id" id="profileCategory" class="user-form-control @error('category_id') is-invalid @enderror">
                 <option value="">Select category</option>
                 @foreach($categories as $category)
                   <option value="{{ $category->id }}" @selected(old('category_id', $user->category_id) == $category->id)>{{ $category->name }}</option>
                 @endforeach
               </select>
-              @error('category_id')<small class="user-field-error">{{ $message }}</small>@enderror
+              <small class="user-field-error">@error('category_id'){{ $message }}@enderror</small>
             </div>
           </div>
           <div class="user-form-row">
-            <div class="user-form-group">
+            <div class="user-form-group" data-field="sub_category_id">
               <label>Sub Category *</label>
-              <select name="sub_category_id" id="profileSubCategory" class="user-form-control @error('sub_category_id') is-invalid @enderror" required>
+              <select name="sub_category_id" id="profileSubCategory" class="user-form-control @error('sub_category_id') is-invalid @enderror">
                 <option value="">Select sub category</option>
                 @foreach($subCategories as $subCategory)
                   <option value="{{ $subCategory->id }}" @selected(old('sub_category_id', $user->sub_category_id) == $subCategory->id)>{{ $subCategory->name }}</option>
                 @endforeach
               </select>
-              @error('sub_category_id')<small class="user-field-error">{{ $message }}</small>@enderror
+              <small class="user-field-error">@error('sub_category_id'){{ $message }}@enderror</small>
             </div>
-            <div class="user-form-group">
+            <div class="user-form-group" data-field="city">
               <label>City *</label>
-              <input type="text" name="city" class="user-form-control @error('city') is-invalid @enderror" value="{{ old('city', $profile->city ?? $user->city) }}" required>
-              @error('city')<small class="user-field-error">{{ $message }}</small>@enderror
+              <input type="text" name="city" class="user-form-control @error('city') is-invalid @enderror" value="{{ old('city', $profile->city ?? $user->city) }}" maxlength="100">
+              <small class="user-field-error">@error('city'){{ $message }}@enderror</small>
             </div>
           </div>
-          <div class="user-form-group">
+          <div class="user-form-group" data-field="tagline">
             <label>Tagline</label>
-            <input type="text" name="tagline" class="user-form-control @error('tagline') is-invalid @enderror" value="{{ old('tagline', $profile->tagline) }}" placeholder="Short business tagline">
-            @error('tagline')<small class="user-field-error">{{ $message }}</small>@enderror
+            <input type="text" name="tagline" class="user-form-control @error('tagline') is-invalid @enderror" value="{{ old('tagline', $profile->tagline) }}" placeholder="Short business tagline" maxlength="255">
+            <small class="user-field-error">@error('tagline'){{ $message }}@enderror</small>
           </div>
-          <div class="user-form-group">
+          <div class="user-form-group" data-field="business_desc">
             <label>About Business *</label>
-            <textarea name="business_desc" class="user-form-control @error('business_desc') is-invalid @enderror" rows="4" required>{{ old('business_desc', $profile->business_desc) }}</textarea>
-            @error('business_desc')<small class="user-field-error">{{ $message }}</small>@enderror
+            <textarea name="business_desc" class="user-form-control @error('business_desc') is-invalid @enderror" rows="4" maxlength="5000">{{ old('business_desc', $profile->business_desc) }}</textarea>
+            <small class="user-field-error">@error('business_desc'){{ $message }}@enderror</small>
           </div>
           <div class="user-form-row">
-            <div class="user-form-group">
+            <div class="user-form-group" data-field="phone">
               <label>Phone *</label>
-              <input type="tel" name="phone" class="user-form-control @error('phone') is-invalid @enderror" value="{{ old('phone', $profile->phone ?? $user->phone) }}" maxlength="10" inputmode="numeric" pattern="[0-9]{10}" required>
-              @error('phone')<small class="user-field-error">{{ $message }}</small>@enderror
+              <input type="tel" name="phone" class="user-form-control @error('phone') is-invalid @enderror" value="{{ old('phone', $profile->phone ?? $user->phone) }}" maxlength="10" inputmode="numeric" placeholder="Enter Phone Number">
+              <small class="user-field-error">@error('phone'){{ $message }}@enderror</small>
             </div>
-            <div class="user-form-group">
+            <div class="user-form-group" data-field="email">
               <label>Email *</label>
-              <input type="email" name="email" class="user-form-control @error('email') is-invalid @enderror" value="{{ old('email', $profile->email ?? $user->email) }}" required>
-              @error('email')<small class="user-field-error">{{ $message }}</small>@enderror
+              <input type="email" name="email" class="user-form-control @error('email') is-invalid @enderror" value="{{ old('email', $profile->email ?? $user->email) }}" maxlength="191">
+              <small class="user-field-error">@error('email'){{ $message }}@enderror</small>
             </div>
           </div>
-          <div class="user-form-group">
+          <div class="user-form-group" data-field="address">
             <label>Address</label>
-            <input type="text" name="address" class="user-form-control @error('address') is-invalid @enderror" value="{{ old('address', $profile->address) }}">
-            @error('address')<small class="user-field-error">{{ $message }}</small>@enderror
+            <input type="text" name="address" class="user-form-control @error('address') is-invalid @enderror" value="{{ old('address', $profile->address) }}" maxlength="500">
+            <small class="user-field-error">@error('address'){{ $message }}@enderror</small>
           </div>
           <div class="user-form-row">
             <div class="user-form-group">

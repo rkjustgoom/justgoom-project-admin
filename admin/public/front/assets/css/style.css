@@ -2517,14 +2517,17 @@ select.form-input:disabled {
 }
 .company-logo-image {
   background: #fff !important;
-  padding: 2px;
+  padding: 8px;
   overflow: hidden;
+  box-sizing: border-box;
 }
 .company-logo-image img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
   border-radius: inherit;
+  display: block;
 }
 .globy-sector-subs {
   font-size: 13px;
@@ -4055,6 +4058,72 @@ select.form-input:disabled {
   font-size: 14px;
 }
 .profile-doc-list a { color: var(--primary); font-weight: 600; font-size: 13px; }
+.profile-doc-list li span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.profile-doc-list li small {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+.profile-services-grid.profile-services-cards {
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+.profile-service-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--bg-white);
+}
+.profile-service-card img,
+.profile-service-card-placeholder {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  display: block;
+}
+.profile-service-card-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-light);
+  font-size: 32px;
+}
+.profile-service-card-body {
+  padding: 14px 16px;
+}
+.profile-service-card-body h4 {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: var(--primary-dark);
+}
+.profile-service-card-body p {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+.team-avatar-img {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  margin: 0 auto 12px;
+  display: block;
+  object-fit: cover;
+}
+.team-bio {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 0;
+}
+.profile-section .profile-team-grid {
+  margin-top: 4px;
+}
 .profile-blog-list { display: flex; flex-direction: column; gap: 12px; }
 .profile-blog-item {
   display: flex;
@@ -5194,7 +5263,7 @@ a.categories-menu-item { color: inherit; }
   overflow: hidden;
   background: var(--primary-dark);
 }
-.profile-hero-banner img { width: 100%; height: 100%; object-fit: cover; opacity: 0.7; }
+.profile-hero-banner img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .profile-hero-content {
   display: grid;
   grid-template-columns: 1fr 220px;
@@ -5214,10 +5283,14 @@ a.categories-menu-item { color: inherit; }
 .profile-avatar {
   width: 120px;
   height: 120px;
-  border-radius: var(--radius-lg);
-  object-fit: cover;
+  border-radius: 8px;
+  object-fit: contain;
+  object-position: center;
+  background: var(--bg-white);
+  padding: 8px;
   border: 4px solid var(--bg-white);
   box-shadow: var(--shadow);
+  box-sizing: border-box;
 }
 .profile-verified {
   position: absolute;

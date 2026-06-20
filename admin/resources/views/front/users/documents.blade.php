@@ -6,15 +6,41 @@
 
 @section('content')
 <div class="user-content">
-      <div class="user-toolbar"><span></span><a href="{{ route('front.users.document-form') }}" class="user-btn user-btn-primary">+ Upload Document</a></div>
+      <div class="user-stat-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
+        <div class="user-stat-card green"><span class="user-stat-icon">📄</span><div class="user-stat-info"><h3>{{ $stats['total'] }}</h3><span>Total Documents</span></div></div>
+        <div class="user-stat-card yellow"><span class="user-stat-icon">📑</span><div class="user-stat-info"><h3>{{ $stats['pdf'] }}</h3><span>PDF Files</span></div></div>
+        <div class="user-stat-card grey"><span class="user-stat-icon">📁</span><div class="user-stat-info"><h3>{{ $stats['other'] }}</h3><span>Other Files</span></div></div>
+      </div>
+      <div class="user-toolbar">
+        <span class="user-text-muted">Manage documents shown on your public profile</span>
+        <a href="{{ route('front.users.document-add') }}" class="user-btn user-btn-primary">+ Upload Document</a>
+      </div>
       <div class="user-table-wrap">
         <table class="user-table">
           <thead><tr><th>Document Name</th><th>Type</th><th>Uploaded</th><th>Action</th></tr></thead>
           <tbody>
-            <tr><td>GST Registration Certificate</td><td>PDF</td><td>Jan 15, 2026</td><td><a href="document-form.html?id=1" class="user-table-action">Edit</a> · <a href="delete.html?module=document&id=1&return=documents.html" class="user-table-action-muted">Delete</a></td></tr>
-            <tr><td>BIS Hallmark License</td><td>PDF</td><td>Jan 15, 2026</td><td><a href="document-form.html?id=2" class="user-table-action">Edit</a> · <a href="delete.html?module=document&id=2&return=documents.html" class="user-table-action-muted">Delete</a></td></tr>
-            <tr><td>Business Registration</td><td>PDF</td><td>Dec 10, 2025</td><td><a href="document-form.html?id=3" class="user-table-action">Edit</a> · <a href="delete.html?module=document&id=3&return=documents.html" class="user-table-action-muted">Delete</a></td></tr>
-            <tr><td>Product Catalogue 2026</td><td>PDF</td><td>May 1, 2026</td><td><a href="document-form.html?id=4" class="user-table-action">Edit</a> · <a href="delete.html?module=document&id=4&return=documents.html" class="user-table-action-muted">Delete</a></td></tr>
+            @forelse($documents as $document)
+            <tr>
+              <td><strong>{{ $document->title }}</strong></td>
+              <td>{{ $document->fileTypeLabel() }}</td>
+              <td>{{ $document->created_at?->format('M j, Y') }}</td>
+              <td>
+                <a href="{{ route('front.users.documents.edit', $document) }}" class="user-table-action">Edit</a>
+                ·
+                <a href="{{ asset($document->attachment) }}" class="user-table-action" target="_blank" rel="noopener">View</a>
+                ·
+                <form method="POST" action="{{ route('front.users.documents.destroy', $document) }}" style="display:inline" onsubmit="return confirm('Remove this document?');">
+                  @csrf
+                  @method('DELETE')
+                  <button type="submit" class="user-table-action-muted" style="background:none;border:none;padding:0;cursor:pointer;font:inherit;">Delete</button>
+                </form>
+              </td>
+            </tr>
+            @empty
+            <tr>
+              <td colspan="4" class="user-text-muted" style="text-align:center;padding:24px;">No documents yet. Upload your first document to show it on your public profile.</td>
+            </tr>
+            @endforelse
           </tbody>
         </table>
       </div>

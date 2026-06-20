@@ -7,9 +7,9 @@
 @section('content')
 <div class="user-content">
       <div class="user-stat-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
-        <div class="user-stat-card green"><span class="user-stat-icon">💼</span><div class="user-stat-info"><h3>7</h3><span>Total Services</span></div></div>
-        <div class="user-stat-card yellow"><span class="user-stat-icon">✅</span><div class="user-stat-info"><h3>7</h3><span>Active</span></div></div>
-        <div class="user-stat-card red"><span class="user-stat-icon">⭐</span><div class="user-stat-info"><h3>3</h3><span>Featured</span></div></div>
+        <div class="user-stat-card green"><span class="user-stat-icon">💼</span><div class="user-stat-info"><h3>{{ $stats['total'] }}</h3><span>Total Services</span></div></div>
+        <div class="user-stat-card yellow"><span class="user-stat-icon">✅</span><div class="user-stat-info"><h3>{{ $stats['active'] }}</h3><span>Active</span></div></div>
+        <div class="user-stat-card red"><span class="user-stat-icon">⭐</span><div class="user-stat-info"><h3>{{ $stats['featured'] }}</h3><span>Featured</span></div></div>
       </div>
       <div class="user-toolbar">
         <span class="user-text-muted">Products and services on your public profile</span>
@@ -17,15 +17,29 @@
       </div>
       <div class="user-table-wrap">
         <table class="user-table">
-          <thead><tr><th>#</th><th>Service Name</th><th>Category</th><th>Price Range</th><th>Status</th><th>Action</th></tr></thead>
+          <thead><tr><th>#</th><th>Service</th><th>Description</th><th>Added</th><th>Action</th></tr></thead>
           <tbody>
-            <tr><td>1</td><td>22K Gold Jewellery <span class="user-badge user-badge-warning" style="font-size:10px">Featured</span></td><td>Retail</td><td>₹5,000 – ₹5,00,000</td><td><span class="user-badge user-badge-success">Active</span></td><td><a href="service-edit.html?id=1" class="user-table-action">Edit</a> · <a href="delete.html?module=service&id=1&return=services.html" class="user-table-action-muted">Delete</a></td></tr>
-            <tr><td>2</td><td>Wedding Collection <span class="user-badge user-badge-warning" style="font-size:10px">Featured</span></td><td>Retail</td><td>₹25,000 – ₹10,00,000</td><td><span class="user-badge user-badge-success">Active</span></td><td><a href="service-edit.html?id=2" class="user-table-action">Edit</a> · <a href="delete.html?module=service&id=2&return=services.html" class="user-table-action-muted">Delete</a></td></tr>
-            <tr><td>3</td><td>Gold Bullion</td><td>Wholesale</td><td>Market rate</td><td><span class="user-badge user-badge-success">Active</span></td><td><a href="service-edit.html?id=3" class="user-table-action">Edit</a> · <a href="delete.html?module=service&id=3&return=services.html" class="user-table-action-muted">Delete</a></td></tr>
-            <tr><td>4</td><td>Custom Design</td><td>Service</td><td>₹2,000+ making</td><td><span class="user-badge user-badge-success">Active</span></td><td><a href="service-edit.html?id=4" class="user-table-action">Edit</a> · <a href="delete.html?module=service&id=4&return=services.html" class="user-table-action-muted">Delete</a></td></tr>
-            <tr><td>5</td><td>B2B Wholesale Supply <span class="user-badge user-badge-warning" style="font-size:10px">Featured</span></td><td>Wholesale</td><td>Bulk pricing</td><td><span class="user-badge user-badge-success">Active</span></td><td><a href="service-edit.html?id=5" class="user-table-action">Edit</a> · <a href="delete.html?module=service&id=5&return=services.html" class="user-table-action-muted">Delete</a></td></tr>
-            <tr><td>6</td><td>Gold Loan Assistance</td><td>Finance</td><td>Free consultation</td><td><span class="user-badge user-badge-success">Active</span></td><td><a href="service-edit.html?id=6" class="user-table-action">Edit</a> · <a href="delete.html?module=service&id=6&return=services.html" class="user-table-action-muted">Delete</a></td></tr>
-            <tr><td>7</td><td>Making Charges Calculator</td><td>Tool</td><td>Free</td><td><span class="user-badge user-badge-success">Active</span></td><td><a href="service-edit.html?id=7" class="user-table-action">Edit</a> · <a href="delete.html?module=service&id=7&return=services.html" class="user-table-action-muted">Delete</a></td></tr>
+            @forelse($services as $service)
+            <tr>
+              <td>{{ $loop->iteration }}</td>
+              <td><strong>{{ $service->product_name }}</strong></td>
+              <td>{{ Str::limit($service->product_desc, 80) ?: '—' }}</td>
+              <td>{{ $service->created_at?->format('M j, Y') }}</td>
+              <td>
+                <a href="{{ route('front.users.services.edit', $service) }}" class="user-table-action">Edit</a>
+                ·
+                <form method="POST" action="{{ route('front.users.services.destroy', $service) }}" style="display:inline" onsubmit="return confirm('Remove this service?');">
+                  @csrf
+                  @method('DELETE')
+                  <button type="submit" class="user-table-action-muted" style="background:none;border:none;padding:0;cursor:pointer;font:inherit;">Delete</button>
+                </form>
+              </td>
+            </tr>
+            @empty
+            <tr>
+              <td colspan="5" class="user-text-muted" style="text-align:center;padding:24px;">No services yet. Add your first service to show it on your public profile.</td>
+            </tr>
+            @endforelse
           </tbody>
         </table>
       </div>
