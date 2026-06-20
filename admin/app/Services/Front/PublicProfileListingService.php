@@ -80,11 +80,13 @@ class PublicProfileListingService
             'slug' => $profile->slug,
             'category' => $user->category->name ?? 'Uncategorized',
             'categorySlug' => $user->category->slug ?? '',
+            'subCategory' => $user->subCategory->name ?? '',
+            'subCategorySlug' => $user->subCategory->slug ?? '',
             'projects' => 0,
             'tasks' => 0,
             'city' => $profile->city ?: ($user->city ?: 'N/A'),
             'verified' => $user->hasVerifiedEmail(),
-            'featured' => $index < 3,
+            'featured' => $index < 4,
             'addedDaysAgo' => $profile->created_at
                 ? max(0, (int) $profile->created_at->diffInDays(now()))
                 : 0,

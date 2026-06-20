@@ -16,12 +16,12 @@
       <img src="{{ asset('front/assets/images/justgoom-logo.png') }}" alt="JustGoom" class="logo-img">
     </a>
     <nav class="main-nav">
-      <a href="{{ route('front.home') }}" data-nav="home">Home</a>
-      <a href="{{ route('front.about') }}" data-nav="about">About Us</a>
-      <a href="{{ route('front.categories') }}" data-nav="categories">Categories</a>
-      <a href="{{ route('front.all-profiles') }}" data-nav="all-profiles">All Profiles</a>
-      <a href="{{ route('front.articles') }}" data-nav="articles">Articles</a>
-      <a href="{{ route('front.contact') }}" data-nav="contact">Contact Us</a>
+      <a href="{{ route('front.home') }}" data-nav="home" @class(['active' => request()->routeIs('front.home')])>Home</a>
+      <a href="{{ route('front.about') }}" data-nav="about" @class(['active' => request()->routeIs('front.about')])>About Us</a>
+      <a href="{{ route('front.categories') }}" data-nav="categories" @class(['active' => request()->routeIs('front.categories', 'front.category-details')])>Categories</a>
+      <a href="{{ route('front.all-profiles') }}" data-nav="all-profiles" @class(['active' => request()->routeIs('front.all-profiles', 'front.profile.show', 'front.profile')])>All Profiles</a>
+      <a href="{{ route('front.articles') }}" data-nav="articles" @class(['active' => request()->routeIs('front.articles')])>Articles</a>
+      <a href="{{ route('front.contact') }}" data-nav="contact" @class(['active' => request()->routeIs('front.contact')])>Contact Us</a>
     </nav>
     <div class="header-actions">
       @auth
@@ -36,8 +36,8 @@
           <a href="{{ route('front.register') }}" class="btn btn-accent btn-sm">Register</a>
         @endif
       @else
-        <a href="{{ route('front.login') }}" class="btn btn-outline btn-sm">Login</a>
-        <a href="{{ route('front.register') }}" class="btn btn-accent btn-sm">Register</a>
+        <a href="{{ route('front.login') }}" class="btn btn-outline btn-sm @if(request()->routeIs('front.login')) active-nav-btn @endif">Login</a>
+        <a href="{{ route('front.register') }}" class="btn btn-accent btn-sm @if(request()->routeIs('front.register')) active-nav-btn @endif">Register</a>
       @endauth
     </div>
     <button class="mobile-toggle" aria-label="Open menu">☰</button>
@@ -48,39 +48,16 @@
   <div class="mobile-nav-panel">
     <button class="mobile-nav-close" aria-label="Close menu">✕</button>
     <nav class="mobile-nav-links">
-      <a href="{{ route('front.home') }}" data-nav="home">Home</a>
-      <a href="{{ route('front.about') }}" data-nav="about">About Us</a>
-      <a href="{{ route('front.categories') }}" data-nav="categories">Categories</a>
-      <a href="{{ route('front.all-profiles') }}" data-nav="all-profiles">All Profiles</a>
-      <a href="{{ route('front.articles') }}" data-nav="articles">Articles</a>
-      <a href="{{ route('front.contact') }}" data-nav="contact">Contact Us</a>
+      <a href="{{ route('front.home') }}" data-nav="home" @class(['active' => request()->routeIs('front.home')])>Home</a>
+      <a href="{{ route('front.about') }}" data-nav="about" @class(['active' => request()->routeIs('front.about')])>About Us</a>
+      <a href="{{ route('front.categories') }}" data-nav="categories" @class(['active' => request()->routeIs('front.categories', 'front.category-details')])>Categories</a>
+      <a href="{{ route('front.all-profiles') }}" data-nav="all-profiles" @class(['active' => request()->routeIs('front.all-profiles', 'front.profile.show', 'front.profile')])>All Profiles</a>
+      <a href="{{ route('front.articles') }}" data-nav="articles" @class(['active' => request()->routeIs('front.articles')])>Articles</a>
+      <a href="{{ route('front.contact') }}" data-nav="contact" @class(['active' => request()->routeIs('front.contact')])>Contact Us</a>
     </nav>
     <div class="mobile-nav-actions">
-      <a href="{{ route('front.login') }}" class="btn btn-outline btn-block">Login</a>
-      <a href="{{ route('front.register') }}" class="btn btn-accent btn-block">Register</a>
+      <a href="{{ route('front.login') }}" class="btn btn-outline btn-block @if(request()->routeIs('front.login')) active-nav-btn @endif">Login</a>
+      <a href="{{ route('front.register') }}" class="btn btn-accent btn-block @if(request()->routeIs('front.register')) active-nav-btn @endif">Register</a>
     </div>
   </div>
 </div>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    var page = document.body.getAttribute('data-page');
-    if (!page) return;
-
-    if (page === 'login' || page === 'register') {
-      document.querySelectorAll('.header-actions a, .mobile-nav-actions a').forEach(function (link) {
-        var label = link.textContent.trim().toLowerCase();
-        if ((page === 'login' && label === 'login') || (page === 'register' && label === 'register')) {
-          link.classList.add('active-nav-btn');
-        }
-      });
-      return;
-    }
-
-    document.querySelectorAll('[data-nav]').forEach(function (link) {
-      if (link.getAttribute('data-nav') === page) {
-        link.classList.add('active');
-      }
-    });
-  });
-</script>

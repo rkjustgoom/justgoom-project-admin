@@ -35,7 +35,7 @@
         <div class="stat-label">Head Office</div>
       </div>
       <div class="stat-item">
-        <div class="stat-num">Pan-India</div>
+        <div class="stat-num">Global Reach</div>
         <div class="stat-label">Business Coverage</div>
       </div>
     </div>

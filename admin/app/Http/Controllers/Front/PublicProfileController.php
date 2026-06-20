@@ -30,6 +30,7 @@ class PublicProfileController extends Controller
         return view('front.pages.all_profiles', [
             'companyProfiles' => $this->listingService->listForFrontend(),
             'profileStats' => $stats,
+            'categorySectors' => $this->categoryCatalogService->sectorsForFrontend(),
             'filterCategories' => $this->categoryCatalogService->activeCategories(),
             'filterCities' => $this->listingService->citiesForFilter(),
         ]);

@@ -87,7 +87,7 @@
       <div class="section-header">
         <div>
           <h2 class="section-title">Featured Business Profiles</h2>
-          <p class="section-subtitle">Browse verified business profiles — showing 3 featured listings</p>
+          <p class="section-subtitle" id="homeCompanySubtitle">Browse verified business profiles — showing 12 featured listings</p>
         </div>
         <a href="{{ route('front.all-profiles') }}" class="view-all-link">View All →</a>
       </div>
@@ -102,12 +102,12 @@
             <button type="button" id="homeViewGrid" class="active" title="Grid view">▦</button>
             <button type="button" id="homeViewList" title="List view">☰</button>
           </div>
-          <button type="button" class="btn-filters" onclick="location.href='{{ route('front.all-profiles') }}'">+ Filters</button>
+          <button type="button" class="btn-filters" id="homeFiltersBtn">+ Filters</button>
         </div>
       </div>
 
-      <p class="company-count" id="homeCompanyCount">Showing 3 of 3 company profiles</p>
-      <div class="company-grid company-grid-3" id="homeCompanyGrid"></div>
+      <p class="company-count" id="homeCompanyCount">Showing 12 of 12 company profiles</p>
+      <div class="company-grid" id="homeCompanyGrid"></div>
     </div>
   </section>
 
@@ -227,22 +227,24 @@
     </div>
   </div>
 
-  <!-- Dual CTA -->
-  <section class="section b2b-dual-cta">
+  <!-- Discover Major Cities -->
+  <section class="major-cities-section" id="major-cities">
     <div class="container">
-      <div class="b2b-cta-grid">
-        <div class="b2b-cta-card b2b-cta-buyer">
-          <span class="b2b-cta-label">For Buyers</span>
-          <h3>Post Your Requirement</h3>
-          <p>Tell us what you need and connect with verified businesses across India.</p>
-          <a href="{{ route('front.contact') }}" class="btn btn-accent">Post Requirement →</a>
-        </div>
-        <div class="b2b-cta-card b2b-cta-seller">
-          <span class="b2b-cta-label">For Sellers</span>
-          <h3>List Your Business Free</h3>
-          <p>Reach thousands of buyers. Create your profile and grow your business on JustGoom.</p>
-          <a href="{{ route('front.register') }}" class="btn btn-primary">Register Now →</a>
-        </div>
+      <div class="major-cities-header">
+        <h2 class="major-cities-title">Discover Major Cities</h2>
+        <p class="major-cities-subtitle">Top Cities</p>
+      </div>
+      <div class="major-cities-grid">
+        @foreach($majorCities as $city)
+          <a href="{{ route('front.all-profiles', ['city' => $city['name']]) }}" class="major-city-card">
+            <div class="major-city-thumb">
+              <img src="{{ str_starts_with($city['image'], 'http') ? $city['image'] : asset('front/assets/images/'.$city['image']) }}"
+                   alt="{{ $city['name'] }} — {{ $city['landmark'] ?? 'business profiles' }}"
+                   loading="lazy">
+            </div>
+            <span class="major-city-name">{{ $city['name'] }}</span>
+          </a>
+        @endforeach
       </div>
     </div>
   </section>
@@ -319,7 +321,7 @@
   </section> -->
 
   <!-- Featured Articles (Platinum/Gold) -->
-  <section class="section" id="articles">
+  <!-- <section class="section" id="articles">
     <div class="container">
       <div class="section-header">
         <div>
@@ -394,7 +396,7 @@
         </a>
       </div>
     </div>
-  </section>
+  </section> -->
 
   <!-- Subscription Plans -->
   <!-- <section class="section section-alt" id="plans">
@@ -484,7 +486,7 @@
   </section> -->
 
   <!-- Company Information -->
-  <section class="section company-info-section" id="about-justgoom">
+  <!-- <section class="section company-info-section" id="about-justgoom">
     <div class="container">
       <div class="section-header text-center about-section-head">
         <div>
@@ -519,7 +521,7 @@
         <a href="{{ route('front.register') }}" class="btn btn-accent">List Your Business Free</a>
       </div>
     </div>
-  </section>
+  </section> -->
 @endsection
 
 @push('scripts')

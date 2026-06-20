@@ -24,7 +24,7 @@ class RegisterService
                 'sub_category_id' => $data['sub_category_id'],
                 'status' => 1,
                 'email_verified_at' => null,
-                'referral_code' => $this->uniqueReferralCode(),
+                'referral_code' => $data['referral_code'] ?? $this->uniqueReferralCode(),
             ]);
 
             CompanyProfile::create([

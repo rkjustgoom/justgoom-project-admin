@@ -191,7 +191,7 @@ function initCategoriesPage() {
 
 document.addEventListener('DOMContentLoaded', function() {
   if (document.getElementById('homeSectorsGrid')) {
-    renderSectorsGrid('homeSectorsGrid', { limit: 7, footerCountId: 'homeSectorsFooterCount' });
+    renderSectorsGrid('homeSectorsGrid', { limit: 8, footerCountId: 'homeSectorsFooterCount' });
   }
   if (document.getElementById('allSectorsGrid')) {
     initCategoriesPage();

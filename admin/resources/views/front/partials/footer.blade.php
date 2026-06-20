@@ -20,10 +20,8 @@
           <li><a href="{{ route('front.about') }}">About Us</a></li>
           <li><a href="{{ route('front.categories') }}">Categories</a></li>
           <li><a href="{{ route('front.all-profiles') }}">All Profiles</a></li>
-          <li><a href="{{ route('front.articles') }}">Articles</a></li>
+          <!-- <li><a href="{{ route('front.articles') }}">Articles</a></li> -->
           <li><a href="{{ route('front.contact') }}">Contact Us</a></li>
-          <li><a href="{{ route('front.login') }}">Login</a></li>
-          <li><a href="{{ route('front.register') }}">Register</a></li>
         </ul>
       </div>
       <div class="footer-col">
@@ -48,7 +46,7 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2026 Just Goom LLP. All rights reserved.</span>
+      <span>© {{ date('Y') }} Just Goom LLP. All rights reserved.</span>
       <div class="footer-bottom-links">
         <a href="#">Privacy</a>
         <a href="#">Terms</a>

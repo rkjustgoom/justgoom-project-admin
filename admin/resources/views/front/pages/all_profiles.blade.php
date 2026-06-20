@@ -61,9 +61,16 @@
             <div class="filter-chips" data-filter-group="category" data-single="true">
               <span class="chip active" data-value="all">All</span>
               @foreach($filterCategories as $category)
-                <span class="chip" data-value="{{ strtolower($category->name) }}">{{ $category->name }}</span>
+                <span class="chip" data-value="{{ $category->slug }}">{{ $category->name }}</span>
               @endforeach
             </div>
+          </div>
+
+          <div class="filter-group" id="subCategoryFilterGroup" hidden>
+            <label class="filter-label" for="profileSubCategorySelect">Subcategory</label>
+            <select class="filter-select" id="profileSubCategorySelect" data-filter="subcategory">
+              <option value="all">All Subcategories</option>
+            </select>
           </div>
 
           <div class="filter-group">

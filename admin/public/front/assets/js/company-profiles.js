@@ -1,7 +1,7 @@
 /* Company profiles — home + all profiles pages */
-const HOME_PROFILE_LIMIT = 3;
-const ALL_PROFILES_LIMIT = 100;
 const PROFILES_PER_PAGE = 12;
+const HOME_PROFILE_LIMIT = PROFILES_PER_PAGE;
+const ALL_PROFILES_LIMIT = 100;
 
 const COMPANY_BANNER_FILES = [
   'movie-1.jpg', 'movie-2.jpg', 'movie-3.jpg',
@@ -111,6 +111,8 @@ function renderCompanyCard(company, index) {
       data-name="${company.name.toLowerCase()}"
       data-category="${company.category.toLowerCase()}"
       data-category-slug="${(company.categorySlug || '').toLowerCase()}"
+      data-subcategory="${(company.subCategory || '').toLowerCase()}"
+      data-subcategory-slug="${(company.subCategorySlug || '').toLowerCase()}"
       data-locality="${company.city.toLowerCase()}"
       data-verified="${company.verified ? 'yes' : 'no'}"
       data-added-days="${addedDays}">
@@ -196,11 +198,17 @@ function initHomeCompanyProfiles() {
 
   if (!grid) return;
 
+  const subtitleEl = document.getElementById('homeCompanySubtitle');
+  if (subtitleEl) {
+    subtitleEl.textContent = `Browse verified business profiles — showing ${HOME_PROFILES.length} featured listings`;
+  }
+
   grid.innerHTML = HOME_PROFILES.map(renderCompanyCard).join('');
 
   function updateCount() {
     const visible = grid.querySelectorAll('.company-card:not([style*="display: none"])').length;
-    if (countEl) countEl.textContent = `Showing ${visible} of ${HOME_PROFILES.length} company profiles`;
+    const total = COMPANY_PROFILES.length;
+    if (countEl) countEl.textContent = `Showing ${visible} of ${total} company profiles`;
   }
 
   searchInput?.addEventListener('input', () => {
@@ -208,7 +216,8 @@ function initHomeCompanyProfiles() {
     grid.querySelectorAll('.company-card').forEach(card => {
       const name = card.dataset.name || '';
       const cat = card.dataset.category || '';
-      const match = !q || name.includes(q) || cat.includes(q);
+      const loc = card.dataset.locality || '';
+      const match = !q || name.includes(q) || cat.includes(q) || loc.includes(q);
       card.style.display = match ? '' : 'none';
     });
     updateCount();
@@ -217,6 +226,14 @@ function initHomeCompanyProfiles() {
   bindViewToggle(grid, viewGridBtn, viewListBtn);
   bindCardInteractions(grid);
   updateCount();
+
+  document.getElementById('homeFiltersBtn')?.addEventListener('click', function() {
+    var q = searchInput?.value.trim() || '';
+    var base = (window.FRONT_ROUTES && window.FRONT_ROUTES.allProfiles) || '/all-profiles';
+    var params = new URLSearchParams();
+    if (q) params.set('q', q);
+    window.location.href = params.toString() ? base + '?' + params.toString() : base;
+  });
 }
 
 function matchesTimeRange(days, range) {
@@ -269,6 +286,139 @@ const CATEGORY_MENU_KEYWORDS = {
   catering: ['food', 'dining', 'event']
 };
 
+function resolveCategoryFilter(slug) {
+  if (!slug || slug === 'all') return null;
+
+  slug = slug.toLowerCase();
+
+  if (typeof CATEGORY_SECTORS !== 'undefined') {
+    var sector = CATEGORY_SECTORS.find(function(s) { return s.slug === slug; });
+    if (sector) {
+      return { type: 'sector', sectorSlug: slug, label: sector.name };
+    }
+
+    for (var i = 0; i < CATEGORY_SECTORS.length; i++) {
+      var s = CATEGORY_SECTORS[i];
+      for (var j = 0; j < s.subs.length; j++) {
+        if (s.subs[j].slug === slug) {
+          return {
+            type: 'sub',
+            sectorSlug: s.slug,
+            subSlug: slug,
+            label: s.subs[j].name
+          };
+        }
+      }
+    }
+  }
+
+  return { type: 'unknown', sectorSlug: slug, label: slug.replace(/-/g, ' ') };
+}
+
+function getCategoryFilterLabel(slug) {
+  var resolved = resolveCategoryFilter(slug);
+  if (!resolved) return '';
+  if (resolved.label) {
+    return resolved.label.replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+  }
+  return slug.replace(/-/g, ' ').replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+}
+
+function populateSubCategoryOptions(sectorSlug, selectedSub) {
+  var group = document.getElementById('subCategoryFilterGroup');
+  var select = document.getElementById('profileSubCategorySelect');
+  if (!group || !select) return;
+
+  if (!sectorSlug || sectorSlug === 'all') {
+    group.hidden = true;
+    select.innerHTML = '<option value="all">All Subcategories</option>';
+    select.value = 'all';
+    return;
+  }
+
+  if (typeof CATEGORY_SECTORS === 'undefined') {
+    group.hidden = true;
+    return;
+  }
+
+  var sector = CATEGORY_SECTORS.find(function(s) { return s.slug === sectorSlug; });
+  if (!sector || !sector.subs.length) {
+    group.hidden = true;
+    select.innerHTML = '<option value="all">All Subcategories</option>';
+    select.value = 'all';
+    return;
+  }
+
+  group.hidden = false;
+  select.innerHTML = '<option value="all">All Subcategories</option>' +
+    sector.subs.map(function(sub) {
+      return '<option value="' + sub.slug + '">' + sub.name + '</option>';
+    }).join('');
+  select.value = (selectedSub && selectedSub !== 'all') ? selectedSub : 'all';
+}
+
+function syncProfilesFilterUrl(sectorSlug, subSlug) {
+  var params = new URLSearchParams(window.location.search);
+  params.delete('category');
+  params.delete('subcategory');
+
+  if (subSlug && subSlug !== 'all') {
+    params.set('category', subSlug);
+  } else if (sectorSlug && sectorSlug !== 'all') {
+    params.set('category', sectorSlug);
+  }
+
+  var query = params.toString();
+  window.history.replaceState({}, '', query ? window.location.pathname + '?' + query : window.location.pathname);
+}
+
+function getProfilesFilterSubtitle(sectorSlug, subSlug) {
+  if (subSlug && subSlug !== 'all') {
+    return 'Showing profiles for ' + getCategoryFilterLabel(subSlug);
+  }
+  if (sectorSlug && sectorSlug !== 'all') {
+    return 'Showing profiles for ' + getCategoryFilterLabel(sectorSlug);
+  }
+  return 'Browse verified business profiles across all categories';
+}
+
+function cardMatchesSectorAndSub(card, sectorSlug, subSlug) {
+  var cardCatSlug = (card.dataset.categorySlug || '').toLowerCase();
+  var cardSubSlug = (card.dataset.subcategorySlug || '').toLowerCase();
+
+  if (subSlug && subSlug !== 'all') {
+    return cardSubSlug === subSlug.toLowerCase();
+  }
+  if (sectorSlug && sectorSlug !== 'all') {
+    return cardCatSlug === sectorSlug.toLowerCase();
+  }
+  return true;
+}
+
+function setActiveCategoryChip(sidebar, slug) {
+  var categoryGroup = sidebar?.querySelector('[data-filter-group="category"]');
+  if (!categoryGroup) return;
+
+  var chipSlug = 'all';
+  if (slug && slug !== 'all') {
+    var resolved = resolveCategoryFilter(slug);
+    chipSlug = resolved ? resolved.sectorSlug : slug;
+  }
+
+  var matched = false;
+  categoryGroup.querySelectorAll('.chip').forEach(function(chip) {
+    var isActive = chip.dataset.value === chipSlug;
+    if (isActive) matched = true;
+    chip.classList.toggle('active', isActive);
+  });
+
+  if (!matched) {
+    categoryGroup.querySelectorAll('.chip').forEach(function(chip) {
+      chip.classList.toggle('active', chip.dataset.value === 'all');
+    });
+  }
+}
+
 function initCategoryCompanyProfiles() {
   const grid = document.getElementById('categoryCompanyGrid');
   const searchInput = document.getElementById('categoryCompanySearch');
@@ -279,6 +429,7 @@ function initCategoryCompanyProfiles() {
   const filtersToggle = document.getElementById('categoryFiltersToggle');
   const sidebar = document.getElementById('profileFilters');
   const timeSelect = document.getElementById('categoryTimeFilterSelect');
+  const subCategorySelect = document.getElementById('profileSubCategorySelect');
   const subtitleEl = document.getElementById('profilesSubtitle');
   const emptyEl = document.getElementById('profilesEmpty');
   const paginationEl = document.getElementById('profilesPagination');
@@ -294,21 +445,69 @@ function initCategoryCompanyProfiles() {
 
   let timeRange = 'all';
   let currentPage = 1;
-  const urlCategory = new URLSearchParams(window.location.search).get('category');
-  let menuCategoryFilter = urlCategory || 'all';
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlCategory = urlParams.get('category');
+  const urlSubCategory = urlParams.get('subcategory');
+  const urlSearch = (urlParams.get('q') || '').trim();
+  const urlCity = (urlParams.get('city') || '').trim();
+  let activeSectorFilter = 'all';
+  let activeSubCategoryFilter = 'all';
+  let urlCityFilter = '';
 
-  if (urlCategory && subtitleEl) {
-    const label = urlCategory.replace(/\b\w/g, c => c.toUpperCase());
-    subtitleEl.textContent = 'Showing profiles for ' + label;
+  if (urlCategory) {
+    var resolvedUrlCategory = resolveCategoryFilter(urlCategory);
+    if (resolvedUrlCategory && resolvedUrlCategory.type === 'sub') {
+      activeSectorFilter = resolvedUrlCategory.sectorSlug;
+      activeSubCategoryFilter = resolvedUrlCategory.subSlug;
+    } else {
+      activeSectorFilter = urlCategory;
+    }
+  }
+  if (urlSubCategory) {
+    activeSubCategoryFilter = urlSubCategory;
+    if (activeSectorFilter === 'all') {
+      var resolvedSub = resolveCategoryFilter(urlSubCategory);
+      if (resolvedSub && resolvedSub.sectorSlug) {
+        activeSectorFilter = resolvedSub.sectorSlug;
+      }
+    }
   }
 
-  function matchesMenuCategory(name, cat, card) {
-    if (!menuCategoryFilter || menuCategoryFilter === 'all') return true;
-    const slug = (card && card.dataset.categorySlug) || '';
-    if (slug && slug === menuCategoryFilter.toLowerCase()) return true;
-    const keywords = CATEGORY_MENU_KEYWORDS[menuCategoryFilter] || [menuCategoryFilter.replace(/-/g, ' ')];
-    const text = name + ' ' + cat;
-    return keywords.some(k => text.includes(k));
+  if (urlSearch && searchInput) {
+    searchInput.value = urlSearch;
+  }
+
+  if (urlCity && sidebar) {
+    const localitySelect = sidebar.querySelector('[data-filter="locality"]');
+    const cityLower = urlCity.toLowerCase();
+    const matchedOption = localitySelect
+      ? Array.from(localitySelect.options).find(function(option) {
+          return option.value.toLowerCase() === cityLower
+            || option.textContent.trim().toLowerCase() === cityLower;
+        })
+      : null;
+
+    if (matchedOption) {
+      localitySelect.value = matchedOption.value;
+    } else {
+      urlCityFilter = cityLower;
+    }
+  }
+
+  if (sidebar && activeSectorFilter !== 'all') {
+    setActiveCategoryChip(sidebar, activeSectorFilter);
+    populateSubCategoryOptions(activeSectorFilter, activeSubCategoryFilter);
+  }
+
+  if (subtitleEl) {
+    if (urlCategory || urlSubCategory || activeSectorFilter !== 'all') {
+      subtitleEl.textContent = getProfilesFilterSubtitle(activeSectorFilter, activeSubCategoryFilter);
+    } else if (urlSearch || urlCity) {
+      const parts = [];
+      if (urlSearch) parts.push('"' + urlSearch + '"');
+      if (urlCity) parts.push('in ' + urlCity);
+      subtitleEl.textContent = 'Search results for ' + parts.join(' ');
+    }
   }
 
   function cardMatchesFilters(card) {
@@ -317,21 +516,37 @@ function initCategoryCompanyProfiles() {
     const categoryGroup = sidebar?.querySelector('[data-filter-group="category"]');
     const verifiedGroup = sidebar?.querySelector('[data-filter-group="verified"]');
 
-    let categories = categoryGroup ? getActiveChips(categoryGroup) : [];
-    if (categories.includes('all')) categories = [];
+    let sectorSlug = activeSectorFilter;
+    let subSlug = activeSubCategoryFilter;
 
-    const verified = verifiedGroup ? getActiveChips(verifiedGroup) : [];
+    if (categoryGroup) {
+      const chips = getActiveChips(categoryGroup).filter(function(v) { return v !== 'all'; });
+      if (chips.length) {
+        sectorSlug = chips[0];
+      }
+    }
+
+    if (subCategorySelect) {
+      var subGroup = document.getElementById('subCategoryFilterGroup');
+      if (subGroup && !subGroup.hidden) {
+        const selectedSub = (subCategorySelect.value || 'all').toLowerCase();
+        subSlug = selectedSub;
+      }
+    }
+
+    const verified = verifiedGroup ? getActiveChips(verifiedGroup).filter(function(v) { return v !== 'all'; }) : [];
     const name = card.dataset.name || '';
     const cat = card.dataset.category || '';
+    const sub = card.dataset.subcategory || '';
     const loc = card.dataset.locality || '';
     const ver = card.dataset.verified || '';
     const days = parseInt(card.dataset.addedDays || '0', 10);
 
-    if (q && !name.includes(q) && !cat.includes(q)) return false;
-    if (!matchesMenuCategory(name, cat, card)) return false;
-    if (locality && locality !== 'all cities' && loc !== locality) return false;
-    if (categories.length && !categories.some(c => cat.includes(c.replace(/&/g, '').trim()))) return false;
-    if (verified.length === 1 && verified[0] === 'verified only' && ver !== 'yes') return false;
+    if (q && !name.includes(q) && !cat.includes(q) && !sub.includes(q) && !loc.includes(q)) return false;
+    if (!cardMatchesSectorAndSub(card, sectorSlug, subSlug)) return false;
+    if (locality && locality !== 'all cities' && loc !== locality && !loc.includes(locality)) return false;
+    if (urlCityFilter && !loc.includes(urlCityFilter)) return false;
+    if (verified.indexOf('verified only') !== -1 && ver !== 'yes') return false;
     if (!matchesTimeRange(days, timeRange)) return false;
     return true;
   }
@@ -457,7 +672,11 @@ function initCategoryCompanyProfiles() {
     });
     if (timeSelect) timeSelect.value = 'all';
     timeRange = 'all';
-    menuCategoryFilter = 'all';
+    activeSectorFilter = 'all';
+    activeSubCategoryFilter = 'all';
+    populateSubCategoryOptions('all', 'all');
+    urlCityFilter = '';
+    if (searchInput) searchInput.value = '';
     if (subtitleEl) subtitleEl.textContent = 'Browse verified business profiles across all categories';
     if (window.location.search) {
       window.history.replaceState({}, '', window.location.pathname);
@@ -466,9 +685,43 @@ function initCategoryCompanyProfiles() {
   }
 
   sidebar?.querySelector('.btn-apply-filters')?.addEventListener('click', applyFilters);
-  sidebar?.querySelector('[data-filter="locality"]')?.addEventListener('change', applyFilters);
-  sidebar?.querySelectorAll('.chip').forEach(chip => {
-    chip.addEventListener('click', () => setTimeout(applyFilters, 0));
+  sidebar?.querySelector('[data-filter="locality"]')?.addEventListener('change', function() {
+    urlCityFilter = '';
+    applyFilters();
+  });
+  sidebar?.querySelectorAll('[data-filter-group="category"] .chip').forEach(chip => {
+    chip.addEventListener('click', function() {
+      activeSectorFilter = chip.dataset.value || 'all';
+      activeSubCategoryFilter = 'all';
+      populateSubCategoryOptions(activeSectorFilter, 'all');
+      syncProfilesFilterUrl(activeSectorFilter, activeSubCategoryFilter);
+      if (subtitleEl) {
+        subtitleEl.textContent = getProfilesFilterSubtitle(activeSectorFilter, activeSubCategoryFilter);
+      }
+      applyFilters();
+    });
+  });
+
+  subCategorySelect?.addEventListener('change', function() {
+    activeSubCategoryFilter = subCategorySelect.value || 'all';
+    if (activeSubCategoryFilter !== 'all' && activeSectorFilter === 'all' && typeof CATEGORY_SECTORS !== 'undefined') {
+      var resolved = resolveCategoryFilter(activeSubCategoryFilter);
+      if (resolved && resolved.sectorSlug) {
+        activeSectorFilter = resolved.sectorSlug;
+        setActiveCategoryChip(sidebar, activeSectorFilter);
+      }
+    }
+    syncProfilesFilterUrl(activeSectorFilter, activeSubCategoryFilter);
+    if (subtitleEl) {
+      subtitleEl.textContent = getProfilesFilterSubtitle(activeSectorFilter, activeSubCategoryFilter);
+    }
+    applyFilters();
+  });
+
+  sidebar?.querySelectorAll('[data-filter-group="verified"] .chip').forEach(chip => {
+    chip.addEventListener('click', function() {
+      applyFilters();
+    });
   });
 
   applyFilters();

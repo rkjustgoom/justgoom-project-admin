@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (typeof loadIncludes === 'function') {
     await loadIncludes();
   }
+  initActiveNav();
   initMobileNav();
   initTabs();
   initProfileTabs();
@@ -14,6 +15,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   initAuthForms();
   initFlashToast();
 });
+
+function initActiveNav() {
+  var page = document.body.getAttribute('data-page');
+  if (!page) return;
+
+  document.querySelectorAll('[data-nav="' + page + '"]').forEach(function(link) {
+    link.classList.add('active');
+  });
+}
 
 function initMobileNav() {
   const toggle = document.querySelector('.mobile-toggle');
