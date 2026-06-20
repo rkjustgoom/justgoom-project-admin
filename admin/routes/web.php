@@ -46,8 +46,10 @@ Route::get('/categories', [FrontCategoryController::class, 'index'])->name('fron
 Route::get('/category-details', fn () => app(PageController::class)->publicPage('category-details'))->name('front.category-details');
 Route::get('/contact', fn () => app(PageController::class)->publicPage('contact'))->name('front.contact');
 Route::get('/all-profiles', [PublicProfileController::class, 'index'])->name('front.all-profiles');
-Route::get('/profile/{slug}', [PublicProfileController::class, 'show'])->name('front.profile.show');
 Route::get('/profile', [PublicProfileController::class, 'redirectLegacy'])->name('front.profile');
+Route::get('/profile/{slug}', function (string $slug) {
+    return redirect('/'.$slug, 301);
+})->where('slug', '[a-z0-9\-]+');
 
 Route::prefix('users')->name('front.users.')->middleware(['auth', 'front.user'])->group(function () {
     Route::get('/', [PageController::class, 'userPage'])->name('dashboard');
@@ -134,3 +136,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         return view('admin.settings.index');
     })->name('settings.index');
 });
+
+Route::get('/{slug}', [PublicProfileController::class, 'show'])
+    ->name('front.profile.show')
+    ->where('slug', '[a-z0-9\-]+');

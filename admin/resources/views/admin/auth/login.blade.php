@@ -7,7 +7,7 @@
         <div class="col-lg-4 mx-auto">
             <div class="auth-form-light text-start py-5 px-4 px-sm-5">
                 <div class="brand-logo">
-                    <img src="https://justgoom.com/img/black-logo.png" alt="logo">
+                    <img src="{{ asset('front/assets/images/justgoom-logo.png') }}" alt="Just Goom LLP">
                 </div>
                 <h4>Hello! let's get started</h4>
                 <h6 class="fw-light">Sign in to continue.</h6>

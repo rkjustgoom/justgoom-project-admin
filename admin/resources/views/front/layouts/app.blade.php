@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>@yield('title', 'Just Goom LLP')</title>
+  @include('partials.favicon')
   @hasSection('meta_description')
     <meta name="description" content="@yield('meta_description')">
   @endif

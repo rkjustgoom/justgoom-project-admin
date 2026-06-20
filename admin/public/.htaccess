@@ -5,6 +5,9 @@
 
     RewriteEngine On
 
+    # Legacy public profile URLs: /profile/company-slug -> /company-slug
+    RewriteRule ^profile/([a-zA-Z0-9-]+)/?$ /$1 [L,R=301]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]

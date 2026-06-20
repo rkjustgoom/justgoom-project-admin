@@ -1,5 +1,5 @@
 <script>
-  window.FRONT_ROUTES = @json(['allProfiles' => route('front.all-profiles'), 'profileBase' => url('/profile')]);
+  window.FRONT_ROUTES = @json(['allProfiles' => route('front.all-profiles'), 'profileBase' => url('/')]);
   window.FRONT_ASSETS = @json(asset('front/assets/images'));
   @isset($categorySectors)
   window.CATEGORY_SECTORS = @json($categorySectors);

@@ -19,6 +19,13 @@ body.sidebar-icon-only.navbar-fixed-top .navbar.navbar-mini.fixed-top {
   object-fit: cover;
 }
 
+.auth .brand-logo img {
+  width: auto;
+  max-width: 220px;
+  max-height: 72px;
+  object-fit: contain;
+}
+
 @media (max-width: 991px) {
   body.navbar-fixed-top .main-panel {
     padding-top: 65px;
