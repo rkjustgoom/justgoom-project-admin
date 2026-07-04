@@ -187,6 +187,37 @@
         </ul>
         <a href="{{ route('front.contact') }}" class="btn btn-accent btn-block">Send Inquiry</a>
       </section>
+
+      @if($profile->business_hours && is_array($profile->business_hours))
+        @php
+          $dayLabels = [
+            'monday' => 'Mon', 'tuesday' => 'Tue', 'wednesday' => 'Wed',
+            'thursday' => 'Thu', 'friday' => 'Fri', 'saturday' => 'Sat', 'sunday' => 'Sun',
+          ];
+          $todayKey = strtolower(now()->format('l'));
+        @endphp
+        <section class="profile-contact-card profile-hours-card">
+          <h3>Business Hours</h3>
+          <ul class="profile-hours-list">
+            @foreach($dayLabels as $day => $label)
+              @php $dayData = $profile->business_hours[$day] ?? null; @endphp
+              @if($dayData)
+                <li class="{{ $day === $todayKey ? 'hours-today' : '' }}">
+                  <span class="hours-day">{{ $label }}</span>
+                  @if(!empty($dayData['is_open']))
+                    <span class="hours-time">{{ $dayData['open'] }} – {{ $dayData['close'] }}</span>
+                  @else
+                    <span class="hours-closed">Closed</span>
+                  @endif
+                  @if($day === $todayKey)
+                    <span class="hours-badge">Today</span>
+                  @endif
+                </li>
+              @endif
+            @endforeach
+          </ul>
+        </section>
+      @endif
     </aside>
   </div>
 @endsection

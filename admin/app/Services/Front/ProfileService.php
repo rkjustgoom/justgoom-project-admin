@@ -51,6 +51,7 @@ class ProfileService
                 'email' => $data['email'],
                 'address' => $data['address'] ?? null,
                 'city' => $data['city'],
+                'business_hours' => $data['business_hours'] ?? null,
             ];
 
             if (($data['logo'] ?? null) instanceof UploadedFile) {

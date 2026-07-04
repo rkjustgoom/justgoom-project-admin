@@ -3,21 +3,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (typeof loadIncludes === 'function') {
     await loadIncludes();
   }
-  initActiveNav();
-  initMobileNav();
-  initTabs();
-  initProfileTabs();
-  initTeamFilter();
-  initGallery();
-  initHealthCalculator();
-  initContactForm();
-  initAuthRegister();
-  initAuthForms();
-  initFlashToast();
+
+  var inits = [
+    initActiveNav, initMobileNav, initTabs, initProfileTabs,
+    initTeamFilter, initGallery, initHealthCalculator,
+    initContactForm, initAuthRegister, initAuthForms, initFlashToast
+  ];
+  inits.forEach(function(fn) {
+    try { fn(); } catch (e) { console.error(e); }
+  });
 });
 
 function initActiveNav() {
-  var page = document.body.getAttribute('data-page');
+  var page = (document.body.getAttribute('data-page') || '').replace(/["'\\]/g, '').trim();
   if (!page) return;
 
   document.querySelectorAll('[data-nav="' + page + '"]').forEach(function(link) {

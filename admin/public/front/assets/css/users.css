@@ -1400,3 +1400,78 @@ html[data-theme="dark"] .user-tab.active {
   object-fit: cover;
   border: 2px solid var(--user-primary-light);
 }
+
+/* Business Hours */
+.business-hours-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid var(--user-border, #e2e8f0);
+  border-radius: 10px;
+  padding: 16px;
+  background: var(--user-card-bg, #fff);
+}
+.bh-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 40px;
+}
+.bh-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 80px;
+  cursor: pointer;
+  font-weight: 500;
+}
+.bh-toggle input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--user-primary, #6366f1);
+  cursor: pointer;
+}
+.bh-day-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--user-text, #1e293b);
+}
+.bh-times {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.bh-select {
+  width: 130px;
+  padding: 6px 10px !important;
+  font-size: 13px !important;
+  min-height: auto !important;
+}
+.bh-separator {
+  font-size: 13px;
+  color: var(--user-muted, #64748b);
+}
+.bh-closed-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #ef4444;
+}
+.bh-row[data-closed="true"] .bh-times {
+  display: none;
+}
+@media (max-width: 600px) {
+  .bh-row {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .bh-select {
+    width: 110px;
+  }
+}
+html[data-theme="dark"] .business-hours-grid {
+  border-color: rgba(255,255,255,0.1);
+  background: var(--user-card-bg, #1e293b);
+}
+html[data-theme="dark"] .bh-day-label {
+  color: rgba(255,255,255,0.9);
+}

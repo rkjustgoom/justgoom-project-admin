@@ -110,6 +110,45 @@
               <input type="text" class="user-form-control" value="{{ $profile->slug }}" readonly>
             </div>
           </div>
+
+          @php
+            $days = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+            $dayLabels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+            $savedHours = old('business_hours', $profile->business_hours ?? []);
+          @endphp
+          <div class="user-form-group" data-field="business_hours">
+            <label>Business Hours</label>
+            <div class="business-hours-grid">
+              @foreach($days as $i => $day)
+                @php
+                  $dayData = $savedHours[$day] ?? ['is_open' => true, 'open' => '10:00 AM', 'close' => '07:00 PM'];
+                  $isOpen = (bool) ($dayData['is_open'] ?? true);
+                @endphp
+                <div class="bh-row" data-day="{{ $day }}">
+                  <label class="bh-toggle">
+                    <input type="hidden" name="business_hours[{{ $day }}][is_open]" value="0">
+                    <input type="checkbox" name="business_hours[{{ $day }}][is_open]" value="1" {{ $isOpen ? 'checked' : '' }}>
+                    <span class="bh-day-label">{{ $dayLabels[$i] }}</span>
+                  </label>
+                  <div class="bh-times">
+                    <select name="business_hours[{{ $day }}][open]" class="user-form-control bh-select" {{ !$isOpen ? 'disabled' : '' }}>
+                      @foreach(getTimeOptions() as $time)
+                        <option value="{{ $time }}" @selected(($dayData['open'] ?? '10:00 AM') === $time)>{{ $time }}</option>
+                      @endforeach
+                    </select>
+                    <span class="bh-separator">to</span>
+                    <select name="business_hours[{{ $day }}][close]" class="user-form-control bh-select" {{ !$isOpen ? 'disabled' : '' }}>
+                      @foreach(getTimeOptions() as $time)
+                        <option value="{{ $time }}" @selected(($dayData['close'] ?? '07:00 PM') === $time)>{{ $time }}</option>
+                      @endforeach
+                    </select>
+                  </div>
+                  <span class="bh-closed-label" style="{{ $isOpen ? 'display:none' : '' }}">Closed</span>
+                </div>
+              @endforeach
+            </div>
+          </div>
+
           <button type="submit" class="user-btn user-btn-primary">Save Profile</button>
         </form>
       </div>

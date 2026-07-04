@@ -23,6 +23,21 @@ class UpdateProfileRequest extends FormRequest
             'address' => $this->filled('address') ? trim((string) $this->input('address')) : null,
             'city' => trim((string) $this->input('city', '')),
         ]);
+
+        $days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+        $hours = $this->input('business_hours', []);
+        $normalized = [];
+
+        foreach ($days as $day) {
+            $dayData = $hours[$day] ?? [];
+            $normalized[$day] = [
+                'is_open' => (bool) ($dayData['is_open'] ?? false),
+                'open' => $dayData['open'] ?? '10:00 AM',
+                'close' => $dayData['close'] ?? '07:00 PM',
+            ];
+        }
+
+        $this->merge(['business_hours' => $normalized]);
     }
 
     public function rules(): array
@@ -38,6 +53,11 @@ class UpdateProfileRequest extends FormRequest
             'address' => ['nullable', 'string', 'max:500'],
             'city' => ['required', 'string', 'max:100'],
             'logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp,gif', 'max:2048'],
+            'business_hours' => ['required', 'array'],
+            'business_hours.*' => ['required', 'array'],
+            'business_hours.*.is_open' => ['required', 'boolean'],
+            'business_hours.*.open' => ['required', 'string'],
+            'business_hours.*.close' => ['required', 'string'],
         ];
     }
 

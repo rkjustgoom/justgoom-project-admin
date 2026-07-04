@@ -104,9 +104,33 @@
     }
   }
 
+  function initBusinessHours() {
+    var rows = document.querySelectorAll('.bh-row');
+    rows.forEach(function (row) {
+      var checkbox = row.querySelector('input[type="checkbox"]');
+      var selects = row.querySelectorAll('.bh-select');
+      var closedLabel = row.querySelector('.bh-closed-label');
+      var timesDiv = row.querySelector('.bh-times');
+
+      if (!checkbox) return;
+
+      function toggle() {
+        var isOpen = checkbox.checked;
+        selects.forEach(function (s) { s.disabled = !isOpen; });
+        if (timesDiv) timesDiv.style.display = isOpen ? 'flex' : 'none';
+        if (closedLabel) closedLabel.style.display = isOpen ? 'none' : '';
+      }
+
+      checkbox.addEventListener('change', toggle);
+      toggle();
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     var form = document.getElementById('profileForm');
     if (!form) return;
+
+    initBusinessHours();
 
     var categorySelect = document.getElementById('profileCategory');
     var subCategorySelect = document.getElementById('profileSubCategory');
