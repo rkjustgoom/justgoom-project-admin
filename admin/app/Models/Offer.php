@@ -39,8 +39,8 @@ class Offer extends Model
         $today = now()->toDateString();
 
         return $query->where('status', 'active')
-            ->where('start_date', '<=', $today)
-            ->where('end_date', '>=', $today);
+            ->whereDate('start_date', '<=', $today)
+            ->whereDate('end_date', '>=', $today);
     }
 
     public function scopeFeatured($query)
@@ -50,10 +50,10 @@ class Offer extends Model
 
     public function isRunning(): bool
     {
-        $today = now()->toDateString();
+        $today = now()->startOfDay();
 
         return $this->status === 'active'
-            && $this->start_date <= $today
-            && $this->end_date >= $today;
+            && $this->start_date->startOfDay()->lte($today)
+            && $this->end_date->startOfDay()->gte($today);
     }
 }

@@ -289,7 +289,7 @@
         <article class="offer-card">
           @if($offer->banner_image)
           <div class="offer-card-banner">
-            <img src="{{ asset('storage/' . $offer->banner_image) }}" alt="{{ $offer->title }}" loading="lazy">
+            <img src="{{ asset($offer->banner_image) }}" alt="{{ $offer->title }}" loading="lazy">
           </div>
           @endif
           <div class="offer-card-body">

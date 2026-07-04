@@ -39,7 +39,7 @@
               <p>Upload banner image (optional)</p>
             </div>
             @if($offer?->banner_image)
-              <p class="user-form-hint">Current: <img src="{{ asset('storage/' . $offer->banner_image) }}" alt="banner" style="height:40px; border-radius:4px; margin-top:6px;"></p>
+              <p class="user-form-hint">Current: <img src="{{ asset($offer->banner_image) }}" alt="banner" style="height:40px; border-radius:4px; margin-top:6px;"></p>
             @endif
             <small class="user-field-error">@error('banner_image'){{ $message }}@enderror</small>
           </div>
@@ -51,12 +51,12 @@
           <div class="user-form-row">
             <div class="user-form-group" data-field="start_date">
               <label>Start Date *</label>
-              <input type="date" name="start_date" class="user-form-control @error('start_date') is-invalid @enderror" value="{{ old('start_date', $offer?->start_date?->format('Y-m-d') ?? now()->format('Y-m-d')) }}" min="{{ now()->format('Y-m-d') }}">
+              <input type="date" id="offerStartDate" name="start_date" class="user-form-control @error('start_date') is-invalid @enderror" value="{{ old('start_date', $offer?->start_date?->format('Y-m-d') ?? now()->format('Y-m-d')) }}" min="{{ now()->format('Y-m-d') }}">
               <small class="user-field-error">@error('start_date'){{ $message }}@enderror</small>
             </div>
             <div class="user-form-group" data-field="end_date">
               <label>End Date *</label>
-              <input type="date" name="end_date" class="user-form-control @error('end_date') is-invalid @enderror" value="{{ old('end_date', $offer?->end_date?->format('Y-m-d') ?? now()->format('Y-m-d')) }}" min="{{ now()->format('Y-m-d') }}">
+              <input type="date" id="offerEndDate" name="end_date" class="user-form-control @error('end_date') is-invalid @enderror" value="{{ old('end_date', $offer?->end_date?->format('Y-m-d') ?? now()->format('Y-m-d')) }}" min="{{ old('start_date', $offer?->start_date?->format('Y-m-d') ?? now()->format('Y-m-d')) }}">
               <small class="user-field-error">@error('end_date'){{ $message }}@enderror</small>
             </div>
           </div>
@@ -78,3 +78,19 @@
       </div>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+(function() {
+  var startEl = document.getElementById('offerStartDate');
+  var endEl   = document.getElementById('offerEndDate');
+  if (!startEl || !endEl) return;
+
+  startEl.addEventListener('change', function() {
+    var picked = this.value;
+    endEl.min = picked;
+    if (endEl.value < picked) endEl.value = picked;
+  });
+})();
+</script>
+@endpush
