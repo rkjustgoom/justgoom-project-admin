@@ -123,6 +123,27 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   font-weight: 600;
 }
 .header-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
+.hdr-profile-dropdown { position: relative; }
+.hdr-profile-toggle { display: flex; align-items: center; gap: 8px; border-radius: 30px; border: 1px solid var(--border, #e0e0e0); background: #fff; cursor: pointer; padding: 4px 12px 4px 4px; transition: border-color 0.2s, box-shadow 0.2s; font-family: inherit; }
+.hdr-profile-toggle:hover { border-color: var(--primary, #f39c12); box-shadow: 0 0 0 3px rgba(243,156,18,0.12); }
+.hdr-avatar-img { width: 32px; height: 32px; object-fit: cover; border-radius: 50%; flex-shrink: 0; }
+.hdr-avatar-initials { font-size: 14px; font-weight: 700; color: #fff; background: var(--primary, #f39c12); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; flex-shrink: 0; }
+.hdr-toggle-name { font-size: 14px; font-weight: 600; color: #222; max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hdr-toggle-arrow { color: #888; flex-shrink: 0; transition: transform 0.2s; }
+.hdr-profile-dropdown.open .hdr-toggle-arrow { transform: rotate(180deg); }
+.hdr-profile-menu { display: none; position: absolute; top: calc(100% + 8px); right: 0; min-width: 240px; background: #fff; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06); z-index: 1000; overflow: hidden; border: 1px solid #f0f0f0; }
+.hdr-profile-dropdown.open .hdr-profile-menu { display: block; animation: hdrMenuIn 0.18s ease-out; }
+@keyframes hdrMenuIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+.hdr-profile-info { padding: 16px 18px; border-bottom: 1px solid #f0f0f0; }
+.hdr-profile-name { font-size: 15px; font-weight: 700; color: #222; margin-bottom: 2px; }
+.hdr-profile-email { font-size: 13px; color: #888; }
+.hdr-profile-links { padding: 6px 0; }
+.hdr-profile-link { display: flex; align-items: center; gap: 10px; padding: 10px 18px; font-size: 14px; color: #333; text-decoration: none; transition: background 0.15s; cursor: pointer; border: none; background: none; width: 100%; text-align: left; font-family: inherit; }
+.hdr-profile-link:hover { background: #f8f8f8; }
+.hdr-profile-link-icon { font-size: 18px; width: 24px; text-align: center; }
+.hdr-profile-logout { color: #e74c3c; }
+.hdr-profile-logout:hover { background: #fdf0ef; }
 .mobile-toggle {
   display: none;
   width: 40px;
@@ -3784,6 +3805,8 @@ select.form-input:disabled {
 
 @media (max-width: 768px) {
   .main-nav, .header-actions .btn-outline { display: none; }
+  .hdr-toggle-name { display: none; }
+  .hdr-profile-toggle { padding: 4px; border-radius: 50%; }
   .mobile-toggle { display: flex; }
   .mobile-nav { display: block; }
   .listing-card { grid-template-columns: 1fr; }

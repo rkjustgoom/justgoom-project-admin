@@ -51,12 +51,12 @@
           <div class="user-form-row">
             <div class="user-form-group" data-field="start_date">
               <label>Start Date *</label>
-              <input type="date" name="start_date" class="user-form-control @error('start_date') is-invalid @enderror" value="{{ old('start_date', $offer?->start_date?->format('Y-m-d')) }}">
+              <input type="date" name="start_date" class="user-form-control @error('start_date') is-invalid @enderror" value="{{ old('start_date', $offer?->start_date?->format('Y-m-d') ?? now()->format('Y-m-d')) }}" min="{{ now()->format('Y-m-d') }}">
               <small class="user-field-error">@error('start_date'){{ $message }}@enderror</small>
             </div>
             <div class="user-form-group" data-field="end_date">
               <label>End Date *</label>
-              <input type="date" name="end_date" class="user-form-control @error('end_date') is-invalid @enderror" value="{{ old('end_date', $offer?->end_date?->format('Y-m-d')) }}">
+              <input type="date" name="end_date" class="user-form-control @error('end_date') is-invalid @enderror" value="{{ old('end_date', $offer?->end_date?->format('Y-m-d') ?? now()->format('Y-m-d')) }}" min="{{ now()->format('Y-m-d') }}">
               <small class="user-field-error">@error('end_date'){{ $message }}@enderror</small>
             </div>
           </div>

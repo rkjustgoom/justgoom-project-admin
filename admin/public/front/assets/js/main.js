@@ -7,7 +7,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   var inits = [
     initActiveNav, initMobileNav, initTabs, initProfileTabs,
     initTeamFilter, initGallery, initHealthCalculator,
-    initContactForm, initAuthRegister, initAuthForms, initFlashToast
+    initContactForm, initAuthRegister, initAuthForms, initFlashToast,
+    initProfileDropdown
   ];
   inits.forEach(function(fn) {
     try { fn(); } catch (e) { console.error(e); }
@@ -444,4 +445,21 @@ function initFlashToast() {
   }
 
   window.JG_FLASH = null;
+}
+
+function initProfileDropdown() {
+  var dropdown = document.querySelector('.hdr-profile-dropdown');
+  if (!dropdown) return;
+  var toggle = dropdown.querySelector('.hdr-profile-toggle');
+
+  toggle.addEventListener('click', function(e) {
+    e.stopPropagation();
+    dropdown.classList.toggle('open');
+  });
+
+  document.addEventListener('click', function(e) {
+    if (!dropdown.contains(e.target)) {
+      dropdown.classList.remove('open');
+    }
+  });
 }

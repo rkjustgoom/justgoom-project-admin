@@ -40,7 +40,7 @@ class OfferController extends Controller
             'description' => 'nullable|string|max:2000',
             'banner_image' => 'nullable|image|max:2048',
             'link_url' => 'nullable|url|max:500',
-            'start_date' => 'required|date',
+            'start_date' => 'required|date|after_or_equal:today',
             'end_date' => 'required|date|after_or_equal:start_date',
         ]);
 
@@ -116,7 +116,7 @@ class OfferController extends Controller
 
     private function authorizeOffer(Offer $offer): void
     {
-        abort_unless($offer->user_id === auth()->id(), 403);
+        abort_unless((int) $offer->user_id === (int) auth()->id(), 403);
     }
 
     private function uploadFile($file, string $subfolder): string
