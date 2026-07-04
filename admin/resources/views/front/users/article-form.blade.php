@@ -1,43 +1,61 @@
 @extends('front.layouts.user')
 
-@section('title', 'Article — Just Goom')
+@section('title', ($article ? 'Edit' : 'Write') . ' Article — Just Goom')
 @section('page_title', 'My Articles')
 @section('body_attrs', 'class="user-panel-body" data-page="articles" data-title="My Articles"')
 
 @section('content')
 <div class="user-content">
-      <nav class="user-form-breadcrumb"><a href="{{ route('front.users.articles') }}">My Articles</a> <span>/</span> <span id="formBreadcrumb">Write Article</span></nav>
-      <h2 class="user-form-page-title" id="formTitle">Write New Article</h2>
-      <p class="user-form-page-desc">Platinum plan · Global publishing enabled across JustGoom.</p>
+      <nav class="user-form-breadcrumb"><a href="{{ route('front.users.articles') }}">My Articles</a> <span>/</span> <span>{{ $article ? 'Edit' : 'Write' }} Article</span></nav>
+      <h2 class="user-form-page-title">{{ $article ? 'Edit' : 'Write New' }} Article</h2>
+      <p class="user-form-page-desc">Publish articles to share your business expertise with the community.</p>
+
+      @if($errors->any())
+        <div class="user-alert user-alert-error" style="margin-bottom:16px;padding:12px 14px;border-radius:8px;background:#fdecea;color:#c0392b;border:1px solid #f5c6cb;">
+          @foreach($errors->all() as $error)
+            <p style="margin:0 0 4px;">{{ $error }}</p>
+          @endforeach
+        </div>
+      @endif
+
       <div class="user-form-card user-form-card-wide">
-        <form onsubmit="return false">
-          <div class="user-form-group"><label>Article Title *</label><input type="text" class="user-form-control" data-crud-field="title" placeholder="Enter a compelling title..."></div>
-          <div class="user-form-row">
-            <div class="user-form-group"><label>Category *</label><select class="user-form-control" data-crud-field="category"><option>B2B Trade</option><option>Manufacturing</option><option>Real Estate</option><option>Jewellery</option><option>Business</option><option>Technology</option><option>MSME Growth</option></select></div>
-            <div class="user-form-group"><label>Visibility</label><select class="user-form-control" data-crud-field="visibility"><option>Global</option><option>Private</option></select></div>
+        <form method="POST" action="{{ $article ? route('front.users.articles.update', $article) : route('front.users.articles.store') }}" enctype="multipart/form-data" novalidate>
+          @csrf
+          @if($article) @method('PUT') @endif
+          <div class="user-form-group" data-field="title">
+            <label>Article Title *</label>
+            <input type="text" name="title" class="user-form-control @error('title') is-invalid @enderror" value="{{ old('title', $article?->title) }}" placeholder="Enter a compelling title..." maxlength="300">
+            <small class="user-field-error">@error('title'){{ $message }}@enderror</small>
           </div>
-          <div class="user-form-group" id="statusGroup" style="display:none"><label>Status</label><select class="user-form-control" data-crud-field="status"><option>Published</option><option>Draft</option></select></div>
-          <div class="user-form-group"><label>Featured Image</label><div class="user-upload-zone"><input type="file" accept="image/*" hidden><p>Upload cover image (16:9)</p></div></div>
-          <div class="user-form-group"><label>Article Content *</label><textarea class="user-form-control" rows="10" data-crud-field="content" placeholder="Write your promotional article here..."></textarea></div>
+          <div class="user-form-group" data-field="featured_image">
+            <label>Featured Image</label>
+            <div class="user-upload-zone">
+              <input type="file" name="featured_image" accept="image/*" hidden>
+              <p>Upload cover image (optional)</p>
+            </div>
+            @if($article?->featured_image)
+              <p class="user-form-hint">Current: <img src="{{ asset('storage/' . $article->featured_image) }}" alt="cover" style="height:50px; border-radius:6px; margin-top:6px;"></p>
+            @endif
+            <small class="user-field-error">@error('featured_image'){{ $message }}@enderror</small>
+          </div>
+          <div class="user-form-group" data-field="body">
+            <label>Article Content *</label>
+            <textarea name="body" class="user-form-control @error('body') is-invalid @enderror" rows="12" placeholder="Write your article content here...">{{ old('body', $article?->body) }}</textarea>
+            <small class="user-field-error">@error('body'){{ $message }}@enderror</small>
+          </div>
+          <div class="user-form-group" data-field="status">
+            <label>Status *</label>
+            <select name="status" class="user-form-control @error('status') is-invalid @enderror">
+              <option value="draft" {{ old('status', $article?->status ?? 'draft') === 'draft' ? 'selected' : '' }}>Draft</option>
+              <option value="published" {{ old('status', $article?->status) === 'published' ? 'selected' : '' }}>Published</option>
+            </select>
+            <small class="user-field-error">@error('status'){{ $message }}@enderror</small>
+          </div>
           <div class="user-form-actions">
-            <div class="user-form-actions-left"><a href="#" data-crud-delete class="user-btn user-btn-danger">Delete Article</a></div>
             <a href="{{ route('front.users.articles') }}" class="user-btn user-btn-default">Cancel</a>
-            <button type="button" class="user-btn user-btn-default" data-crud-draft>Save Draft</button>
-            <button type="button" class="user-btn user-btn-primary" data-crud-save>Publish Article</button>
+            <button type="submit" class="user-btn user-btn-primary">{{ $article ? 'Update' : 'Publish' }} Article</button>
           </div>
         </form>
       </div>
     </div>
-<script>
-  (function() {
-    var id = new URLSearchParams(location.search).get('id');
-    if (id) {
-      document.body.setAttribute('data-mode', 'edit');
-      document.getElementById('formTitle').textContent = 'Edit Article';
-      document.getElementById('formBreadcrumb').textContent = 'Edit Article';
-      document.getElementById('statusGroup').style.display = 'block';
-    }
-  })();
-</script>
-<script src="{{ asset('front/assets/js/user-crud.js') }}"></script>
 @endsection

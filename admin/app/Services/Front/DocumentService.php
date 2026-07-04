@@ -102,15 +102,16 @@ class DocumentService
 
     private function uploadFile(UploadedFile $file): string
     {
-        $destination = public_path('uploads/documents');
+        $email = auth()->user()->email;
+        $destination = public_path('uploads/' . $email . '/documents');
         if (! File::isDirectory($destination)) {
-            File::makeDirectory($destination, 0755, true);
+            File::makeDirectory($destination, 0777, true);
         }
 
         $filename = time().'-'.Str::random(12).'.'.$file->getClientOriginalExtension();
         $file->move($destination, $filename);
 
-        return 'uploads/documents/'.$filename;
+        return 'uploads/' . $email . '/documents/' . $filename;
     }
 
     private function deleteFile(?string $path): void

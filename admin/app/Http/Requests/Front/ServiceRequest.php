@@ -22,9 +22,11 @@ class ServiceRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'type' => ['nullable', 'in:service,product'],
             'product_name' => ['required', 'string', 'min:2', 'max:200'],
             'product_desc' => ['nullable', 'string', 'max:5000'],
             'product_image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp,gif', 'max:2048'],
+            'price' => ['nullable', 'numeric', 'min:0', 'max:99999999.99'],
         ];
     }
 

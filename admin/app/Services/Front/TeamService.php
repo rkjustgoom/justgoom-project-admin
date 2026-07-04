@@ -115,15 +115,16 @@ class TeamService
             return null;
         }
 
-        $destination = public_path('uploads/team-members');
+        $email = auth()->user()->email;
+        $destination = public_path('uploads/' . $email . '/team-members');
         if (! File::isDirectory($destination)) {
-            File::makeDirectory($destination, 0755, true);
+            File::makeDirectory($destination, 0777, true);
         }
 
         $filename = time().'-'.Str::random(12).'.'.$file->getClientOriginalExtension();
         $file->move($destination, $filename);
 
-        return 'uploads/team-members/'.$filename;
+        return 'uploads/' . $email . '/team-members/' . $filename;
     }
 
     private function deleteImage(?string $image): void

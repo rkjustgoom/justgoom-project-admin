@@ -40,7 +40,7 @@
           <div class="b2b-trust-badges">
             <span>✓ Verified Profiles</span>
             <span>✓ Free Business Listing</span>
-            <span>✓ Pan-India Coverage</span>
+            <span>✓ Global Reach</span>
           </div>
         </div>
         <div class="b2b-hero-visual">
@@ -227,14 +227,39 @@
     </div>
   </div>
 
-  <!-- Discover Major Cities -->
-  <section class="major-cities-section" id="major-cities">
+  <!-- Location Selection -->
+  <section class="location-selector-section" id="location-selector">
     <div class="container">
-      <div class="major-cities-header">
-        <h2 class="major-cities-title">Discover Major Cities</h2>
-        <p class="major-cities-subtitle">Top Cities</p>
+      <div class="location-selector-header">
+        <h2 class="section-title">Find Businesses by Location</h2>
+        <p class="section-subtitle">Select your country, state, and city to discover local businesses worldwide</p>
       </div>
-      <div class="major-cities-grid">
+      <div class="location-selector-form">
+        <div class="location-selector-fields">
+          <div class="location-field">
+            <label for="locCountry">Country</label>
+            <select id="locCountry" class="location-select">
+              <option value="">Select Country</option>
+            </select>
+          </div>
+          <div class="location-field">
+            <label for="locState">State / Province</label>
+            <select id="locState" class="location-select" disabled>
+              <option value="">Select State</option>
+            </select>
+          </div>
+          <div class="location-field">
+            <label for="locCity">City</label>
+            <select id="locCity" class="location-select" disabled>
+              <option value="">Select City</option>
+            </select>
+          </div>
+          <div class="location-field location-field-btn">
+            <button type="button" id="locSearchBtn" class="btn btn-accent btn-lg" disabled>Search Businesses</button>
+          </div>
+        </div>
+      </div>
+      <div class="major-cities-grid" style="margin-top:32px;">
         @foreach($majorCities as $city)
           <a href="{{ route('front.all-profiles', ['city' => $city['name']]) }}" class="major-city-card">
             <div class="major-city-thumb">
@@ -246,6 +271,57 @@
           </a>
         @endforeach
       </div>
+    </div>
+  </section>
+
+  <!-- Running Offers & Advertisements -->
+  <section class="offers-section" id="running-offers">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Running Offers & Promotions</h2>
+          <p class="section-subtitle">Exclusive deals and promotions from registered businesses</p>
+        </div>
+        <a href="{{ route('front.all-profiles') }}" class="view-all-link">Browse All →</a>
+      </div>
+      <div class="offers-grid" id="offersGrid">
+        @forelse($runningOffers ?? [] as $offer)
+        <article class="offer-card">
+          @if($offer->banner_image)
+          <div class="offer-card-banner">
+            <img src="{{ asset('storage/' . $offer->banner_image) }}" alt="{{ $offer->title }}" loading="lazy">
+          </div>
+          @endif
+          <div class="offer-card-body">
+            <h3 class="offer-card-title">{{ $offer->title }}</h3>
+            @if($offer->description)
+              <p class="offer-card-desc">{{ Str::limit($offer->description, 100) }}</p>
+            @endif
+            <div class="offer-card-meta">
+              <span class="offer-card-company">{{ $offer->user?->companyProfile?->company_name ?? 'Business' }}</span>
+              <span class="offer-card-validity">Valid till {{ $offer->end_date->format('d M Y') }}</span>
+            </div>
+            @if($offer->link_url)
+              <a href="{{ $offer->link_url }}" target="_blank" class="offer-card-link">View Offer →</a>
+            @endif
+          </div>
+        </article>
+        @empty
+        <div class="offers-empty">
+          <p>No active offers at the moment. Check back soon for exclusive business promotions.</p>
+        </div>
+        @endforelse
+      </div>
+
+      @if(!empty($advertisements) && count($advertisements) > 0)
+      <div class="ads-banner-row" style="margin-top:28px;">
+        @foreach($advertisements as $ad)
+        <a href="{{ $ad->link_url ?? '#' }}" target="_blank" class="ad-banner-card" rel="noopener">
+          <img src="{{ asset('storage/' . $ad->banner_image) }}" alt="{{ $ad->title }}" loading="lazy">
+        </a>
+        @endforeach
+      </div>
+      @endif
     </div>
   </section>
 
@@ -530,6 +606,7 @@
 <script src="{{ asset('front/assets/js/categories-render.js') }}"></script>
 <script src="{{ asset('front/assets/js/company-profiles.js') }}"></script>
 <script src="{{ asset('front/assets/js/home.js') }}"></script>
+<script src="{{ asset('front/assets/js/location-selector.js') }}"></script>
 <script>
     document.querySelectorAll('.b2b-search-tabs button').forEach(function(btn) {
       btn.addEventListener('click', function() {

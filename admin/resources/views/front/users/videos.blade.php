@@ -1,22 +1,64 @@
 @extends('front.layouts.user')
 
-@section('title', 'My Video — Just Goom')
-@section('page_title', 'My Video')
-@section('body_attrs', 'class="user-panel-body" data-page="videos" data-title="My Video"')
+@section('title', 'My Videos — Just Goom')
+@section('page_title', 'My Videos')
+@section('body_attrs', 'class="user-panel-body" data-page="videos" data-title="My Videos"')
 
 @section('content')
 <div class="user-content">
-      <div class="user-toolbar"><span class="user-text-muted">Platinum Plan · Promotional videos on homepage</span><a href="{{ route('front.users.video-form') }}" class="user-btn user-btn-primary">+ Upload Video</a></div>
+      <div class="user-stat-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
+        <div class="user-stat-card green"><span class="user-stat-icon">🎬</span><div class="user-stat-info"><h3>{{ $stats['total'] }}</h3><span>Total Videos</span></div></div>
+        <div class="user-stat-card yellow"><span class="user-stat-icon">📊</span><div class="user-stat-info"><h3>{{ $stats['max_allowed'] > 0 ? $stats['max_allowed'] - $stats['total'] : 0 }}</h3><span>Remaining Quota</span></div></div>
+        <div class="user-stat-card grey"><span class="user-stat-icon">💾</span><div class="user-stat-info"><h3>{{ $stats['max_size_mb'] > 0 ? $stats['max_size_mb'] . 'MB' : 'N/A' }}</h3><span>Max Upload Size</span></div></div>
+      </div>
+      <div class="user-toolbar">
+        <span class="user-text-muted">
+          @if($stats['max_allowed'] > 0)
+            Upload Quota: {{ $stats['total'] }} / {{ $stats['max_allowed'] }} videos used
+          @else
+            Upgrade your plan to upload videos
+          @endif
+        </span>
+        <a href="{{ route('front.users.video-form') }}" class="user-btn user-btn-primary">+ Upload Video</a>
+      </div>
       <div class="user-table-wrap">
         <table class="user-table">
-          <thead><tr><th>Title</th><th>Duration</th><th>Views</th><th>Status</th><th>Action</th></tr></thead>
+          <thead><tr><th>#</th><th>Title</th><th>Type</th><th>Added</th><th>Action</th></tr></thead>
           <tbody>
-            <tr><td>Wedding Collection 2026 Showcase</td><td>1:24</td><td>2,400</td><td><span class="user-badge user-badge-success">Live</span></td><td><a href="video-form.html?id=1" class="user-table-action">Edit</a> · <a href="delete.html?module=video&id=1&return=videos.html" class="user-table-action-muted">Delete</a></td></tr>
-            <tr><td>Custom Design Process Tour</td><td>0:58</td><td>1,820</td><td><span class="user-badge user-badge-success">Live</span></td><td><a href="video-form.html?id=2" class="user-table-action">Edit</a> · <a href="delete.html?module=video&id=2&return=videos.html" class="user-table-action-muted">Delete</a></td></tr>
-            <tr><td>B2B Bulk Order Walkthrough</td><td>2:05</td><td>—</td><td><span class="user-badge user-badge-warning">Pending</span></td><td><a href="video-form.html?id=3" class="user-table-action">Edit</a> · <a href="delete.html?module=video&id=3&return=videos.html" class="user-table-action-muted">Delete</a></td></tr>
-            <tr><td>22K Gold Purity Explained</td><td>1:10</td><td>980</td><td><span class="user-badge user-badge-success">Live</span></td><td><a href="video-form.html?id=4" class="user-table-action">Edit</a> · <a href="delete.html?module=video&id=4&return=videos.html" class="user-table-action-muted">Delete</a></td></tr>
+            @forelse($videos as $video)
+            <tr>
+              <td>{{ $loop->iteration + ($videos->currentPage() - 1) * $videos->perPage() }}</td>
+              <td><strong>{{ $video->title }}</strong></td>
+              <td>
+                @if(str_starts_with($video->link, 'http'))
+                  <span class="user-badge user-badge-info">External</span>
+                @else
+                  <span class="user-badge user-badge-success">Uploaded</span>
+                @endif
+              </td>
+              <td>{{ \Carbon\Carbon::parse($video->created_at)->format('M j, Y') }}</td>
+              <td>
+                @if(str_starts_with($video->link, 'http'))
+                  <a href="{{ $video->link }}" target="_blank" class="user-table-action">View</a> ·
+                @else
+                  <a href="{{ asset('storage/' . $video->link) }}" target="_blank" class="user-table-action">View</a> ·
+                @endif
+                <form method="POST" action="{{ route('front.users.videos.destroy', $video->id) }}" style="display:inline" onsubmit="return confirm('Delete this video?');">
+                  @csrf @method('DELETE')
+                  <button type="submit" class="user-table-action-muted" style="background:none;border:none;padding:0;cursor:pointer;font:inherit;">Delete</button>
+                </form>
+              </td>
+            </tr>
+            @empty
+            <tr>
+              <td colspan="5" class="user-text-muted" style="text-align:center;padding:24px;">No videos yet. Upload promotional videos or add YouTube/Vimeo links.</td>
+            </tr>
+            @endforelse
           </tbody>
         </table>
       </div>
+      @if($videos->hasPages())
+      <div style="padding:16px 0;">{{ $videos->links() }}</div>
+      @endif
     </div>
 @endsection

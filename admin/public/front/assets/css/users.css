@@ -1353,3 +1353,50 @@ html[data-theme="dark"] .user-tab.active {
   cursor: pointer;
   padding: 0;
 }
+
+/* Dashboard Branding */
+.user-header-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 2px solid var(--user-border);
+}
+.sidebar-company-logo {
+  max-width: 140px;
+  max-height: 44px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+.sidebar-company-name {
+  display: block;
+  font-size: 11px;
+  color: rgba(255,255,255,0.6);
+  margin-top: 4px;
+  text-align: center;
+}
+.btn-return-profile {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--user-primary);
+  background: var(--user-primary-light);
+  border-radius: 8px;
+  text-decoration: none;
+  transition: var(--user-transition);
+  white-space: nowrap;
+}
+.btn-return-profile:hover {
+  background: var(--user-primary);
+  color: #fff;
+}
+.user-topbar-avatar-img {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--user-primary-light);
+}

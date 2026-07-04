@@ -13,10 +13,26 @@ class Service extends Model
 
     protected $fillable = [
         'user_id',
+        'type',
         'product_name',
         'product_image',
         'product_desc',
+        'price',
     ];
+
+    protected $casts = [
+        'price' => 'decimal:2',
+    ];
+
+    public function scopeServices($query)
+    {
+        return $query->where('type', 'service');
+    }
+
+    public function scopeProducts($query)
+    {
+        return $query->where('type', 'product');
+    }
 
     public function user(): BelongsTo
     {

@@ -12,26 +12,38 @@ use Illuminate\Support\Str;
 
 class ServiceService
 {
-    public function listForUser(User $user): Collection
+    public function listForUser(User $user, ?string $type = null): Collection
     {
-        return $user->services()
-            ->latest()
-            ->get();
+        $query = $user->services()->latest();
+
+        if ($type) {
+            $query->where('type', $type);
+        }
+
+        return $query->get();
     }
 
-    public function listForPublicProfile(User $user): Collection
+    public function listForPublicProfile(User $user, ?string $type = null): Collection
     {
-        return $user->services()
-            ->latest()
-            ->get();
+        $query = $user->services()->latest();
+
+        if ($type) {
+            $query->where('type', $type);
+        }
+
+        return $query->get();
     }
 
     public function statsForUser(User $user): array
     {
         $total = $user->services()->count();
+        $services = $user->services()->where('type', 'service')->count();
+        $products = $user->services()->where('type', 'product')->count();
 
         return [
             'total' => $total,
+            'services' => $services,
+            'products' => $products,
             'active' => $total,
             'featured' => 0,
         ];
@@ -40,9 +52,11 @@ class ServiceService
     public function store(User $user, array $data): Service
     {
         return $user->services()->create([
+            'type' => $data['type'] ?? 'service',
             'product_name' => $data['product_name'],
             'product_desc' => $data['product_desc'] ?? null,
             'product_image' => $this->uploadImage($data['product_image'] ?? null),
+            'price' => $data['price'] ?? null,
         ]);
     }
 
@@ -51,8 +65,10 @@ class ServiceService
         abort_unless($this->belongsToUser($service, $user), 404);
 
         $payload = [
+            'type' => $data['type'] ?? $service->type,
             'product_name' => $data['product_name'],
             'product_desc' => $data['product_desc'] ?? null,
+            'price' => $data['price'] ?? null,
         ];
 
         if (($data['product_image'] ?? null) instanceof UploadedFile) {
@@ -86,15 +102,16 @@ class ServiceService
             return null;
         }
 
-        $destination = public_path('uploads/services');
+        $email = auth()->user()->email;
+        $destination = public_path('uploads/' . $email . '/services');
         if (! File::isDirectory($destination)) {
-            File::makeDirectory($destination, 0755, true);
+            File::makeDirectory($destination, 0777, true);
         }
 
         $filename = time().'-'.Str::random(12).'.'.$file->getClientOriginalExtension();
         $file->move($destination, $filename);
 
-        return 'uploads/services/'.$filename;
+        return 'uploads/' . $email . '/services/' . $filename;
     }
 
     private function deleteImage(?string $image): void

@@ -99,15 +99,16 @@ class ProfileService
 
     private function uploadLogo(UploadedFile $file): string
     {
-        $destination = public_path('uploads/company-logos');
+        $email = auth()->user()->email;
+        $destination = public_path('uploads/' . $email . '/company-logos');
         if (! File::isDirectory($destination)) {
-            File::makeDirectory($destination, 0755, true);
+            File::makeDirectory($destination, 0777, true);
         }
 
         $filename = time().'-'.Str::random(12).'.'.$file->getClientOriginalExtension();
         $file->move($destination, $filename);
 
-        return 'uploads/company-logos/'.$filename;
+        return 'uploads/' . $email . '/company-logos/' . $filename;
     }
 
     private function deleteLogo(?string $logo): void

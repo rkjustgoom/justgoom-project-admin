@@ -17,9 +17,10 @@ class ServiceController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
+        $type = $request->query('type');
 
         return view('front.users.services', [
-            'services' => $this->serviceService->listForUser($user),
+            'services' => $this->serviceService->listForUser($user, $type),
             'stats' => $this->serviceService->statsForUser($user),
         ]);
     }

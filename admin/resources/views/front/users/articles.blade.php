@@ -6,17 +6,51 @@
 
 @section('content')
 <div class="user-content">
-      <div class="user-toolbar"><span class="user-text-muted">Platinum · Global publishing enabled</span><a href="{{ route('front.users.article-form') }}" class="user-btn user-btn-primary">+ Write Article</a></div>
+      <div class="user-stat-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
+        <div class="user-stat-card green"><span class="user-stat-icon">📝</span><div class="user-stat-info"><h3>{{ $stats['total'] }}</h3><span>Total Articles</span></div></div>
+        <div class="user-stat-card yellow"><span class="user-stat-icon">✅</span><div class="user-stat-info"><h3>{{ $stats['published'] }}</h3><span>Published</span></div></div>
+        <div class="user-stat-card grey"><span class="user-stat-icon">📋</span><div class="user-stat-info"><h3>{{ $stats['drafts'] }}</h3><span>Drafts</span></div></div>
+      </div>
+      <div class="user-toolbar">
+        <span class="user-text-muted">Publish articles to promote your expertise globally</span>
+        <a href="{{ route('front.users.article-form') }}" class="user-btn user-btn-primary">+ Write Article</a>
+      </div>
       <div class="user-table-wrap">
         <table class="user-table">
-          <thead><tr><th>Title</th><th>Category</th><th>Visibility</th><th>Reads</th><th>Status</th><th>Action</th></tr></thead>
+          <thead><tr><th>#</th><th>Title</th><th>Status</th><th>Published</th><th>Created</th><th>Action</th></tr></thead>
           <tbody>
-            <tr><td>Why 22K Gold is the Smart Choice</td><td>Jewellery</td><td>Global</td><td>1,240</td><td><span class="user-badge user-badge-success">Published</span></td><td><a href="article-form.html?id=1" class="user-table-action">Edit</a> · <a href="delete.html?module=article&id=1&return=articles.html" class="user-table-action-muted">Delete</a></td></tr>
-            <tr><td>Understanding Gold Making Charges</td><td>Business</td><td>Global</td><td>890</td><td><span class="user-badge user-badge-success">Published</span></td><td><a href="article-form.html?id=2" class="user-table-action">Edit</a> · <a href="delete.html?module=article&id=2&return=articles.html" class="user-table-action-muted">Delete</a></td></tr>
-            <tr><td>B2B Bulk Gold Supply Guide</td><td>B2B Trade</td><td>Global</td><td>620</td><td><span class="user-badge user-badge-success">Published</span></td><td><a href="article-form.html?id=3" class="user-table-action">Edit</a> · <a href="delete.html?module=article&id=3&return=articles.html" class="user-table-action-muted">Delete</a></td></tr>
-            <tr><td>Wedding Season Trends 2026</td><td>Jewellery</td><td>—</td><td>—</td><td><span class="user-badge user-badge-warning">Draft</span></td><td><a href="article-form.html?id=4" class="user-table-action">Edit</a> · <a href="delete.html?module=article&id=4&return=articles.html" class="user-table-action-muted">Delete</a></td></tr>
+            @forelse($articles as $article)
+            <tr>
+              <td>{{ $loop->iteration + ($articles->currentPage() - 1) * $articles->perPage() }}</td>
+              <td><strong>{{ $article->title }}</strong></td>
+              <td>
+                @if($article->status === 'published')
+                  <span class="user-badge user-badge-success">Published</span>
+                @else
+                  <span class="user-badge user-badge-warning">Draft</span>
+                @endif
+              </td>
+              <td>{{ $article->published_at?->format('M j, Y') ?? '—' }}</td>
+              <td>{{ $article->created_at?->format('M j, Y') }}</td>
+              <td>
+                <a href="{{ route('front.users.articles.edit', $article) }}" class="user-table-action">Edit</a>
+                ·
+                <form method="POST" action="{{ route('front.users.articles.destroy', $article) }}" style="display:inline" onsubmit="return confirm('Delete this article?');">
+                  @csrf @method('DELETE')
+                  <button type="submit" class="user-table-action-muted" style="background:none;border:none;padding:0;cursor:pointer;font:inherit;">Delete</button>
+                </form>
+              </td>
+            </tr>
+            @empty
+            <tr>
+              <td colspan="6" class="user-text-muted" style="text-align:center;padding:24px;">No articles yet. Write and publish articles to share your business expertise.</td>
+            </tr>
+            @endforelse
           </tbody>
         </table>
       </div>
+      @if($articles->hasPages())
+      <div style="padding:16px 0;">{{ $articles->links() }}</div>
+      @endif
     </div>
 @endsection

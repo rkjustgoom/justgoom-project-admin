@@ -1,22 +1,29 @@
 <?php
 
+use App\Http\Controllers\AdvertisementController;
 use App\Http\Controllers\Auth\LoginController as AdminLoginController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\Front\ArticleController;
 use App\Http\Controllers\Front\Auth\LoginController as FrontLoginController;
 use App\Http\Controllers\Front\Auth\RegisterController;
 use App\Http\Controllers\Front\Auth\ResendVerificationController;
 use App\Http\Controllers\Front\Auth\VerifyEmailController;
+use App\Http\Controllers\Front\BusinessActivityController;
 use App\Http\Controllers\Front\CategoryController as FrontCategoryController;
 use App\Http\Controllers\Front\DashboardController;
 use App\Http\Controllers\Front\DocumentController;
 use App\Http\Controllers\Front\InquiryController;
+use App\Http\Controllers\Front\LocationController;
+use App\Http\Controllers\Front\OfferController;
 use App\Http\Controllers\Front\PageController;
 use App\Http\Controllers\Front\PasswordController;
 use App\Http\Controllers\Front\ProfileController;
+use App\Http\Controllers\Front\ProjectController;
 use App\Http\Controllers\Front\PublicProfileController;
 use App\Http\Controllers\Front\ServiceController;
 use App\Http\Controllers\Front\TeamController;
 use App\Http\Controllers\Front\UserNotificationController;
+use App\Http\Controllers\Front\VideoController;
 use App\Http\Controllers\SubCategoryController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -57,14 +64,27 @@ Route::get('/profile/{slug}', function (string $slug) {
 
 Route::prefix('users')->name('front.users.')->middleware(['auth', 'front.user'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/business-activity', [BusinessActivityController::class, 'index'])->name('business-activity');
     Route::get('/analytics', fn () => app(PageController::class)->userPage('analytics'))->name('analytics');
-    Route::get('/articles', fn () => app(PageController::class)->userPage('articles'))->name('articles');
-    Route::get('/article-form', fn () => app(PageController::class)->userPage('article-form'))->name('article-form');
+
+    // Articles
+    Route::get('/articles', [ArticleController::class, 'index'])->name('articles');
+    Route::get('/articles/create', [ArticleController::class, 'create'])->name('article-form');
+    Route::post('/articles', [ArticleController::class, 'store'])->name('articles.store');
+    Route::get('/articles/{article}/edit', [ArticleController::class, 'edit'])->name('articles.edit');
+    Route::put('/articles/{article}', [ArticleController::class, 'update'])->name('articles.update');
+    Route::delete('/articles/{article}', [ArticleController::class, 'destroy'])->name('articles.destroy');
+
+    // Banners
     Route::get('/banners', fn () => app(PageController::class)->userPage('banners'))->name('banners');
     Route::get('/banner-form', fn () => app(PageController::class)->userPage('banner-form'))->name('banner-form');
+
+    // Account
     Route::get('/change-password', [PasswordController::class, 'show'])->name('change-password');
     Route::put('/change-password', [PasswordController::class, 'update'])->name('change-password.update');
     Route::get('/delete', fn () => app(PageController::class)->userPage('delete'))->name('delete');
+
+    // Documents
     Route::get('/document-add', [DocumentController::class, 'create'])->name('document-add');
     Route::redirect('/document-form', '/users/document-add')->name('document-form');
     Route::get('/documents', [DocumentController::class, 'index'])->name('documents');
@@ -72,17 +92,25 @@ Route::prefix('users')->name('front.users.')->middleware(['auth', 'front.user'])
     Route::get('/documents/{document}/edit', [DocumentController::class, 'edit'])->name('documents.edit');
     Route::put('/documents/{document}', [DocumentController::class, 'update'])->name('documents.update');
     Route::delete('/documents/{document}', [DocumentController::class, 'destroy'])->name('documents.destroy');
+
+    // Inquiries
     Route::get('/inquiries', [InquiryController::class, 'index'])->name('inquiries');
     Route::get('/inquiries/{inquiry}', [InquiryController::class, 'show'])->name('inquiries.show');
     Route::redirect('/inquiry-view', '/users/inquiries')->name('inquiry-view');
     Route::get('/inquiry-reply', fn () => app(PageController::class)->userPage('inquiry-reply'))->name('inquiry-reply');
+
+    // Notifications
     Route::get('/notifications', [UserNotificationController::class, 'index'])->name('notifications');
     Route::get('/notifications/{notification}', [UserNotificationController::class, 'show'])->name('notifications.show');
     Route::redirect('/notification-view', '/users/notifications')->name('notification-view');
+
+    // Profile
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::get('/reviews', fn () => app(PageController::class)->userPage('reviews'))->name('reviews');
     Route::get('/review-view', fn () => app(PageController::class)->userPage('review-view'))->name('review-view');
+
+    // Services & Products
     Route::get('/service-add', [ServiceController::class, 'create'])->name('service-add');
     Route::get('/services', [ServiceController::class, 'index'])->name('services');
     Route::post('/services', [ServiceController::class, 'store'])->name('services.store');
@@ -91,7 +119,33 @@ Route::prefix('users')->name('front.users.')->middleware(['auth', 'front.user'])
     Route::delete('/services/{service}', [ServiceController::class, 'destroy'])->name('services.destroy');
     Route::redirect('/service-edit', '/users/services')->name('service-edit');
     Route::redirect('/service-form', '/users/services')->name('service-form');
+
+    // Projects
+    Route::get('/projects', [ProjectController::class, 'index'])->name('projects');
+    Route::get('/projects/create', [ProjectController::class, 'create'])->name('project-add');
+    Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
+    Route::get('/projects/{project}/edit', [ProjectController::class, 'edit'])->name('projects.edit');
+    Route::put('/projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
+    Route::delete('/projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
+
+    // Videos
+    Route::get('/videos', [VideoController::class, 'index'])->name('videos');
+    Route::get('/videos/create', [VideoController::class, 'create'])->name('video-form');
+    Route::post('/videos', [VideoController::class, 'store'])->name('videos.store');
+    Route::delete('/videos/{video}', [VideoController::class, 'destroy'])->name('videos.destroy');
+
+    // Offers
+    Route::get('/offers', [OfferController::class, 'index'])->name('offers');
+    Route::get('/offers/create', [OfferController::class, 'create'])->name('offer-form');
+    Route::post('/offers', [OfferController::class, 'store'])->name('offers.store');
+    Route::get('/offers/{offer}/edit', [OfferController::class, 'edit'])->name('offers.edit');
+    Route::put('/offers/{offer}', [OfferController::class, 'update'])->name('offers.update');
+    Route::delete('/offers/{offer}', [OfferController::class, 'destroy'])->name('offers.destroy');
+
+    // Subscription
     Route::get('/subscription', fn () => app(PageController::class)->userPage('subscription'))->name('subscription');
+
+    // Team
     Route::get('/team', [TeamController::class, 'index'])->name('team');
     Route::get('/team-add', [TeamController::class, 'create'])->name('team-add');
     Route::post('/team', [TeamController::class, 'store'])->name('team.store');
@@ -100,8 +154,6 @@ Route::prefix('users')->name('front.users.')->middleware(['auth', 'front.user'])
     Route::delete('/team/{team}', [TeamController::class, 'destroy'])->name('team.destroy');
     Route::redirect('/team-edit', '/users/team')->name('team-edit');
     Route::redirect('/team-form', '/users/team')->name('team-form');
-    Route::get('/videos', fn () => app(PageController::class)->userPage('videos'))->name('videos');
-    Route::get('/video-form', fn () => app(PageController::class)->userPage('video-form'))->name('video-form');
 });
 
 Route::redirect('/admin', '/admin/dashboard');
@@ -138,6 +190,13 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
     Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+
+    Route::get('/advertisements', [AdvertisementController::class, 'index'])->name('advertisements.index');
+    Route::get('/advertisements/create', [AdvertisementController::class, 'create'])->name('advertisements.create');
+    Route::post('/advertisements', [AdvertisementController::class, 'store'])->name('advertisements.store');
+    Route::get('/advertisements/{advertisement}/edit', [AdvertisementController::class, 'edit'])->name('advertisements.edit');
+    Route::put('/advertisements/{advertisement}', [AdvertisementController::class, 'update'])->name('advertisements.update');
+    Route::delete('/advertisements/{advertisement}', [AdvertisementController::class, 'destroy'])->name('advertisements.destroy');
 
     Route::get('/settings', function () {
         return view('admin.settings.index');

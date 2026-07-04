@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Front;
 
 use App\Http\Controllers\Controller;
+use App\Models\Advertisement;
+use App\Models\Offer;
 use App\Services\Front\CategoryCatalogService;
 use App\Services\Front\PublicProfileListingService;
 
@@ -28,6 +30,17 @@ class PageController extends Controller
             'categorySectors' => $this->categoryCatalogService->sectorsForFrontend(),
             'companyProfiles' => $this->publicProfileListingService->listForFrontend(),
             'majorCities' => $this->majorCitiesForHome(),
+            'runningOffers' => Offer::with('user.companyProfile')
+                ->active()
+                ->orderByDesc('is_featured')
+                ->orderByDesc('created_at')
+                ->take(6)
+                ->get(),
+            'advertisements' => Advertisement::active()
+                ->forPosition('homepage')
+                ->orderByDesc('priority')
+                ->take(3)
+                ->get(),
         ]);
     }
 

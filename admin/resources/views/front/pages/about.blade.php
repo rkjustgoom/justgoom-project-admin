@@ -68,7 +68,7 @@
         <ul class="about-logo-tags">
           <li>B2B Marketplace</li>
           <li>Verified Listings</li>
-          <li>Pan-India</li>
+          <li>Global Reach</li>
         </ul>
       </div>
     </div>

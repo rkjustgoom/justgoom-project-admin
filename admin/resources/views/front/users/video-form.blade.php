@@ -1,39 +1,52 @@
 @extends('front.layouts.user')
 
-@section('title', 'Video — Just Goom')
-@section('page_title', 'My Video')
-@section('body_attrs', 'class="user-panel-body" data-page="videos" data-title="My Video"')
+@section('title', 'Upload Video — Just Goom')
+@section('page_title', 'My Videos')
+@section('body_attrs', 'class="user-panel-body" data-page="videos" data-title="My Videos"')
 
 @section('content')
 <div class="user-content">
-      <nav class="user-form-breadcrumb"><a href="{{ route('front.users.videos') }}">My Video</a> <span>/</span> <span id="formBreadcrumb">Upload Video</span></nav>
-      <h2 class="user-form-page-title" id="formTitle">Upload Promotional Video</h2>
-      <p class="user-form-page-desc">Max 3 minutes · MP4 or WebM · Featured on homepage for Platinum plan.</p>
+      <nav class="user-form-breadcrumb"><a href="{{ route('front.users.videos') }}">My Videos</a> <span>/</span> <span>Upload Video</span></nav>
+      <h2 class="user-form-page-title">Upload Video</h2>
+      <p class="user-form-page-desc">Add a video by uploading a file or pasting an external link (YouTube, Vimeo, etc.).@if($planLimits['max_video_size_mb'] > 0) Max upload size: {{ $planLimits['max_video_size_mb'] }}MB per file.@endif</p>
+
+      @if($errors->any())
+        <div class="user-alert user-alert-error" style="margin-bottom:16px;padding:12px 14px;border-radius:8px;background:#fdecea;color:#c0392b;border:1px solid #f5c6cb;">
+          @foreach($errors->all() as $error)
+            <p style="margin:0 0 4px;">{{ $error }}</p>
+          @endforeach
+        </div>
+      @endif
+
       <div class="user-form-card user-form-card-wide">
-        <form onsubmit="return false">
-          <div class="user-form-group"><label>Video Title *</label><input type="text" class="user-form-control" data-crud-field="title" placeholder="e.g. Wedding Collection 2026 Showcase"></div>
-          <div class="user-form-group"><label>Description</label><textarea class="user-form-control" rows="3" data-crud-field="description" placeholder="Brief description..."></textarea></div>
-          <div class="user-form-group" id="statusGroup" style="display:none"><label>Status</label><select class="user-form-control" data-crud-field="status"><option>Live</option><option>Pending</option></select></div>
-          <div class="user-form-group"><label>Video File *</label><div class="user-upload-zone"><input type="file" accept="video/*" hidden><p>Drag &amp; drop or <strong>click to upload video</strong></p></div></div>
-          <div class="user-form-group"><label>Custom Thumbnail (optional)</label><div class="user-upload-zone"><input type="file" accept="image/*" hidden><p>Upload thumbnail (16:9)</p></div></div>
+        <form method="POST" action="{{ route('front.users.videos.store') }}" enctype="multipart/form-data" novalidate>
+          @csrf
+          <div class="user-form-group" data-field="title">
+            <label>Video Title *</label>
+            <input type="text" name="title" class="user-form-control @error('title') is-invalid @enderror" value="{{ old('title') }}" placeholder="Enter video title" maxlength="200">
+            <small class="user-field-error">@error('title'){{ $message }}@enderror</small>
+          </div>
+          <div class="user-form-group" data-field="link">
+            <label>External Video URL</label>
+            <input type="url" name="link" class="user-form-control @error('link') is-invalid @enderror" value="{{ old('link') }}" placeholder="https://www.youtube.com/watch?v=... or https://vimeo.com/...">
+            <p class="user-form-hint">Paste a YouTube, Vimeo, or other video platform URL</p>
+            <small class="user-field-error">@error('link'){{ $message }}@enderror</small>
+          </div>
+          <div class="user-form-group" style="text-align:center;padding:8px 0;color:var(--user-muted);">— OR —</div>
+          <div class="user-form-group" data-field="video_file">
+            <label>Upload Video File</label>
+            <div class="user-upload-zone">
+              <input type="file" name="video_file" accept="video/mp4,video/avi,video/quicktime,video/x-ms-wmv,video/webm" hidden>
+              <p>Upload video file (MP4, AVI, MOV, WMV, WebM)</p>
+            </div>
+            <p class="user-form-hint">Supported: MP4, AVI, MOV, WMV, WebM @if($planLimits['max_video_size_mb'] > 0) · Max size: {{ $planLimits['max_video_size_mb'] }}MB @endif</p>
+            <small class="user-field-error">@error('video_file'){{ $message }}@enderror</small>
+          </div>
           <div class="user-form-actions">
-            <div class="user-form-actions-left"><a href="#" data-crud-delete class="user-btn user-btn-danger">Delete Video</a></div>
             <a href="{{ route('front.users.videos') }}" class="user-btn user-btn-default">Cancel</a>
-            <button type="button" class="user-btn user-btn-primary" data-crud-save>Save Video</button>
+            <button type="submit" class="user-btn user-btn-primary">Upload Video</button>
           </div>
         </form>
       </div>
     </div>
-<script>
-  (function() {
-    var id = new URLSearchParams(location.search).get('id');
-    if (id) {
-      document.body.setAttribute('data-mode', 'edit');
-      document.getElementById('formTitle').textContent = 'Edit Promotional Video';
-      document.getElementById('formBreadcrumb').textContent = 'Edit Video';
-      document.getElementById('statusGroup').style.display = 'block';
-    }
-  })();
-</script>
-<script src="{{ asset('front/assets/js/user-crud.js') }}"></script>
 @endsection

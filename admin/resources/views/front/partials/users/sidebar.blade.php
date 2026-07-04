@@ -10,29 +10,30 @@
   <div class="user-nav-section">
     <div class="user-nav-heading">Overview</div>
     <a href="{{ route('front.users.dashboard') }}" class="user-nav-link{{ request()->routeIs('front.users.dashboard') ? ' active' : '' }}" data-nav="dashboard"><span class="nav-icon">📊</span>Dashboard</a>
-    <!-- <a href="{{ route('front.users.analytics') }}" class="user-nav-link{{ request()->routeIs('front.users.analytics') ? ' active' : '' }}" data-nav="analytics"><span class="nav-icon">📈</span>Visitor Analytics</a> -->
+    <a href="{{ route('front.users.business-activity') }}" class="user-nav-link{{ request()->routeIs('front.users.business-activity') ? ' active' : '' }}" data-nav="business-activity"><span class="nav-icon">📈</span>Business Activity</a>
   </div>
   <div class="user-nav-section">
     <div class="user-nav-heading">My Business</div>
     <a href="{{ route('front.users.profile') }}" class="user-nav-link{{ request()->routeIs('front.users.profile*') ? ' active' : '' }}" data-nav="profile"><span class="nav-icon">👤</span>My Profile</a>
     <a href="{{ route('front.users.team') }}" class="user-nav-link{{ request()->routeIs('front.users.team', 'front.users.team-*') ? ' active' : '' }}" data-nav="team"><span class="nav-icon">👥</span>My Team</a>
-    <a href="{{ route('front.users.services') }}" class="user-nav-link{{ request()->routeIs('front.users.services', 'front.users.service-*') ? ' active' : '' }}" data-nav="services"><span class="nav-icon">💼</span>My Services</a>
-    <a href="{{ route('front.users.documents') }}" class="user-nav-link{{ request()->routeIs('front.users.documents', 'front.users.document-*') ? ' active' : '' }}" data-nav="documents"><span class="nav-icon">📄</span>My Document</a>
+    <a href="{{ route('front.users.services') }}" class="user-nav-link{{ request()->routeIs('front.users.services', 'front.users.service-*') ? ' active' : '' }}" data-nav="services"><span class="nav-icon">💼</span>Services & Products</a>
+    <a href="{{ route('front.users.documents') }}" class="user-nav-link{{ request()->routeIs('front.users.documents', 'front.users.document-*') ? ' active' : '' }}" data-nav="documents"><span class="nav-icon">📄</span>My Documents</a>
+    <a href="{{ route('front.users.projects') }}" class="user-nav-link{{ request()->routeIs('front.users.projects', 'front.users.project-*') ? ' active' : '' }}" data-nav="projects"><span class="nav-icon">📁</span>My Projects</a>
   </div>
-  <!-- <div class="user-nav-section">
-    <div class="user-nav-heading">Marketing</div>
-    <a href="{{ route('front.users.banners') }}" class="user-nav-link" data-nav="banners"><span class="nav-icon">🖼</span>My Banner</a>
-    <a href="{{ route('front.users.videos') }}" class="user-nav-link" data-nav="videos"><span class="nav-icon">🎬</span>My Video</a>
-    <a href="{{ route('front.users.articles') }}" class="user-nav-link" data-nav="articles"><span class="nav-icon">📝</span>My Articles</a>
-  </div> -->
-  <!-- <div class="user-nav-section">
+  <div class="user-nav-section">
+    <div class="user-nav-heading">Content & Marketing</div>
+    <a href="{{ route('front.users.articles') }}" class="user-nav-link{{ request()->routeIs('front.users.articles', 'front.users.article-*') ? ' active' : '' }}" data-nav="articles"><span class="nav-icon">📝</span>My Articles</a>
+    <a href="{{ route('front.users.videos') }}" class="user-nav-link{{ request()->routeIs('front.users.videos', 'front.users.video-*') ? ' active' : '' }}" data-nav="videos"><span class="nav-icon">🎬</span>My Videos</a>
+    <a href="{{ route('front.users.offers') }}" class="user-nav-link{{ request()->routeIs('front.users.offers', 'front.users.offer-*') ? ' active' : '' }}" data-nav="offers"><span class="nav-icon">🏷️</span>My Offers</a>
+  </div>
+  <div class="user-nav-section">
     <div class="user-nav-heading">Engagement</div>
-    <a href="{{ route('front.users.inquiries') }}" class="user-nav-link" data-nav="inquiries"><span class="nav-icon">💬</span>My Inquiry</a>
-    <a href="{{ route('front.users.notifications') }}" class="user-nav-link" data-nav="notifications"><span class="nav-icon">✉</span>My Notification</a>
-    <a href="{{ route('front.users.reviews') }}" class="user-nav-link" data-nav="reviews"><span class="nav-icon">⭐</span>My Review</a>
-  </div> -->
+    <a href="{{ route('front.users.inquiries') }}" class="user-nav-link{{ request()->routeIs('front.users.inquiries', 'front.users.inquiries.*') ? ' active' : '' }}" data-nav="inquiries"><span class="nav-icon">💬</span>My Inquiries</a>
+    <a href="{{ route('front.users.notifications') }}" class="user-nav-link{{ request()->routeIs('front.users.notifications', 'front.users.notifications.*') ? ' active' : '' }}" data-nav="notifications"><span class="nav-icon">✉</span>Notifications</a>
+  </div>
   <div class="user-nav-section">
     <div class="user-nav-heading">Account</div>
+    <a href="{{ route('front.users.subscription') }}" class="user-nav-link{{ request()->routeIs('front.users.subscription') ? ' active' : '' }}" data-nav="subscription"><span class="nav-icon">💳</span>Subscription</a>
     <a href="{{ route('front.users.change-password') }}" class="user-nav-link{{ request()->routeIs('front.users.change-password') ? ' active' : '' }}" data-nav="change-password"><span class="nav-icon">🔑</span>Change Password</a>
   </div>
 </nav>

@@ -29,6 +29,17 @@
         </li>
 
         <li class="nav-item sidebar-category">
+            <p>Marketing</p>
+            <span></span>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ request()->routeIs('admin.advertisements.*') ? 'active' : '' }}" href="{{ route('admin.advertisements.index') }}">
+                <i class="mdi mdi-billboard menu-icon"></i>
+                <span class="menu-title">Advertisements</span>
+            </a>
+        </li>
+
+        <li class="nav-item sidebar-category">
             <p>System</p>
             <span></span>
         </li>
