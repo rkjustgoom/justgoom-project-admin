@@ -20,9 +20,24 @@ class Service extends Model
         'price',
     ];
 
-    protected $casts = [
-        'price' => 'decimal:2',
-    ];
+    public function formattedPrice(): ?string
+    {
+        if ($this->price === null || $this->price === '') {
+            return null;
+        }
+
+        $value = (string) $this->price;
+        $hasPlus = str_ends_with($value, '+');
+        $numeric = $hasPlus ? substr($value, 0, -1) : $value;
+
+        if (! is_numeric($numeric)) {
+            return $value;
+        }
+
+        $formatted = '₹' . number_format((float) $numeric, 2);
+
+        return $hasPlus ? $formatted . '+' : $formatted;
+    }
 
     public function scopeServices($query)
     {

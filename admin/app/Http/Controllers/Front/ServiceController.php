@@ -18,10 +18,17 @@ class ServiceController extends Controller
     {
         $user = $request->user();
         $type = $request->query('type');
+        $allowedPerPage = [10, 25, 50, 100];
+        $perPage = (int) $request->query('per_page', 10);
+
+        if (! in_array($perPage, $allowedPerPage, true)) {
+            $perPage = 10;
+        }
 
         return view('front.users.services', [
-            'services' => $this->serviceService->listForUser($user, $type),
+            'services' => $this->serviceService->listForUser($user, $type, $perPage),
             'stats' => $this->serviceService->statsForUser($user),
+            'perPageOptions' => $allowedPerPage,
         ]);
     }
 
@@ -50,7 +57,15 @@ class ServiceController extends Controller
     {
         abort_unless($this->serviceService->belongsToUser($service, $request->user()), 404);
 
-        $this->serviceService->update($request->user(), $service, $request->validated());
+        $validated = $request->validated();
+
+        if (! $this->serviceService->hasChanges($service, $validated, $request->file('product_image'))) {
+            return redirect()
+                ->route('front.users.services.edit', $service)
+                ->with('info', 'No changes to save.');
+        }
+
+        $this->serviceService->update($request->user(), $service, $validated);
 
         return redirect()
             ->route('front.users.services')

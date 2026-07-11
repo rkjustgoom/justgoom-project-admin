@@ -4,6 +4,7 @@ namespace App\Services\Front;
 
 use App\Models\Service;
 use App\Models\User;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -12,7 +13,7 @@ use Illuminate\Support\Str;
 
 class ServiceService
 {
-    public function listForUser(User $user, ?string $type = null): Collection
+    public function listForUser(User $user, ?string $type = null, int $perPage = 10): LengthAwarePaginator
     {
         $query = $user->services()->latest();
 
@@ -20,7 +21,7 @@ class ServiceService
             $query->where('type', $type);
         }
 
-        return $query->get();
+        return $query->paginate($perPage)->withQueryString();
     }
 
     public function listForPublicProfile(User $user, ?string $type = null): Collection
@@ -58,6 +59,36 @@ class ServiceService
             'product_image' => $this->uploadImage($data['product_image'] ?? null),
             'price' => $data['price'] ?? null,
         ]);
+    }
+
+    public function hasChanges(Service $service, array $data, mixed $image = null): bool
+    {
+        $type = $data['type'] ?? $service->type;
+        $price = $data['price'] ?? null;
+        $currentPrice = $service->price === null || $service->price === '' ? null : (string) $service->price;
+        $newPrice = $price === null || $price === '' ? null : (string) $price;
+
+        if ($type !== $service->type) {
+            return true;
+        }
+
+        if ($data['product_name'] !== $service->product_name) {
+            return true;
+        }
+
+        if (($data['product_desc'] ?? null) !== $service->product_desc) {
+            return true;
+        }
+
+        if ($newPrice !== $currentPrice) {
+            return true;
+        }
+
+        if ($image instanceof UploadedFile) {
+            return true;
+        }
+
+        return false;
     }
 
     public function update(User $user, Service $service, array $data): Service

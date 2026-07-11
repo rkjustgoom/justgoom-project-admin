@@ -723,6 +723,13 @@ body.user-sidebar-open { overflow: hidden; }
   transform: translateY(-1px);
   box-shadow: 0 6px 20px rgba(247, 148, 29, 0.45);
 }
+.user-btn-primary:disabled,
+.user-btn-primary[disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
 .user-btn-default {
   background: var(--user-surface);
   border: 1.5px solid var(--user-border);

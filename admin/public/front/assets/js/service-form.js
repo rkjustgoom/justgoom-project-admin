@@ -2,19 +2,37 @@
 (function () {
   var ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
   var MAX_IMAGE_BYTES = 2 * 1024 * 1024;
+  var PRICE_PATTERN = /^\d+(\.\d{1,2})?\+?$/;
+  var PRODUCT_NAME_PATTERN = /^[a-zA-Z0-9\s\-'&.,()]+$/;
 
   var rules = {
+    type: {
+      test: function (v) { return v === 'service' || v === 'product'; },
+      message: function () { return 'Please select a type (Service or Product).'; }
+    },
     product_name: {
-      test: function (v) { return v.trim().length >= 2 && v.trim().length <= 200; },
+      test: function (v) {
+        var trimmed = v.trim();
+        return trimmed.length >= 2 && trimmed.length <= 200 && PRODUCT_NAME_PATTERN.test(trimmed);
+      },
       message: function (v) {
         if (v.trim().length === 0) return 'Service name is required.';
         if (v.trim().length < 2) return 'Service name must be at least 2 characters.';
-        return 'Service name must not exceed 200 characters.';
+        if (v.trim().length > 200) return 'Service name must not exceed 200 characters.';
+        return 'Name must not contain special characters (e.g. +, @, #).';
       }
     },
     product_desc: {
       test: function (v) { return v.length <= 5000; },
       message: function () { return 'Description must not exceed 5000 characters.'; }
+    },
+    price: {
+      test: function (v) {
+        var trimmed = v.trim();
+        if (!trimmed) return true;
+        return PRICE_PATTERN.test(trimmed);
+      },
+      message: function () { return 'Enter a valid price (e.g. 1500, 1500.00, or 1500+).'; }
     },
     product_image: {
       test: function (file) {
@@ -31,6 +49,19 @@
       }
     }
   };
+
+  function normalizePriceInput(value) {
+    var cleaned = value.replace(/[^\d.+]/g, '');
+    var parts = cleaned.split('+');
+    var numeric = parts[0].replace(/(\..*)\./g, '$1');
+    var plus = cleaned.indexOf('+') !== -1 ? '+' : '';
+
+    if (plus && numeric === '') {
+      return '';
+    }
+
+    return numeric + plus;
+  }
 
   function setFieldError(form, fieldName, message) {
     var group = form.querySelector('[data-field="' + fieldName + '"]');
@@ -58,9 +89,26 @@
     }
   }
 
+  function getFormSnapshot(form) {
+    var typeEl = form.querySelector('[name="type"]');
+    var imageInput = form.querySelector('input[name="product_image"]');
+
+    return JSON.stringify({
+      type: typeEl ? typeEl.value : '',
+      product_name: form.querySelector('input[name="product_name"]')?.value || '',
+      product_desc: form.querySelector('textarea[name="product_desc"]')?.value || '',
+      price: form.querySelector('input[name="price"]')?.value || '',
+      has_new_image: !!(imageInput && imageInput.files.length)
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     var form = document.getElementById('serviceForm');
     if (!form) return;
+
+    var isEdit = form.querySelector('input[name="_method"][value="PUT"]') !== null;
+    var updateBtn = document.getElementById('serviceUpdateBtn');
+    var initialSnapshot = getFormSnapshot(form);
 
     form.querySelectorAll('.user-field-error').forEach(function (el) {
       if (el.textContent.trim()) {
@@ -72,13 +120,20 @@
     });
 
     var imageInput = form.querySelector('input[name="product_image"]');
+    var priceInput = form.querySelector('input[name="price"]');
 
     function getFieldValue(fieldName) {
+      if (fieldName === 'type') {
+        return form.querySelector('select[name="type"]')?.value || '';
+      }
       if (fieldName === 'product_name') {
         return form.querySelector('input[name="product_name"]')?.value || '';
       }
       if (fieldName === 'product_desc') {
         return form.querySelector('textarea[name="product_desc"]')?.value || '';
+      }
+      if (fieldName === 'price') {
+        return form.querySelector('input[name="price"]')?.value || '';
       }
       if (fieldName === 'product_image') {
         return imageInput && imageInput.files.length ? imageInput.files[0] : null;
@@ -101,11 +156,13 @@
     }
 
     function validateForm() {
-      var fields = ['product_name', 'product_desc', 'product_image'];
+      var fields = ['type', 'product_name', 'product_desc', 'price', 'product_image'];
       var valid = true;
 
       fields.forEach(function (field) {
-        if (!validateField(field, true)) valid = false;
+        if (form.querySelector('[data-field="' + field + '"]') && !validateField(field, true)) {
+          valid = false;
+        }
       });
 
       if (!valid) {
@@ -116,21 +173,54 @@
       return valid;
     }
 
-    ['product_name', 'product_desc'].forEach(function (field) {
+    function updateSubmitState() {
+      if (!updateBtn) return;
+      updateBtn.disabled = getFormSnapshot(form) === initialSnapshot;
+    }
+
+    ['type', 'product_name', 'product_desc', 'price'].forEach(function (field) {
       var group = form.querySelector('[data-field="' + field + '"]');
       if (!group) return;
-      var input = group.querySelector('input, textarea');
+      var input = group.querySelector('input, textarea, select');
       if (!input) return;
       input.addEventListener('blur', function () { validateField(field, true); });
-      input.addEventListener('input', function () { validateField(field, false); });
+      input.addEventListener('input', function () {
+        validateField(field, false);
+        updateSubmitState();
+      });
+      input.addEventListener('change', function () {
+        validateField(field, true);
+        updateSubmitState();
+      });
     });
 
+    if (priceInput) {
+      priceInput.addEventListener('input', function () {
+        var normalized = normalizePriceInput(priceInput.value);
+        if (priceInput.value !== normalized) {
+          priceInput.value = normalized;
+        }
+      });
+    }
+
     if (imageInput) {
-      imageInput.addEventListener('change', function () { validateField('product_image', true); });
+      imageInput.addEventListener('change', function () {
+        validateField('product_image', true);
+        updateSubmitState();
+      });
+    }
+
+    if (isEdit) {
+      updateSubmitState();
     }
 
     form.addEventListener('submit', function (e) {
       if (!validateForm()) {
+        e.preventDefault();
+        return;
+      }
+
+      if (isEdit && updateBtn && updateBtn.disabled) {
         e.preventDefault();
       }
     });

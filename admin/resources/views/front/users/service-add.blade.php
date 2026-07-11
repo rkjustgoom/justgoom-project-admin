@@ -23,10 +23,11 @@
           @csrf
           <div class="user-form-group" data-field="type">
             <label>Type *</label>
-            <select name="type" class="user-form-control">
-              <option value="service" {{ old('type') === 'service' ? 'selected' : '' }}>Service</option>
+            <select name="type" class="user-form-control @error('type') is-invalid @enderror">
+              <option value="service" {{ old('type', 'service') === 'service' ? 'selected' : '' }}>Service</option>
               <option value="product" {{ old('type') === 'product' ? 'selected' : '' }}>Product</option>
             </select>
+            <small class="user-field-error">@error('type'){{ $message }}@enderror</small>
           </div>
           <div class="user-form-group" data-field="product_name">
             <label>Name *</label>
@@ -40,7 +41,7 @@
           </div>
           <div class="user-form-group" data-field="price">
             <label>Price (optional)</label>
-            <input type="number" name="price" class="user-form-control" value="{{ old('price') }}" placeholder="e.g. 1500.00" step="0.01" min="0">
+            <input type="text" name="price" class="user-form-control @error('price') is-invalid @enderror" value="{{ old('price') }}" placeholder="e.g. 1500, 1500.00, or 1500+" inputmode="decimal" maxlength="20">
             <small class="user-field-error">@error('price'){{ $message }}@enderror</small>
           </div>
           <div class="user-form-group" data-field="product_image">

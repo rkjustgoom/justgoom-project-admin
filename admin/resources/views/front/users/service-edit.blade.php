@@ -22,6 +22,14 @@
         <form method="POST" action="{{ route('front.users.services.update', $service) }}" enctype="multipart/form-data" id="serviceForm" novalidate>
           @csrf
           @method('PUT')
+          <div class="user-form-group" data-field="type">
+            <label>Type *</label>
+            <select name="type" class="user-form-control @error('type') is-invalid @enderror">
+              <option value="service" {{ old('type', $service->type) === 'service' ? 'selected' : '' }}>Service</option>
+              <option value="product" {{ old('type', $service->type) === 'product' ? 'selected' : '' }}>Product</option>
+            </select>
+            <small class="user-field-error">@error('type'){{ $message }}@enderror</small>
+          </div>
           <div class="user-form-group" data-field="product_name">
             <label>Service Name *</label>
             <input type="text" name="product_name" class="user-form-control @error('product_name') is-invalid @enderror" value="{{ old('product_name', $service->product_name) }}" maxlength="200">
@@ -31,6 +39,11 @@
             <label>Short Description</label>
             <textarea name="product_desc" class="user-form-control @error('product_desc') is-invalid @enderror" rows="3" maxlength="5000">{{ old('product_desc', $service->product_desc) }}</textarea>
             <small class="user-field-error">@error('product_desc'){{ $message }}@enderror</small>
+          </div>
+          <div class="user-form-group" data-field="price">
+            <label>Price (optional)</label>
+            <input type="text" name="price" class="user-form-control @error('price') is-invalid @enderror" value="{{ old('price', $service->price) }}" placeholder="e.g. 1500, 1500.00, or 1500+" inputmode="decimal" maxlength="20">
+            <small class="user-field-error">@error('price'){{ $message }}@enderror</small>
           </div>
           <div class="user-form-group" data-field="product_image">
             <label>Service Image</label>
@@ -49,7 +62,7 @@
               <button type="submit" form="serviceDeleteForm" class="user-btn user-btn-danger" onclick="return confirm('Remove this service?');">Remove Service</button>
             </div>
             <a href="{{ route('front.users.services') }}" class="user-btn user-btn-default">Cancel</a>
-            <button type="submit" class="user-btn user-btn-primary">Update Service</button>
+            <button type="submit" id="serviceUpdateBtn" class="user-btn user-btn-primary" disabled>Update Service</button>
           </div>
         </form>
         <form id="serviceDeleteForm" method="POST" action="{{ route('front.users.services.destroy', $service) }}">
