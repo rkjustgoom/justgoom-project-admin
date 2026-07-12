@@ -9,7 +9,10 @@ use App\Services\Front\ProfileService;
 use App\Services\Front\PublicProfileListingService;
 use App\Services\Front\ServiceService;
 use App\Services\Front\TeamService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class PublicProfileController extends Controller
 {
@@ -41,17 +44,90 @@ class PublicProfileController extends Controller
         $profile = $this->listingService->findPublicProfile($slug);
         $user = $profile->user;
 
+        $teams = $this->teamService->listForPublicProfile($user);
+        $services = $this->serviceService->listForPublicProfile($user, 'service');
+        $products = $this->serviceService->listForPublicProfile($user, 'product');
+        $documents = $this->documentService->listForPublicProfile($user);
+        $projects = $user->projects()->where('status', 1)->latest()->get();
+        $articles = $user->articles()->where('status', 'published')->latest('published_at')->get();
+        $videos = collect(DB::table('videos')
+            ->where('user_id', $user->id)
+            ->where('status', 1)
+            ->whereNull('deleted_at')
+            ->latest()
+            ->get());
+
+        $activities = collect()
+            ->merge($projects->take(3)->map(fn ($item) => [
+                'text' => 'Published project “'.$item->title.'”',
+                'time' => $item->created_at?->diffForHumans() ?? '',
+                'at' => $item->created_at,
+            ]))
+            ->merge($articles->take(3)->map(fn ($item) => [
+                'text' => 'Published blog “'.$item->title.'”',
+                'time' => ($item->published_at ?? $item->created_at)?->diffForHumans() ?? '',
+                'at' => $item->published_at ?? $item->created_at,
+            ]))
+            ->merge($videos->take(2)->map(fn ($item) => [
+                'text' => 'Added video “'.$item->title.'”',
+                'time' => Carbon::parse($item->created_at)->diffForHumans(),
+                'at' => $item->created_at,
+            ]))
+            ->merge($teams->take(2)->map(fn ($item) => [
+                'text' => 'Added team member '.$item->name,
+                'time' => $item->created_at?->diffForHumans() ?? '',
+                'at' => $item->created_at,
+            ]))
+            ->sortByDesc('at')
+            ->take(6)
+            ->values();
+
         return view('front.pages.profile', [
             'profile' => $profile,
             'user' => $user,
-            'teams' => $this->teamService->listForPublicProfile($user),
-            'services' => $this->serviceService->listForPublicProfile($user),
-            'documents' => $this->documentService->listForPublicProfile($user),
+            'teams' => $teams,
+            'services' => $services,
+            'products' => $products,
+            'documents' => $documents,
+            'projects' => $projects,
+            'articles' => $articles,
+            'videos' => $videos,
+            'activities' => $activities,
             'completionPercent' => $this->profileService->completionPercent($user),
             'planName' => $this->profileService->planName($user),
             'isOwner' => auth()->check() && auth()->id() === $user->id,
             'profileUrl' => route('front.profile.show', $profile->slug),
-            'qrUrl' => 'https://api.qrserver.com/v1/create-qr-code/?size=160x160&data='.urlencode(route('front.profile.show', $profile->slug)),
+            'qrUrl' => route('front.profile.qr', ['slug' => $profile->slug, 'size' => 180]),
+            'qrDownloadUrl' => route('front.profile.qr', ['slug' => $profile->slug, 'size' => 400]),
+            'justgoomLogoUrl' => asset('front/assets/images/justgoom-logo.png'),
+        ]);
+    }
+
+    public function qrImage(string $slug, Request $request)
+    {
+        $profile = $this->listingService->findPublicProfile($slug);
+        $size = max(120, min(600, (int) $request->query('size', 400)));
+        $profileUrl = route('front.profile.show', $profile->slug);
+        // Standard black & white QR (high error correction for center JG).
+        $apiUrl = 'https://api.qrserver.com/v1/create-qr-code/'
+            .'?size='.$size.'x'.$size
+            .'&margin=12'
+            .'&ecc=H'
+            .'&color=000000'
+            .'&bgcolor=FFFFFF'
+            .'&data='.urlencode($profileUrl);
+
+        $response = Http::timeout(10)->get($apiUrl);
+        if (! $response->successful()) {
+            abort(502, 'Unable to generate QR code.');
+        }
+
+        $png = $response->body();
+
+        return response($png, 200, [
+            'Content-Type' => 'image/png',
+            'Cache-Control' => 'public, max-age=86400',
+            'Access-Control-Allow-Origin' => '*',
         ]);
     }
 

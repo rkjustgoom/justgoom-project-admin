@@ -267,6 +267,9 @@ Route::get('/clear-cache', function () {
         ->header('Content-Type', 'text/plain; charset=UTF-8');
 })->name('clear-cache');
 
+Route::get('/{slug}/qr.png', [PublicProfileController::class, 'qrImage'])
+    ->name('front.profile.qr')
+    ->where('slug', '[a-z0-9\-]+');
 Route::get('/{slug}', [PublicProfileController::class, 'show'])
     ->name('front.profile.show')
     ->where('slug', '[a-z0-9\-]+');

@@ -27,7 +27,7 @@ class TeamMemberRequest extends FormRequest
             'short_info' => $this->filled('short_info') ? trim((string) $this->input('short_info')) : null,
             'department_other' => $departmentOther !== '' ? $departmentOther : null,
             'is_primary' => $this->boolean('is_primary'),
-            'status' => (string) $this->input('status', '1'),
+            'status' => (string) $this->input('status', $this->isMethod('post') ? '0' : '1'),
             'department' => $department !== '' ? $department : null,
         ]);
     }
