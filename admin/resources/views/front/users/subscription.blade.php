@@ -5,84 +5,165 @@
 @section('body_attrs', 'class="user-panel-body" data-page="subscription" data-title="Subscription"')
 
 @section('content')
+@php
+  $planMeta = [
+    'Free' => ['icon' => '🆓', 'features' => ['15 days trial access', 'Basic account registration', 'Company profile (1)', 'Limited content features']],
+    'Gold' => ['icon' => '🥇', 'features' => ['Full company profile', 'Services, team, documents & videos', 'Enhanced business visibility', 'Plan-based content limits']],
+    'Platinum' => ['icon' => '💎', 'features' => ['Unlimited adds for all details', 'Full company profile', 'Services, team, documents & videos', 'Maximum platform visibility']],
+  ];
+  $currentName = $currentPlan?->name ?? 'Free';
+@endphp
 <div class="user-content">
       <div class="user-plan-banner">
-        <span style="font-size:40px">💎</span>
+        <span style="font-size:40px">{{ $planMeta[$currentName]['icon'] ?? '💳' }}</span>
         <div style="flex:1">
-          <h2>Platinum Plan</h2>
-          <p>₹4,800 / 12 months · Renews on June 7, 2027</p>
+          <h2>{{ $currentPlan?->name ?? 'Free' }} Plan</h2>
+          <p>
+            @if(($currentPlan?->rate ?? 0) > 0)
+              ₹{{ number_format((float) $currentPlan->rate, 0) }}
+              @if($currentPlan?->duration_days)
+                / {{ $currentPlan->duration_days }} days
+              @endif
+              @if($currentUserPlan?->next_purchase_date)
+                · Renews on {{ $currentUserPlan->next_purchase_date->format('M j, Y') }}
+              @endif
+            @else
+              Free
+              @if($currentPlan?->duration_days)
+                / {{ $currentPlan->duration_days }} days trial
+              @endif
+            @endif
+          </p>
         </div>
-        <button type="button" class="user-btn user-btn-default">Manage Billing</button>
+        <a href="#plan-cards" class="user-btn user-btn-default">Manage Plan</a>
       </div>
-      <div class="user-plan-row">
-        <div class="user-plan-card">
-          <span style="font-size:28px">🆓</span>
-          <h3>Free Plan</h3>
-          <div class="price">Free<small style="font-size:13px;font-weight:400;color:#888">/15 days</small></div>
-          <ul>
-            <li>✓ 15 days trial access</li>
-            <li>✓ Basic account registration</li>
-            <li>✓ Company profile (1)</li>
-            <li>✕ Services, team &amp; documents</li>
-            <li>✕ Promotional listings</li>
-          </ul>
-          <button type="button" class="user-btn user-btn-default" style="width:100%" disabled>Below current</button>
-        </div>
-        <div class="user-plan-card">
-          <span style="font-size:28px">🥇</span>
-          <h3>Gold Plan</h3>
-          <div class="price">₹3,000<small style="font-size:13px;font-weight:400;color:#888">/6 months</small></div>
-          <ul>
-            <li>✓ Full company profile</li>
-            <li>✓ All details — 15 times each</li>
-            <li>✓ Services, team, documents &amp; videos</li>
-            <li>✓ Enhanced business visibility</li>
-            <li>✕ Unlimited content adds</li>
-          </ul>
-          <button type="button" class="user-btn user-btn-default" style="width:100%">Downgrade</button>
-        </div>
-        <div class="user-plan-card featured">
-          <span style="font-size:28px">💎</span>
-          <h3>Platinum Plan</h3>
-          <div class="price">₹4,800<small style="font-size:13px;font-weight:400;color:#888">/12 months</small></div>
-          <p class="user-plan-discount"><s>₹6,000</s> · 20% discount</p>
-          <ul>
-            <li>✓ Unlimited adds for all details</li>
-            <li>✓ Full company profile</li>
-            <li>✓ Services, team, documents &amp; videos</li>
-            <li>✓ Maximum platform visibility</li>
-            <li>✓ All Gold Plan benefits</li>
-          </ul>
-          <button type="button" class="user-btn user-btn-primary" style="width:100%" disabled>Current Plan</button>
-        </div>
+
+      <div class="user-plan-row" id="plan-cards">
+        @forelse($plans as $plan)
+          @php
+            $meta = $planMeta[$plan->name] ?? ['icon' => '📦', 'features' => ['Plan features available after activation']];
+            $isCurrent = (int) $plan->id === (int) ($currentPlan?->id);
+          @endphp
+          <div class="user-plan-card{{ $isCurrent ? ' featured' : '' }}">
+            <span style="font-size:28px">{{ $meta['icon'] }}</span>
+            <h3>{{ $plan->name }} Plan</h3>
+            <div class="price">
+              @if((float) $plan->rate > 0)
+                ₹{{ number_format((float) $plan->rate, 0) }}
+                <small style="font-size:13px;font-weight:400;color:#888">/{{ $plan->duration_days }} days</small>
+              @else
+                Free
+                <small style="font-size:13px;font-weight:400;color:#888">/{{ $plan->duration_days }} days</small>
+              @endif
+            </div>
+            <ul>
+              @foreach($meta['features'] as $feature)
+                <li>✓ {{ $feature }}</li>
+              @endforeach
+              @if($plan->max_video_count)
+                <li>✓ Up to {{ $plan->max_video_count }} videos</li>
+              @endif
+            </ul>
+            @if($isCurrent)
+              <button type="button" class="user-btn user-btn-primary" style="width:100%" disabled>Current Plan</button>
+            @else
+              <form method="POST" action="{{ route('front.users.subscription.subscribe', $plan) }}">
+                @csrf
+                <button type="submit" class="user-btn user-btn-default" style="width:100%" onclick="return confirm('Switch to {{ $plan->name }} plan?');">
+                  {{ (float) $plan->rate > (float) ($currentPlan?->rate ?? 0) ? 'Upgrade' : 'Switch' }} to {{ $plan->name }}
+                </button>
+              </form>
+            @endif
+          </div>
+        @empty
+          <p class="user-text-muted">No subscription plans are available yet.</p>
+        @endforelse
       </div>
+
       <div class="user-panel">
-        <div class="user-panel-head">Feature Usage (Platinum — Unlimited)</div>
+        <div class="user-panel-head">Feature Usage ({{ $currentName }})</div>
         <div class="user-panel-body" style="padding:0">
           <table class="user-table" style="border:none">
             <thead><tr><th>Feature</th><th>Used</th><th>Limit</th><th>Status</th></tr></thead>
             <tbody>
-              <tr><td>Company Profile</td><td>1</td><td>1</td><td><span class="user-badge user-badge-success">Active</span></td></tr>
-              <tr><td>Services</td><td>4</td><td>Unlimited</td><td><span class="user-badge user-badge-success">Unlimited</span></td></tr>
-              <tr><td>Team Members</td><td>3</td><td>Unlimited</td><td><span class="user-badge user-badge-success">Unlimited</span></td></tr>
-              <tr><td>Documents</td><td>2</td><td>Unlimited</td><td><span class="user-badge user-badge-success">Unlimited</span></td></tr>
-              <tr><td>Videos</td><td>1</td><td>Unlimited</td><td><span class="user-badge user-badge-success">Unlimited</span></td></tr>
+              <tr>
+                <td>Company Profile</td>
+                <td>1</td>
+                <td>1</td>
+                <td><span class="user-badge user-badge-success">Active</span></td>
+              </tr>
+              <tr>
+                <td>Services</td>
+                <td>{{ $usage['services'] }}</td>
+                <td>{{ $currentName === 'Platinum' ? 'Unlimited' : ($currentName === 'Gold' ? '15' : '—') }}</td>
+                <td><span class="user-badge user-badge-success">{{ $currentName === 'Free' ? 'Limited' : 'Active' }}</span></td>
+              </tr>
+              <tr>
+                <td>Team Members</td>
+                <td>{{ $usage['team'] }}</td>
+                <td>{{ $currentName === 'Platinum' ? 'Unlimited' : ($currentName === 'Gold' ? '15' : '—') }}</td>
+                <td><span class="user-badge user-badge-success">{{ $currentName === 'Free' ? 'Limited' : 'Active' }}</span></td>
+              </tr>
+              <tr>
+                <td>Documents</td>
+                <td>{{ $usage['documents'] }}</td>
+                <td>{{ $currentName === 'Platinum' ? 'Unlimited' : ($currentName === 'Gold' ? '15' : '—') }}</td>
+                <td><span class="user-badge user-badge-success">{{ $currentName === 'Free' ? 'Limited' : 'Active' }}</span></td>
+              </tr>
+              <tr>
+                <td>Videos</td>
+                <td>{{ $usage['videos'] }}</td>
+                <td>{{ $currentPlan?->max_video_count ?: ($currentName === 'Free' ? '0' : '—') }}</td>
+                <td><span class="user-badge user-badge-success">{{ ($currentPlan?->max_video_count ?? 0) > 0 ? 'Active' : 'Locked' }}</span></td>
+              </tr>
+              <tr>
+                <td>Projects</td>
+                <td>{{ $usage['projects'] }}</td>
+                <td>{{ $currentPlan?->max_project_count ?: '—' }}</td>
+                <td><span class="user-badge user-badge-success">Active</span></td>
+              </tr>
+              <tr>
+                <td>Articles</td>
+                <td>{{ $usage['articles'] }}</td>
+                <td>{{ $currentPlan?->max_article_count ?: '—' }}</td>
+                <td><span class="user-badge user-badge-success">Active</span></td>
+              </tr>
             </tbody>
           </table>
         </div>
       </div>
+
       <div class="user-panel" style="margin-top:20px">
         <div class="user-panel-head">Plan Comparison</div>
         <div class="user-panel-body" style="padding:0">
           <table class="user-table" style="border:none">
             <thead>
-              <tr><th>Feature</th><th>Free</th><th>Gold</th><th>Platinum</th></tr>
+              <tr>
+                <th>Feature</th>
+                @foreach($plans as $plan)
+                  <th>{{ $plan->name }}</th>
+                @endforeach
+              </tr>
             </thead>
             <tbody>
-              <tr><td>Duration</td><td>15 days</td><td>6 months</td><td>12 months</td></tr>
-              <tr><td>Price</td><td>Free</td><td>₹3,000</td><td>₹4,800 (20% off)</td></tr>
-              <tr><td>Company Profile</td><td>1</td><td>1</td><td>1</td></tr>
-              <tr><td>Add Details Limit</td><td>—</td><td>15 times each</td><td>Unlimited</td></tr>
+              <tr>
+                <td>Duration</td>
+                @foreach($plans as $plan)
+                  <td>{{ $plan->duration_days }} days</td>
+                @endforeach
+              </tr>
+              <tr>
+                <td>Price</td>
+                @foreach($plans as $plan)
+                  <td>{{ (float) $plan->rate > 0 ? '₹'.number_format((float) $plan->rate, 0) : 'Free' }}</td>
+                @endforeach
+              </tr>
+              <tr>
+                <td>Video Limit</td>
+                @foreach($plans as $plan)
+                  <td>{{ $plan->max_video_count ?: '—' }}</td>
+                @endforeach
+              </tr>
             </tbody>
           </table>
         </div>

@@ -101,6 +101,13 @@ class TeamService
         return (int) $team->user_id === (int) $user->id;
     }
 
+    public function updateStatus(Team $team, int $status): Team
+    {
+        $team->update(['status' => $status ? 1 : 0]);
+
+        return $team->fresh();
+    }
+
     private function clearPrimaryContact(User $user, ?int $exceptId = null): void
     {
         $user->teams()

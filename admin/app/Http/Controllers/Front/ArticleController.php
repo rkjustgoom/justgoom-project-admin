@@ -14,10 +14,12 @@ class ArticleController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
+        $perPage = $this->resolvePerPage($request);
 
         $articles = $user->articles()
             ->orderByDesc('created_at')
-            ->paginate(10);
+            ->paginate($perPage)
+            ->withQueryString();
 
         $stats = [
             'total' => $user->articles()->count(),
@@ -112,9 +114,33 @@ class ArticleController extends Controller
             ->with('success', 'Article deleted successfully.');
     }
 
+    public function updateStatus(Request $request, Article $article)
+    {
+        $this->authorizeArticle($article);
+
+        $validated = $request->validate([
+            'status' => ['required', 'in:draft,published'],
+        ]);
+
+        $article->status = $validated['status'];
+        if ($validated['status'] === 'published' && ! $article->published_at) {
+            $article->published_at = now();
+        }
+        $article->save();
+
+        return back()->with('success', 'Article status updated.');
+    }
+
     private function authorizeArticle(Article $article): void
     {
         abort_unless($article->user_id === auth()->id(), 403);
+    }
+
+    private function resolvePerPage(Request $request): int
+    {
+        $perPage = (int) $request->query('per_page', 10);
+
+        return in_array($perPage, [10, 25, 50], true) ? $perPage : 10;
     }
 
     private function uploadFile($file, string $subfolder): string

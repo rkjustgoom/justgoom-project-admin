@@ -16,14 +16,24 @@ class Project extends Model
         'title',
         'description',
         'type',
+        'status',
         'file_path',
         'external_url',
         'thumbnail',
     ];
 
+    protected $casts = [
+        'status' => 'integer',
+    ];
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function isActive(): bool
+    {
+        return (int) $this->status === 1;
     }
 
     public function isDocument(): bool

@@ -1,10 +1,25 @@
+@php
+  $sidebarUserPlan = auth()->user()
+    ? \App\Models\UserPlan::with('plan')
+        ->where('user_id', auth()->id())
+        ->where('next_purchase_date', '>=', now()->toDateString())
+        ->orderByDesc('next_purchase_date')
+        ->first()
+    : null;
+  $sidebarPlanName = $sidebarUserPlan?->plan?->name
+    ?? \App\Models\Plan::where('name', 'Free')->value('name')
+    ?? 'Free';
+@endphp
 <button type="button" class="user-sidebar-close" aria-label="Close menu">✕</button>
 <div class="user-sidebar-brand">
   <a href="{{ route('front.users.dashboard') }}"><img src="{{ asset('front/assets/images/justgoom-logo.png') }}" alt="JustGoom"></a>
 </div>
 <div class="user-sidebar-plan">
-  <span class="user-sidebar-plan-icon">💎</span>
-  <div><strong>Free Plan</strong><span>All features locked</span></div>
+  <span class="user-sidebar-plan-icon">{{ $sidebarPlanName === 'Platinum' ? '💎' : ($sidebarPlanName === 'Gold' ? '🥇' : '🆓') }}</span>
+  <div>
+    <strong>{{ $sidebarPlanName }} Plan</strong>
+    <span><a href="{{ route('front.users.subscription') }}" style="color:inherit;text-decoration:underline;">Manage subscription</a></span>
+  </div>
 </div>
 <nav>
   <div class="user-nav-section">

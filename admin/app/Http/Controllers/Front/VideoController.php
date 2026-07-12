@@ -7,7 +7,6 @@ use App\Models\UserPlan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class VideoController extends Controller
@@ -15,12 +14,14 @@ class VideoController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
+        $perPage = $this->resolvePerPage($request);
 
         $videos = DB::table('videos')
             ->where('user_id', $user->id)
             ->whereNull('deleted_at')
             ->orderByDesc('created_at')
-            ->paginate(12);
+            ->paginate($perPage)
+            ->withQueryString();
 
         $planLimits = $this->getPlanLimits($user);
 
@@ -65,6 +66,11 @@ class VideoController extends Controller
             'title' => 'required|string|max:200',
             'link' => 'required_without:video_file|nullable|url|max:500',
             'video_file' => "required_without:link|nullable|file|max:{$maxSize}|mimes:mp4,avi,mov,wmv,webm",
+        ], [
+            'title.required' => 'Video title is required.',
+            'link.required_without' => 'Provide an external video URL or upload a video file.',
+            'video_file.required_without' => 'Provide an external video URL or upload a video file.',
+            'link.url' => 'Enter a valid video URL.',
         ]);
 
         $link = $validated['link'] ?? null;
@@ -77,6 +83,7 @@ class VideoController extends Controller
             'user_id' => $user->id,
             'title' => $validated['title'],
             'link' => $link,
+            'status' => 1,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -94,7 +101,7 @@ class VideoController extends Controller
 
         abort_unless($video, 404);
 
-        if ($video->link && !str_starts_with($video->link, 'http')) {
+        if ($video->link && ! str_starts_with($video->link, 'http')) {
             $this->deleteFile($video->link);
         }
 
@@ -104,6 +111,37 @@ class VideoController extends Controller
 
         return redirect()->route('front.users.videos')
             ->with('success', 'Video deleted successfully.');
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $video = DB::table('videos')
+            ->where('id', $id)
+            ->where('user_id', $request->user()->id)
+            ->whereNull('deleted_at')
+            ->first();
+
+        abort_unless($video, 404);
+
+        $validated = $request->validate([
+            'status' => ['required', 'in:0,1'],
+        ]);
+
+        DB::table('videos')
+            ->where('id', $id)
+            ->update([
+                'status' => (int) $validated['status'],
+                'updated_at' => now(),
+            ]);
+
+        return back()->with('success', 'Video status updated.');
+    }
+
+    private function resolvePerPage(Request $request): int
+    {
+        $perPage = (int) $request->query('per_page', 10);
+
+        return in_array($perPage, [10, 25, 50], true) ? $perPage : 10;
     }
 
     private function getPlanLimits($user): array

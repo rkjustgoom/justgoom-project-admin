@@ -32,11 +32,12 @@
               <td>{{ $member->email }}</td>
               <td>{{ $member->phone }}</td>
               <td>
-                @if($member->isActive())
-                  <span class="user-badge user-badge-success">Active</span>
-                @else
-                  <span class="user-badge user-badge-warning">Inactive</span>
-                @endif
+                @include('front.partials.users.status-toggle', [
+                  'action' => route('front.users.team.status', $member),
+                  'active' => $member->isActive(),
+                  'label' => $member->isActive() ? 'Active' : 'Inactive',
+                  'statusValue' => $member->isActive() ? '0' : '1',
+                ])
               </td>
               <td>
                 <a href="{{ route('front.users.team.edit', $member) }}" class="user-table-action">Edit</a>

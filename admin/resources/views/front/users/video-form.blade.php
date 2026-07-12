@@ -50,3 +50,7 @@
       </div>
     </div>
 @endsection
+
+@push('scripts')
+<script src="{{ asset('front/assets/js/video-form.js') }}"></script>
+@endpush

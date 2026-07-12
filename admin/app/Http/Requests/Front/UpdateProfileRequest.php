@@ -43,11 +43,11 @@ class UpdateProfileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'company_name' => ['required', 'string', 'min:4', 'max:200'],
+            'company_name' => ['required', 'string', 'min:4', 'max:200', 'regex:/^[a-zA-Z0-9\s\-\'&.,()]+$/'],
             'category_id' => ['required', 'exists:categories,id'],
             'sub_category_id' => ['required', 'exists:sub_categories,id'],
             'tagline' => ['nullable', 'string', 'max:255'],
-            'business_desc' => ['required', 'string', 'min:20', 'max:5000'],
+            'business_desc' => ['required', 'string', 'min:20', 'max:5000', 'regex:/^[a-zA-Z0-9\s\-\'&.,()]+$/'],
             'phone' => ['required', 'digits:10'],
             'email' => ['required', 'email', 'max:191', Rule::unique('users', 'email')->ignore($this->user()->id)],
             'address' => ['nullable', 'string', 'max:500'],

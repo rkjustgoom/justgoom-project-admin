@@ -24,11 +24,14 @@
               <td>{{ $loop->iteration + ($articles->currentPage() - 1) * $articles->perPage() }}</td>
               <td><strong>{{ $article->title }}</strong></td>
               <td>
-                @if($article->status === 'published')
-                  <span class="user-badge user-badge-success">Published</span>
-                @else
-                  <span class="user-badge user-badge-warning">Draft</span>
-                @endif
+                @include('front.partials.users.status-toggle', [
+                  'action' => route('front.users.articles.status', $article),
+                  'active' => $article->status === 'published',
+                  'label' => $article->status === 'published' ? 'Published' : 'Draft',
+                  'activeClass' => 'user-badge-success',
+                  'inactiveClass' => 'user-badge-warning',
+                  'statusValue' => $article->status === 'published' ? 'draft' : 'published',
+                ])
               </td>
               <td>{{ $article->published_at?->format('M j, Y') ?? '—' }}</td>
               <td>{{ $article->created_at?->format('M j, Y') }}</td>
@@ -49,6 +52,6 @@
           </tbody>
         </table>
       </div>
-      {{ $articles->links('front.partials.pagination') }}
+      @include('front.partials.pagination-bar', ['paginator' => $articles])
     </div>
 @endsection

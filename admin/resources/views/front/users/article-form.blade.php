@@ -34,7 +34,7 @@
               <p>Upload cover image (optional)</p>
             </div>
             @if($article?->featured_image)
-              <p class="user-form-hint">Current: <img src="{{ asset('storage/' . $article->featured_image) }}" alt="cover" style="height:50px; border-radius:6px; margin-top:6px;"></p>
+              <p class="user-form-hint">Current: <img src="{{ asset($article->featured_image) }}" alt="cover" style="height:50px; border-radius:6px; margin-top:6px;"></p>
             @endif
             <small class="user-field-error">@error('featured_image'){{ $message }}@enderror</small>
           </div>
@@ -59,3 +59,7 @@
       </div>
     </div>
 @endsection
+
+@push('scripts')
+<script src="{{ asset('front/assets/js/article-form.js') }}"></script>
+@endpush

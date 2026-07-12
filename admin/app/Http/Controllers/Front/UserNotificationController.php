@@ -33,4 +33,24 @@ class UserNotificationController extends Controller
             'notification' => $notification->fresh(),
         ]);
     }
+
+    public function markAllRead(Request $request)
+    {
+        $count = $this->notificationService->markAllAsRead($request->user());
+
+        return back()->with('success', $count > 0
+            ? "Marked {$count} notification(s) as read."
+            : 'All notifications are already read.');
+    }
+
+    public function destroy(Request $request, UserNotification $notification)
+    {
+        abort_unless($this->notificationService->belongsToUser($notification, $request->user()), 404);
+
+        $this->notificationService->delete($notification);
+
+        return redirect()
+            ->route('front.users.notifications')
+            ->with('success', 'Notification deleted.');
+    }
 }

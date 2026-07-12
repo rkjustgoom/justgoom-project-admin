@@ -4,6 +4,7 @@ namespace App\Services\Front;
 
 use App\Models\Document;
 use App\Models\User;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -12,16 +13,18 @@ use Illuminate\Support\Str;
 
 class DocumentService
 {
-    public function listForUser(User $user): Collection
+    public function listForUser(User $user, int $perPage = 10): LengthAwarePaginator
     {
         return $user->documents()
             ->latest()
-            ->get();
+            ->paginate($perPage)
+            ->withQueryString();
     }
 
     public function listForPublicProfile(User $user): Collection
     {
         return $user->documents()
+            ->where('status', 1)
             ->latest()
             ->get();
     }
@@ -43,6 +46,7 @@ class DocumentService
             'title' => $data['title'],
             'attachment' => $this->uploadFile($data['attachment']),
             'file_type' => $data['file_type'],
+            'status' => (int) ($data['status'] ?? 1),
         ]);
     }
 
@@ -54,6 +58,10 @@ class DocumentService
             'title' => $data['title'],
             'file_type' => $data['file_type'],
         ];
+
+        if (array_key_exists('status', $data)) {
+            $payload['status'] = (int) $data['status'];
+        }
 
         if (($data['attachment'] ?? null) instanceof UploadedFile) {
             $this->deleteFile($document->attachment);
@@ -78,6 +86,13 @@ class DocumentService
     public function belongsToUser(Document $document, User $user): bool
     {
         return (int) $document->user_id === (int) $user->id;
+    }
+
+    public function updateStatus(Document $document, int $status): Document
+    {
+        $document->update(['status' => $status ? 1 : 0]);
+
+        return $document->fresh();
     }
 
     public function detectFileType(UploadedFile $file): string

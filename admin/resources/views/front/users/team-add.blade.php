@@ -50,8 +50,8 @@
             <div class="user-form-group">
               <label>Status</label>
               <select name="status" class="user-form-control @error('status') is-invalid @enderror">
-                <option value="1" @selected(old('status', '1') == '1')>Active</option>
-                <option value="0" @selected(old('status') === '0')>Inactive</option>
+                <option value="1" @selected((string) old('status', '1') === '1')>Active</option>
+                <option value="0" @selected((string) old('status', '1') === '0')>Inactive</option>
               </select>
               @error('status')<small class="user-field-error">{{ $message }}</small>@enderror
             </div>

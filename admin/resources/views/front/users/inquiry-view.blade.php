@@ -14,7 +14,17 @@
           <dt>Email</dt><dd>{{ $inquiry->sender_email ?: '—' }}</dd>
           <dt>Phone</dt><dd>{{ $inquiry->sender_phone ?: '—' }}</dd>
           <dt>Date</dt><dd>{{ $inquiry->created_at?->format('M j, Y g:i A') }}</dd>
-          <dt>Status</dt><dd><span class="user-badge {{ $inquiry->statusBadgeClass() }}">{{ $inquiry->statusLabel() }}</span></dd>
+          <dt>Status</dt>
+          <dd>
+            @include('front.partials.users.status-toggle', [
+              'action' => route('front.users.inquiries.status', $inquiry),
+              'active' => !$inquiry->isNew(),
+              'label' => $inquiry->statusLabel(),
+              'activeClass' => 'user-badge-success',
+              'inactiveClass' => 'user-badge-warning',
+              'statusValue' => $inquiry->isNew() ? 'replied' : 'new',
+            ])
+          </dd>
           <dt>Subject</dt><dd>{{ $inquiry->subject }}</dd>
           <dt>Message</dt><dd style="grid-column:1/-1;padding-top:8px;line-height:1.6">{{ $inquiry->message ?: '—' }}</dd>
         </dl>
@@ -29,9 +39,7 @@
         @endif
         <div class="user-form-actions">
           <a href="{{ route('front.users.inquiries') }}" class="user-btn user-btn-default">Back</a>
-          @if($inquiry->isNew())
-            <a href="{{ route('front.users.inquiry-reply') }}" class="user-btn user-btn-primary">Reply</a>
-          @endif
+          <a href="{{ route('front.users.inquiries.reply', $inquiry) }}" class="user-btn user-btn-primary">{{ $inquiry->isNew() ? 'Reply' : 'Update Reply' }}</a>
         </div>
       </div>
     </div>

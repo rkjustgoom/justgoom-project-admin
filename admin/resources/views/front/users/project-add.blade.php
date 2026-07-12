@@ -73,18 +73,5 @@
 @endsection
 
 @push('scripts')
-<script>
-  document.getElementById('projectType').addEventListener('change', function() {
-    var fileGroup = document.getElementById('fileGroup');
-    var urlGroup = document.getElementById('urlGroup');
-    if (this.value === 'link') {
-      fileGroup.style.display = 'none';
-      urlGroup.style.display = 'block';
-    } else {
-      fileGroup.style.display = 'block';
-      urlGroup.style.display = 'none';
-    }
-  });
-  document.getElementById('projectType').dispatchEvent(new Event('change'));
-</script>
+<script src="{{ asset('front/assets/js/project-form.js') }}"></script>
 @endpush

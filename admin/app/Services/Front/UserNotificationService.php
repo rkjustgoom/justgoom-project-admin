@@ -35,4 +35,16 @@ class UserNotificationService
     {
         $notification->markAsRead();
     }
+
+    public function markAllAsRead(User $user): int
+    {
+        return $user->userNotifications()
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+    }
+
+    public function delete(UserNotification $notification): void
+    {
+        $notification->delete();
+    }
 }

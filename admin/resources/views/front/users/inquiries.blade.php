@@ -22,12 +22,23 @@
                 <td>{{ $inquiry->sender_name }}</td>
                 <td>{{ $inquiry->subject }}</td>
                 <td>{{ $inquiry->created_at?->format('M j, Y') }}</td>
-                <td><span class="user-badge {{ $inquiry->statusBadgeClass() }}">{{ $inquiry->statusLabel() }}</span></td>
                 <td>
+                  @include('front.partials.users.status-toggle', [
+                    'action' => route('front.users.inquiries.status', $inquiry),
+                    'active' => !$inquiry->isNew(),
+                    'label' => $inquiry->statusLabel(),
+                    'activeClass' => 'user-badge-success',
+                    'inactiveClass' => 'user-badge-warning',
+                    'statusValue' => $inquiry->isNew() ? 'replied' : 'new',
+                  ])
+                </td>
+                <td>
+                  <a href="{{ route('front.users.inquiries.show', $inquiry) }}" class="user-table-action">View</a>
                   @if($inquiry->isNew())
-                    <a href="{{ route('front.users.inquiry-reply') }}" class="user-table-action">Reply</a> ·
+                    · <a href="{{ route('front.users.inquiries.reply', $inquiry) }}" class="user-table-action">Reply</a>
+                  @else
+                    · <a href="{{ route('front.users.inquiries.reply', $inquiry) }}" class="user-table-action-muted">Update Reply</a>
                   @endif
-                  <a href="{{ route('front.users.inquiries.show', $inquiry) }}" class="user-table-action-muted">View</a>
                 </td>
               </tr>
               @empty

@@ -16,11 +16,21 @@ class Document extends Model
         'title',
         'attachment',
         'file_type',
+        'status',
+    ];
+
+    protected $casts = [
+        'status' => 'integer',
     ];
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function isActive(): bool
+    {
+        return (int) $this->status === 1;
     }
 
     public function fileTypeLabel(): string

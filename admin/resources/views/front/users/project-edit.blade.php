@@ -47,7 +47,7 @@
               <p>Upload new file to replace current</p>
             </div>
             @if($project->file_path)
-              <p class="user-form-hint">Current: <a href="{{ asset('storage/' . $project->file_path) }}" target="_blank">View file</a></p>
+              <p class="user-form-hint">Current: <a href="{{ asset($project->file_path) }}" target="_blank">View file</a></p>
             @endif
             <small class="user-field-error">@error('file'){{ $message }}@enderror</small>
           </div>
@@ -63,7 +63,7 @@
               <p>Upload new thumbnail (optional)</p>
             </div>
             @if($project->thumbnail)
-              <p class="user-form-hint">Current: <img src="{{ asset('storage/' . $project->thumbnail) }}" alt="thumb" style="height:40px; border-radius:4px;"></p>
+              <p class="user-form-hint">Current: <img src="{{ asset($project->thumbnail) }}" alt="thumb" style="height:40px; border-radius:4px;"></p>
             @endif
             <small class="user-field-error">@error('thumbnail'){{ $message }}@enderror</small>
           </div>
@@ -77,18 +77,5 @@
 @endsection
 
 @push('scripts')
-<script>
-  document.getElementById('projectType').addEventListener('change', function() {
-    var fileGroup = document.getElementById('fileGroup');
-    var urlGroup = document.getElementById('urlGroup');
-    if (this.value === 'link') {
-      fileGroup.style.display = 'none';
-      urlGroup.style.display = 'block';
-    } else {
-      fileGroup.style.display = 'block';
-      urlGroup.style.display = 'none';
-    }
-  });
-  document.getElementById('projectType').dispatchEvent(new Event('change'));
-</script>
+<script src="{{ asset('front/assets/js/project-form.js') }}"></script>
 @endpush

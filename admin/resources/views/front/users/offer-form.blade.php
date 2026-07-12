@@ -51,7 +51,7 @@
           <div class="user-form-row">
             <div class="user-form-group" data-field="start_date">
               <label>Start Date *</label>
-              <input type="date" id="offerStartDate" name="start_date" class="user-form-control @error('start_date') is-invalid @enderror" value="{{ old('start_date', $offer?->start_date?->format('Y-m-d') ?? now()->format('Y-m-d')) }}" min="{{ now()->format('Y-m-d') }}">
+              <input type="date" id="offerStartDate" name="start_date" class="user-form-control @error('start_date') is-invalid @enderror" value="{{ old('start_date', $offer?->start_date?->format('Y-m-d') ?? now()->format('Y-m-d')) }}" @if(!$offer) min="{{ now()->format('Y-m-d') }}" @endif>
               <small class="user-field-error">@error('start_date'){{ $message }}@enderror</small>
             </div>
             <div class="user-form-group" data-field="end_date">
@@ -80,17 +80,5 @@
 @endsection
 
 @push('scripts')
-<script>
-(function() {
-  var startEl = document.getElementById('offerStartDate');
-  var endEl   = document.getElementById('offerEndDate');
-  if (!startEl || !endEl) return;
-
-  startEl.addEventListener('change', function() {
-    var picked = this.value;
-    endEl.min = picked;
-    if (endEl.value < picked) endEl.value = picked;
-  });
-})();
-</script>
+<script src="{{ asset('front/assets/js/offer-form.js') }}"></script>
 @endpush

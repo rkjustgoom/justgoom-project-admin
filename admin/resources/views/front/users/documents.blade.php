@@ -17,12 +17,20 @@
       </div>
       <div class="user-table-wrap">
         <table class="user-table">
-          <thead><tr><th>Document Name</th><th>Type</th><th>Uploaded</th><th>Action</th></tr></thead>
+          <thead><tr><th>Document Name</th><th>Type</th><th>Status</th><th>Uploaded</th><th>Action</th></tr></thead>
           <tbody>
             @forelse($documents as $document)
             <tr>
               <td><strong>{{ $document->title }}</strong></td>
               <td>{{ $document->fileTypeLabel() }}</td>
+              <td>
+                @include('front.partials.users.status-toggle', [
+                  'action' => route('front.users.documents.status', $document),
+                  'active' => $document->isActive(),
+                  'label' => $document->isActive() ? 'Active' : 'Inactive',
+                  'statusValue' => $document->isActive() ? '0' : '1',
+                ])
+              </td>
               <td>{{ $document->created_at?->format('M j, Y') }}</td>
               <td>
                 <a href="{{ route('front.users.documents.edit', $document) }}" class="user-table-action">Edit</a>
@@ -38,11 +46,12 @@
             </tr>
             @empty
             <tr>
-              <td colspan="4" class="user-text-muted" style="text-align:center;padding:24px;">No documents yet. Upload your first document to show it on your public profile.</td>
+              <td colspan="5" class="user-text-muted" style="text-align:center;padding:24px;">No documents yet. Upload your first document to show it on your public profile.</td>
             </tr>
             @endforelse
           </tbody>
         </table>
       </div>
+      @include('front.partials.pagination-bar', ['paginator' => $documents])
     </div>
 @endsection

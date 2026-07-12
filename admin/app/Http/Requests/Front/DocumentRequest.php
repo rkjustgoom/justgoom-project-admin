@@ -32,7 +32,7 @@ class DocumentRequest extends FormRequest
         }
 
         return [
-            'title' => ['required', 'string', 'min:2', 'max:200'],
+            'title' => ['required', 'string', 'min:2', 'max:200', 'regex:/^[a-zA-Z0-9\s\-\'&.,()]+$/'],
             'file_type' => ['required', 'in:pdf,word,excel,image'],
             'attachment' => $attachmentRules,
         ];

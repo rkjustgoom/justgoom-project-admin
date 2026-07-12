@@ -14,10 +14,12 @@ class OfferController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
+        $perPage = $this->resolvePerPage($request);
 
         $offers = $user->offers()
             ->orderByDesc('created_at')
-            ->paginate(10);
+            ->paginate($perPage)
+            ->withQueryString();
 
         $stats = [
             'total' => $user->offers()->count(),
@@ -114,9 +116,29 @@ class OfferController extends Controller
             ->with('success', 'Offer deleted successfully.');
     }
 
+    public function updateStatus(Request $request, Offer $offer)
+    {
+        $this->authorizeOffer($offer);
+
+        $validated = $request->validate([
+            'status' => ['required', 'in:active,paused'],
+        ]);
+
+        $offer->update(['status' => $validated['status']]);
+
+        return back()->with('success', 'Offer status updated.');
+    }
+
     private function authorizeOffer(Offer $offer): void
     {
         abort_unless((int) $offer->user_id === (int) auth()->id(), 403);
+    }
+
+    private function resolvePerPage(Request $request): int
+    {
+        $perPage = (int) $request->query('per_page', 10);
+
+        return in_array($perPage, [10, 25, 50], true) ? $perPage : 10;
     }
 
     private function uploadFile($file, string $subfolder): string

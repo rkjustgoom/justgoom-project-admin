@@ -18,7 +18,7 @@
       </div>
       <div class="user-table-wrap">
         <table class="user-table">
-          <thead><tr><th>#</th><th>Title</th><th>Type</th><th>Description</th><th>Added</th><th>Action</th></tr></thead>
+          <thead><tr><th>#</th><th>Title</th><th>Type</th><th>Status</th><th>Description</th><th>Added</th><th>Action</th></tr></thead>
           <tbody>
             @forelse($projects as $project)
             <tr>
@@ -33,13 +33,21 @@
                   <span class="user-badge user-badge-info">Link</span>
                 @endif
               </td>
+              <td>
+                @include('front.partials.users.status-toggle', [
+                  'action' => route('front.users.projects.status', $project),
+                  'active' => $project->isActive(),
+                  'label' => $project->isActive() ? 'Active' : 'Inactive',
+                  'statusValue' => $project->isActive() ? '0' : '1',
+                ])
+              </td>
               <td>{{ Str::limit($project->description, 60) ?: '—' }}</td>
               <td>{{ $project->created_at?->format('M j, Y') }}</td>
               <td>
                 @if($project->external_url)
                   <a href="{{ $project->external_url }}" target="_blank" class="user-table-action">View</a> ·
                 @elseif($project->file_path)
-                  <a href="{{ asset('storage/' . $project->file_path) }}" target="_blank" class="user-table-action">Download</a> ·
+                  <a href="{{ asset($project->file_path) }}" target="_blank" class="user-table-action">Download</a> ·
                 @endif
                 <a href="{{ route('front.users.projects.edit', $project) }}" class="user-table-action">Edit</a>
                 ·
@@ -51,14 +59,12 @@
             </tr>
             @empty
             <tr>
-              <td colspan="6" class="user-text-muted" style="text-align:center;padding:24px;">No projects yet. Upload project documents, videos, or add external video links.</td>
+              <td colspan="7" class="user-text-muted" style="text-align:center;padding:24px;">No projects yet. Upload project documents, videos, or add external video links.</td>
             </tr>
             @endforelse
           </tbody>
         </table>
       </div>
-      @if($projects->hasPages())
-      {{ $projects->links('front.partials.pagination') }}
-      @endif
+      @include('front.partials.pagination-bar', ['paginator' => $projects])
     </div>
 @endsection

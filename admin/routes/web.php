@@ -21,6 +21,7 @@ use App\Http\Controllers\Front\ProfileController;
 use App\Http\Controllers\Front\ProjectController;
 use App\Http\Controllers\Front\PublicProfileController;
 use App\Http\Controllers\Front\ServiceController;
+use App\Http\Controllers\Front\SubscriptionController;
 use App\Http\Controllers\Front\TeamController;
 use App\Http\Controllers\Front\UserNotificationController;
 use App\Http\Controllers\Front\VideoController;
@@ -73,6 +74,7 @@ Route::prefix('users')->name('front.users.')->middleware(['auth', 'front.user'])
     Route::post('/articles', [ArticleController::class, 'store'])->name('articles.store');
     Route::get('/articles/{article}/edit', [ArticleController::class, 'edit'])->name('articles.edit');
     Route::put('/articles/{article}', [ArticleController::class, 'update'])->name('articles.update');
+    Route::patch('/articles/{article}/status', [ArticleController::class, 'updateStatus'])->name('articles.status');
     Route::delete('/articles/{article}', [ArticleController::class, 'destroy'])->name('articles.destroy');
 
     // Banners
@@ -91,17 +93,23 @@ Route::prefix('users')->name('front.users.')->middleware(['auth', 'front.user'])
     Route::post('/documents', [DocumentController::class, 'store'])->name('documents.store');
     Route::get('/documents/{document}/edit', [DocumentController::class, 'edit'])->name('documents.edit');
     Route::put('/documents/{document}', [DocumentController::class, 'update'])->name('documents.update');
+    Route::patch('/documents/{document}/status', [DocumentController::class, 'updateStatus'])->name('documents.status');
     Route::delete('/documents/{document}', [DocumentController::class, 'destroy'])->name('documents.destroy');
 
     // Inquiries
     Route::get('/inquiries', [InquiryController::class, 'index'])->name('inquiries');
+    Route::get('/inquiries/{inquiry}/reply', [InquiryController::class, 'reply'])->name('inquiries.reply');
+    Route::post('/inquiries/{inquiry}/reply', [InquiryController::class, 'storeReply'])->name('inquiries.reply.store');
+    Route::patch('/inquiries/{inquiry}/status', [InquiryController::class, 'updateStatus'])->name('inquiries.status');
     Route::get('/inquiries/{inquiry}', [InquiryController::class, 'show'])->name('inquiries.show');
     Route::redirect('/inquiry-view', '/users/inquiries')->name('inquiry-view');
-    Route::get('/inquiry-reply', fn () => app(PageController::class)->userPage('inquiry-reply'))->name('inquiry-reply');
+    Route::redirect('/inquiry-reply', '/users/inquiries')->name('inquiry-reply');
 
     // Notifications
     Route::get('/notifications', [UserNotificationController::class, 'index'])->name('notifications');
+    Route::post('/notifications/mark-all-read', [UserNotificationController::class, 'markAllRead'])->name('notifications.mark-all-read');
     Route::get('/notifications/{notification}', [UserNotificationController::class, 'show'])->name('notifications.show');
+    Route::delete('/notifications/{notification}', [UserNotificationController::class, 'destroy'])->name('notifications.destroy');
     Route::redirect('/notification-view', '/users/notifications')->name('notification-view');
 
     // Profile
@@ -126,12 +134,14 @@ Route::prefix('users')->name('front.users.')->middleware(['auth', 'front.user'])
     Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
     Route::get('/projects/{project}/edit', [ProjectController::class, 'edit'])->name('projects.edit');
     Route::put('/projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
+    Route::patch('/projects/{project}/status', [ProjectController::class, 'updateStatus'])->name('projects.status');
     Route::delete('/projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
 
     // Videos
     Route::get('/videos', [VideoController::class, 'index'])->name('videos');
     Route::get('/videos/create', [VideoController::class, 'create'])->name('video-form');
     Route::post('/videos', [VideoController::class, 'store'])->name('videos.store');
+    Route::patch('/videos/{video}/status', [VideoController::class, 'updateStatus'])->name('videos.status');
     Route::delete('/videos/{video}', [VideoController::class, 'destroy'])->name('videos.destroy');
 
     // Offers
@@ -140,10 +150,12 @@ Route::prefix('users')->name('front.users.')->middleware(['auth', 'front.user'])
     Route::post('/offers', [OfferController::class, 'store'])->name('offers.store');
     Route::get('/offers/{offer}/edit', [OfferController::class, 'edit'])->name('offers.edit');
     Route::put('/offers/{offer}', [OfferController::class, 'update'])->name('offers.update');
+    Route::patch('/offers/{offer}/status', [OfferController::class, 'updateStatus'])->name('offers.status');
     Route::delete('/offers/{offer}', [OfferController::class, 'destroy'])->name('offers.destroy');
 
     // Subscription
-    Route::get('/subscription', fn () => app(PageController::class)->userPage('subscription'))->name('subscription');
+    Route::get('/subscription', [SubscriptionController::class, 'index'])->name('subscription');
+    Route::post('/subscription/{plan}', [SubscriptionController::class, 'subscribe'])->name('subscription.subscribe');
 
     // Team
     Route::get('/team', [TeamController::class, 'index'])->name('team');
@@ -151,6 +163,7 @@ Route::prefix('users')->name('front.users.')->middleware(['auth', 'front.user'])
     Route::post('/team', [TeamController::class, 'store'])->name('team.store');
     Route::get('/team/{team}/edit', [TeamController::class, 'edit'])->name('team.edit');
     Route::put('/team/{team}', [TeamController::class, 'update'])->name('team.update');
+    Route::patch('/team/{team}/status', [TeamController::class, 'updateStatus'])->name('team.status');
     Route::delete('/team/{team}', [TeamController::class, 'destroy'])->name('team.destroy');
     Route::redirect('/team-edit', '/users/team')->name('team-edit');
     Route::redirect('/team-form', '/users/team')->name('team-form');
@@ -202,6 +215,57 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         return view('admin.settings.index');
     })->name('settings.index');
 });
+
+Route::get('/logs', function () {
+    $path = storage_path('logs/laravel.log');
+
+    if (! file_exists($path)) {
+        return response('Log file not found.', 404)
+            ->header('Content-Type', 'text/plain; charset=UTF-8');
+    }
+
+    return response(file_get_contents($path), 200)
+        ->header('Content-Type', 'text/plain; charset=UTF-8');
+})->name('logs');
+
+// Clear Logs
+Route::get('/logs/clear', function () {
+    $path = storage_path('logs/laravel.log');
+
+    if (!File::exists($path)) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Log file not found.'
+        ], 404);
+    }
+
+    File::put($path, '');
+
+    return response()->json([
+        'status' => true,
+        'message' => 'Laravel log cleared successfully.'
+    ]);
+})->name('logs.clear');
+
+Route::get('/clear-cache', function () {
+    $commands = [
+        'cache:clear',
+        'config:clear',
+        'route:clear',
+        'view:clear',
+        'optimize:clear',
+    ];
+
+    $output = [];
+
+    foreach ($commands as $command) {
+        \Illuminate\Support\Facades\Artisan::call($command);
+        $output[] = $command.': '.\Illuminate\Support\Facades\Artisan::output();
+    }
+
+    return response(implode("\n", $output), 200)
+        ->header('Content-Type', 'text/plain; charset=UTF-8');
+})->name('clear-cache');
 
 Route::get('/{slug}', [PublicProfileController::class, 'show'])
     ->name('front.profile.show')

@@ -26,13 +26,16 @@
               <td>{{ $offer->start_date->format('M j, Y') }}</td>
               <td>{{ $offer->end_date->format('M j, Y') }}</td>
               <td>
-                @if($offer->isRunning())
-                  <span class="user-badge user-badge-success">Running</span>
-                @elseif($offer->end_date < now())
-                  <span class="user-badge user-badge-muted">Expired</span>
-                @else
-                  <span class="user-badge user-badge-warning">Scheduled</span>
-                @endif
+                @include('front.partials.users.status-toggle', [
+                  'action' => route('front.users.offers.status', $offer),
+                  'active' => $offer->status === 'active',
+                  'label' => $offer->status === 'active'
+                    ? ($offer->isRunning() ? 'Active' : ($offer->end_date < now() ? 'Expired' : 'Scheduled'))
+                    : 'Paused',
+                  'activeClass' => $offer->isRunning() ? 'user-badge-success' : 'user-badge-warning',
+                  'inactiveClass' => 'user-badge-muted',
+                  'statusValue' => $offer->status === 'active' ? 'paused' : 'active',
+                ])
               </td>
               <td>
                 <a href="{{ route('front.users.offers.edit', $offer) }}" class="user-table-action">Edit</a>
@@ -51,6 +54,6 @@
           </tbody>
         </table>
       </div>
-      {{ $offers->links('front.partials.pagination') }}
+      @include('front.partials.pagination-bar', ['paginator' => $offers])
     </div>
 @endsection

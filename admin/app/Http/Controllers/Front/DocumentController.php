@@ -17,9 +17,10 @@ class DocumentController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
+        $perPage = $this->resolvePerPage($request);
 
         return view('front.users.documents', [
-            'documents' => $this->documentService->listForUser($user),
+            'documents' => $this->documentService->listForUser($user, $perPage),
             'stats' => $this->documentService->statsForUser($user),
         ]);
     }
@@ -65,5 +66,25 @@ class DocumentController extends Controller
         return redirect()
             ->route('front.users.documents')
             ->with('success', 'Document removed successfully.');
+    }
+
+    public function updateStatus(Request $request, Document $document)
+    {
+        abort_unless($this->documentService->belongsToUser($document, $request->user()), 404);
+
+        $validated = $request->validate([
+            'status' => ['required', 'in:0,1'],
+        ]);
+
+        $this->documentService->updateStatus($document, (int) $validated['status']);
+
+        return back()->with('success', 'Document status updated.');
+    }
+
+    private function resolvePerPage(Request $request): int
+    {
+        $perPage = (int) $request->query('per_page', 10);
+
+        return in_array($perPage, [10, 25, 50], true) ? $perPage : 10;
     }
 }

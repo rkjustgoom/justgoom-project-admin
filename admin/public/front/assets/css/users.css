@@ -1035,6 +1035,17 @@ html[data-theme="dark"] .user-delete-card h2 {
 .user-badge-success { background: var(--user-success-light); color: #047857; }
 .user-badge-warning { background: var(--user-warning-light); color: #b45309; }
 .user-badge-danger { background: var(--user-danger-light); color: #b91c1c; }
+.user-badge-info { background: #e0f2fe; color: #0369a1; }
+.user-badge-muted { background: #f3f4f6; color: #6b7280; }
+.user-badge[type="submit"],
+button.user-badge {
+  cursor: pointer;
+}
+.user-badge[type="submit"]:hover,
+button.user-badge:hover {
+  filter: brightness(0.96);
+  outline: 1px solid currentColor;
+}
 
 /* ═══ Tabs ═══ */
 .user-tabs {

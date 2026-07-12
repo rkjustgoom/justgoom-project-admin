@@ -14,10 +14,12 @@ class ProjectController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
+        $perPage = $this->resolvePerPage($request);
 
         $projects = $user->projects()
             ->orderByDesc('created_at')
-            ->paginate(12);
+            ->paginate($perPage)
+            ->withQueryString();
 
         $stats = [
             'total' => $user->projects()->count(),
@@ -40,8 +42,8 @@ class ProjectController extends Controller
             'title' => 'required|string|max:200',
             'description' => 'nullable|string|max:2000',
             'type' => 'required|in:document,video,link',
-            'file' => 'nullable|file|max:51200|mimes:pdf,doc,docx,ppt,pptx,mp4,avi,mov,wmv',
-            'external_url' => 'nullable|url|max:500',
+            'file' => 'required_unless:type,link|nullable|file|max:51200|mimes:pdf,doc,docx,ppt,pptx,mp4,avi,mov,wmv',
+            'external_url' => 'required_if:type,link|nullable|url|max:500',
             'thumbnail' => 'nullable|image|max:2048',
         ]);
 
@@ -50,6 +52,7 @@ class ProjectController extends Controller
         $project->title = $validated['title'];
         $project->description = $validated['description'] ?? null;
         $project->type = $validated['type'];
+        $project->status = 1;
 
         if ($request->hasFile('file')) {
             $project->file_path = $this->uploadFile($request->file('file'), 'projects');
@@ -126,9 +129,29 @@ class ProjectController extends Controller
             ->with('success', 'Project deleted successfully.');
     }
 
+    public function updateStatus(Request $request, Project $project)
+    {
+        $this->authorizeProject($project);
+
+        $validated = $request->validate([
+            'status' => ['required', 'in:0,1'],
+        ]);
+
+        $project->update(['status' => (int) $validated['status']]);
+
+        return back()->with('success', 'Project status updated.');
+    }
+
     private function authorizeProject(Project $project): void
     {
         abort_unless($project->user_id === auth()->id(), 403);
+    }
+
+    private function resolvePerPage(Request $request): int
+    {
+        $perPage = (int) $request->query('per_page', 10);
+
+        return in_array($perPage, [10, 25, 50], true) ? $perPage : 10;
     }
 
     private function uploadFile($file, string $subfolder): string

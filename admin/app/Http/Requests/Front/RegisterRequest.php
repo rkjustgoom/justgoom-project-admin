@@ -39,7 +39,7 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'company_name' => ['required', 'string', 'min:4', 'max:200'],
+            'company_name' => ['required', 'string', 'min:4', 'max:200', 'regex:/^[a-zA-Z0-9\s\-\'&.,()]+$/'],
             'company_slug' => [
                 'required',
                 'string',
@@ -56,8 +56,8 @@ class RegisterRequest extends FormRequest
                         ->where('status', 1);
                 }),
             ],
-            'fname' => ['required', 'string', 'min:2', 'max:100'],
-            'lname' => ['required', 'string', 'min:2', 'max:100'],
+            'fname' => ['required', 'string', 'min:2', 'max:100', 'regex:/^[a-zA-Z0-9\s\-\'&.,()]+$/'],
+            'lname' => ['required', 'string', 'min:2', 'max:100', 'regex:/^[a-zA-Z0-9\s\-\'&.,()]+$/'],
             'mobile' => ['required', 'digits:10'],
             'email' => ['required', 'email', 'max:191', 'unique:users,email'],
             'password' => ['required', 'string', 'min:6', 'max:255', 'confirmed'],
