@@ -911,6 +911,46 @@ body.user-sidebar-open { overflow: hidden; }
   border-color: var(--user-danger);
 }
 
+.user-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 16px 0;
+}
+.user-pagination a,
+.user-pagination span {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--user-radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  border: 1px solid var(--user-border);
+  color: var(--user-muted);
+  background: var(--user-surface);
+  text-decoration: none;
+  transition: all var(--user-transition);
+}
+.user-pagination a:hover {
+  background: var(--user-primary);
+  border-color: var(--user-primary);
+  color: #fff;
+}
+.user-pagination span.active {
+  background: var(--user-primary);
+  border-color: var(--user-primary);
+  color: #fff;
+}
+.user-pagination span.user-pagination-disabled,
+.user-pagination span.user-pagination-ellipsis {
+  opacity: 0.45;
+  cursor: default;
+}
+
 .user-detail-grid {
   display: grid;
   grid-template-columns: 140px 1fr;

@@ -41,7 +41,7 @@
         </table>
       </div>
       @if($loginHistories->hasPages())
-      <div style="padding:16px 0;">{{ $loginHistories->links() }}</div>
+      {{ $loginHistories->links('front.partials.pagination') }}
       @endif
 
       @if(!empty($businessHours))

@@ -58,7 +58,7 @@
         </table>
       </div>
       @if($projects->hasPages())
-      <div style="padding:16px 0;">{{ $projects->links() }}</div>
+      {{ $projects->links('front.partials.pagination') }}
       @endif
     </div>
 @endsection

@@ -54,22 +54,6 @@
           </tbody>
         </table>
       </div>
-      <div class="user-table-footer" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;padding:16px 0;">
-        <form method="GET" action="{{ route('front.users.services') }}" class="user-per-page-form" style="display:flex;align-items:center;gap:8px;">
-          @if(request('type'))
-            <input type="hidden" name="type" value="{{ request('type') }}">
-          @endif
-          <label for="servicesPerPage" class="user-text-muted" style="margin:0;">Show</label>
-          <select id="servicesPerPage" name="per_page" class="user-form-control" style="width:auto;min-width:72px;padding:6px 10px;" onchange="this.form.submit()">
-            @foreach($perPageOptions as $size)
-              <option value="{{ $size }}" @selected($services->perPage() === $size)>{{ $size }}</option>
-            @endforeach
-          </select>
-          <span class="user-text-muted">per page</span>
-        </form>
-        @if($services->hasPages())
-          <div>{{ $services->links() }}</div>
-        @endif
-      </div>
+      {{ $services->links('front.partials.pagination') }}
     </div>
 @endsection

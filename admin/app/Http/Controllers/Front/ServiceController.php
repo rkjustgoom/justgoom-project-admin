@@ -18,17 +18,10 @@ class ServiceController extends Controller
     {
         $user = $request->user();
         $type = $request->query('type');
-        $allowedPerPage = [10, 25, 50, 100];
-        $perPage = (int) $request->query('per_page', 10);
-
-        if (! in_array($perPage, $allowedPerPage, true)) {
-            $perPage = 10;
-        }
 
         return view('front.users.services', [
-            'services' => $this->serviceService->listForUser($user, $type, $perPage),
+            'services' => $this->serviceService->listForUser($user, $type),
             'stats' => $this->serviceService->statsForUser($user),
-            'perPageOptions' => $allowedPerPage,
         ]);
     }
 

@@ -58,7 +58,7 @@
         </table>
       </div>
       @if($videos->hasPages())
-      <div style="padding:16px 0;">{{ $videos->links() }}</div>
+      {{ $videos->links('front.partials.pagination') }}
       @endif
     </div>
 @endsection

@@ -49,8 +49,6 @@
           </tbody>
         </table>
       </div>
-      @if($articles->hasPages())
-      <div style="padding:16px 0;">{{ $articles->links() }}</div>
-      @endif
+      {{ $articles->links('front.partials.pagination') }}
     </div>
 @endsection

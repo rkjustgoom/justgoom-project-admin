@@ -13,7 +13,7 @@ use Illuminate\Support\Str;
 
 class ServiceService
 {
-    public function listForUser(User $user, ?string $type = null, int $perPage = 10): LengthAwarePaginator
+    public function listForUser(User $user, ?string $type = null): LengthAwarePaginator
     {
         $query = $user->services()->latest();
 
@@ -21,7 +21,7 @@ class ServiceService
             $query->where('type', $type);
         }
 
-        return $query->paginate($perPage)->withQueryString();
+        return $query->paginate(10)->withQueryString();
     }
 
     public function listForPublicProfile(User $user, ?string $type = null): Collection
