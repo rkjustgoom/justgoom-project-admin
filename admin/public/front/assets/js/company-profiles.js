@@ -114,6 +114,7 @@ function renderCompanyCard(company, index) {
       data-subcategory="${(company.subCategory || '').toLowerCase()}"
       data-subcategory-slug="${(company.subCategorySlug || '').toLowerCase()}"
       data-locality="${company.city.toLowerCase()}"
+      data-country="${(company.country || '').toLowerCase()}"
       data-verified="${company.verified ? 'yes' : 'no'}"
       data-added-days="${addedDays}">
       <div class="company-card-banner">
@@ -450,9 +451,11 @@ function initCategoryCompanyProfiles() {
   const urlSubCategory = urlParams.get('subcategory');
   const urlSearch = (urlParams.get('q') || '').trim();
   const urlCity = (urlParams.get('city') || '').trim();
+  const urlCountry = (urlParams.get('country') || '').trim();
   let activeSectorFilter = 'all';
   let activeSubCategoryFilter = 'all';
   let urlCityFilter = '';
+  let urlCountryFilter = urlCountry ? urlCountry.toLowerCase() : '';
 
   if (urlCategory) {
     var resolvedUrlCategory = resolveCategoryFilter(urlCategory);
@@ -502,10 +505,11 @@ function initCategoryCompanyProfiles() {
   if (subtitleEl) {
     if (urlCategory || urlSubCategory || activeSectorFilter !== 'all') {
       subtitleEl.textContent = getProfilesFilterSubtitle(activeSectorFilter, activeSubCategoryFilter);
-    } else if (urlSearch || urlCity) {
+    } else if (urlSearch || urlCity || urlCountry) {
       const parts = [];
       if (urlSearch) parts.push('"' + urlSearch + '"');
-      if (urlCity) parts.push('in ' + urlCity);
+      if (urlCountry) parts.push('in ' + urlCountry);
+      else if (urlCity) parts.push('in ' + urlCity);
       subtitleEl.textContent = 'Search results for ' + parts.join(' ');
     }
   }
@@ -539,13 +543,15 @@ function initCategoryCompanyProfiles() {
     const cat = card.dataset.category || '';
     const sub = card.dataset.subcategory || '';
     const loc = card.dataset.locality || '';
+    const country = card.dataset.country || '';
     const ver = card.dataset.verified || '';
     const days = parseInt(card.dataset.addedDays || '0', 10);
 
-    if (q && !name.includes(q) && !cat.includes(q) && !sub.includes(q) && !loc.includes(q)) return false;
+    if (q && !name.includes(q) && !cat.includes(q) && !sub.includes(q) && !loc.includes(q) && !country.includes(q)) return false;
     if (!cardMatchesSectorAndSub(card, sectorSlug, subSlug)) return false;
     if (locality && locality !== 'all cities' && loc !== locality && !loc.includes(locality)) return false;
     if (urlCityFilter && !loc.includes(urlCityFilter)) return false;
+    if (urlCountryFilter && country !== urlCountryFilter && !country.includes(urlCountryFilter)) return false;
     if (verified.indexOf('verified only') !== -1 && ver !== 'yes') return false;
     if (!matchesTimeRange(days, timeRange)) return false;
     return true;

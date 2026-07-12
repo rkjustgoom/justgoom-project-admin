@@ -36,6 +36,11 @@ class Article extends Model
         return $this->status === 'published';
     }
 
+    public function scopePublished($query)
+    {
+        return $query->where('status', 'published');
+    }
+
     public static function generateSlug(string $title): string
     {
         $slug = Str::slug($title);

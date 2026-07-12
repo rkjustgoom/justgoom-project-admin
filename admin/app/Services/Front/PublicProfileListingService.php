@@ -85,6 +85,7 @@ class PublicProfileListingService
             'projects' => 0,
             'tasks' => 0,
             'city' => $profile->city ?: ($user->city ?: 'N/A'),
+            'country' => $profile->country ?: 'N/A',
             'verified' => $user->hasVerifiedEmail(),
             'featured' => $index < 4,
             'addedDaysAgo' => $profile->created_at

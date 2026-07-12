@@ -259,15 +259,15 @@
           </div>
         </div>
       </div>
-      <div class="major-cities-grid" style="margin-top:32px;">
-        @foreach($majorCities as $city)
-          <a href="{{ route('front.all-profiles', ['city' => $city['name']]) }}" class="major-city-card">
-            <div class="major-city-thumb">
-              <img src="{{ str_starts_with($city['image'], 'http') ? $city['image'] : asset('front/assets/images/'.$city['image']) }}"
-                   alt="{{ $city['name'] }} — {{ $city['landmark'] ?? 'business profiles' }}"
+      <div class="major-countries-grid" style="margin-top:32px;">
+        @foreach($majorCountries as $country)
+          <a href="{{ route('front.all-profiles', ['country' => $country['name']]) }}" class="major-country-card">
+            <div class="major-country-thumb">
+              <img src="{{ str_starts_with($country['image'], 'http') ? $country['image'] : asset('front/assets/images/'.$country['image']) }}"
+                   alt="{{ $country['name'] }} — {{ $country['landmark'] ?? 'business profiles' }}"
                    loading="lazy">
             </div>
-            <span class="major-city-name">{{ $city['name'] }}</span>
+            <span class="major-country-name">{{ $country['name'] }}</span>
           </a>
         @endforeach
       </div>
@@ -284,33 +284,83 @@
         </div>
         <a href="{{ route('front.all-profiles') }}" class="view-all-link">Browse All →</a>
       </div>
-      <div class="offers-grid" id="offersGrid">
-        @forelse($runningOffers ?? [] as $offer)
-        <article class="offer-card">
-          @if($offer->banner_image)
-          <div class="offer-card-banner">
-            <img src="{{ asset($offer->banner_image) }}" alt="{{ $offer->title }}" loading="lazy">
-          </div>
-          @endif
-          <div class="offer-card-body">
-            <h3 class="offer-card-title">{{ $offer->title }}</h3>
-            @if($offer->description)
-              <p class="offer-card-desc">{{ Str::limit($offer->description, 100) }}</p>
-            @endif
-            <div class="offer-card-meta">
-              <span class="offer-card-company">{{ $offer->user?->companyProfile?->company_name ?? 'Business' }}</span>
-              <span class="offer-card-validity">Valid till {{ $offer->end_date->format('d M Y') }}</span>
+
+      @php
+        $staticOffers = [
+          [
+            'discount' => 'Up to 25% OFF',
+            'title' => 'on Business Listings',
+            'tagline' => 'Boost your visibility across India',
+            'cta' => 'View Offer',
+            'cta_url' => route('front.register'),
+            'logo' => asset('front/assets/images/justgoom-logo.png'),
+            'logo_alt' => 'JustGoom',
+            'image' => asset('front/assets/images/cat-business.jpg'),
+            'theme' => 'purple',
+          ],
+          [
+            'discount' => 'Flat 30% OFF',
+            'title' => 'on Food & Catering',
+            'tagline' => 'Partner with verified food suppliers',
+            'cta' => 'Shop now',
+            'cta_url' => route('front.all-profiles', ['category' => 'food']),
+            'logo' => asset('front/assets/images/justgoom-logo.png'),
+            'logo_alt' => 'JustGoom Food',
+            'image' => asset('front/assets/images/cat-food.jpg'),
+            'theme' => 'amber',
+          ],
+          [
+            'discount' => 'Save 20%',
+            'title' => 'on Health Services',
+            'tagline' => 'Trusted clinics & wellness partners',
+            'cta' => 'Explore',
+            'cta_url' => route('front.all-profiles', ['category' => 'health']),
+            'logo' => asset('front/assets/images/justgoom-logo.png'),
+            'logo_alt' => 'JustGoom Health',
+            'image' => asset('front/assets/images/cat-health.jpg'),
+            'theme' => 'teal',
+          ],
+          [
+            'discount' => 'Up to 40% OFF',
+            'title' => 'on Real Estate',
+            'tagline' => 'Premium spaces from verified agents',
+            'cta' => 'Shop now',
+            'cta_url' => route('front.all-profiles', ['category' => 'real-estate']),
+            'logo' => asset('front/assets/images/justgoom-logo.png'),
+            'logo_alt' => 'JustGoom Realty',
+            'image' => asset('front/assets/images/cat-real-estate.jpg'),
+            'theme' => 'navy',
+          ],
+        ];
+      @endphp
+
+      <div class="offers-promo-carousel" id="offersCarousel">
+        <button type="button" class="offers-promo-nav prev" aria-label="Previous offer">‹</button>
+        <div class="offers-promo-track" id="offersTrack">
+          @foreach($staticOffers as $offer)
+          <article class="offer-promo-card offer-promo-{{ $offer['theme'] }}">
+            <img class="offer-promo-bg" src="{{ $offer['image'] }}" alt="" loading="lazy" aria-hidden="true">
+            <div class="offer-promo-overlay" aria-hidden="true"></div>
+            <div class="offer-promo-wave" aria-hidden="true"></div>
+            <div class="offer-promo-content">
+              <div class="offer-promo-text">
+                <h3 class="offer-promo-discount">{{ $offer['discount'] }}</h3>
+                <p class="offer-promo-title">{{ $offer['title'] }}</p>
+                <p class="offer-promo-tagline">{{ $offer['tagline'] }}</p>
+                <a href="{{ $offer['cta_url'] }}" class="offer-promo-cta">{{ $offer['cta'] }}</a>
+              </div>
+              <div class="offer-promo-brand">
+                <div class="offer-promo-logo">
+                  <img src="{{ $offer['logo'] }}" alt="{{ $offer['logo_alt'] }}">
+                </div>
+              </div>
             </div>
-            @if($offer->link_url)
-              <a href="{{ $offer->link_url }}" target="_blank" class="offer-card-link">View Offer →</a>
-            @endif
-          </div>
-        </article>
-        @empty
-        <div class="offers-empty">
-          <p>No active offers at the moment. Check back soon for exclusive business promotions.</p>
+            <span class="offer-promo-ad">Ad</span>
+          </article>
+          @endforeach
         </div>
-        @endforelse
+        <button type="button" class="offers-promo-nav next" aria-label="Next offer">›</button>
+        <div class="offers-promo-dots" id="offersDots" role="tablist" aria-label="Offer slides"></div>
       </div>
 
       @if(!empty($advertisements) && count($advertisements) > 0)
@@ -322,6 +372,116 @@
         @endforeach
       </div>
       @endif
+    </div>
+  </section>
+
+  <!-- Blog / Articles -->
+  <section class="section home-blog-section" id="articles">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Latest Articles & Insights</h2>
+          <p class="section-subtitle">Business tips and promotional articles from verified members</p>
+        </div>
+        <a href="{{ route('front.articles') }}" class="view-all-link">View All →</a>
+      </div>
+
+      @php
+        $fallbackBlogImages = [
+          asset('front/assets/images/blog-1.jpg'),
+          asset('front/assets/images/blog-2.jpg'),
+          asset('front/assets/images/blog-3.jpg'),
+        ];
+
+        $staticBlogs = [
+          [
+            'title' => 'Why 22K Gold is the Smart Choice for Wedding Jewellery',
+            'excerpt' => 'Purity, making charges, and resale value explained for B2B buyers and retailers.',
+            'author' => 'Shree Gold Jewellers',
+            'initials' => 'SG',
+            'tag' => 'Jewellery',
+            'date' => 'May 28, 2026',
+            'read' => '5 min read',
+            'image' => asset('front/assets/images/blog-1.jpg'),
+          ],
+          [
+            'title' => 'Commercial Property Investment Guide for SMEs',
+            'excerpt' => 'What business owners should know before investing in office or warehouse space.',
+            'author' => 'Mehta Real Estate',
+            'initials' => 'MR',
+            'tag' => 'Real Estate',
+            'date' => 'May 25, 2026',
+            'read' => '8 min read',
+            'image' => asset('front/assets/images/cat-real-estate.jpg'),
+          ],
+          [
+            'title' => '5 Ways to Grow Your Local Business Online in 2026',
+            'excerpt' => 'From listing optimization to customer engagement — practical MSME strategies.',
+            'author' => 'Amit Mehta Consulting',
+            'initials' => 'AM',
+            'tag' => 'Business',
+            'date' => 'May 22, 2026',
+            'read' => '4 min read',
+            'image' => asset('front/assets/images/blog-3.jpg'),
+          ],
+        ];
+
+        $dynamicBlogs = collect($homeArticles ?? [])->map(function ($article, $index) use ($fallbackBlogImages) {
+          $company = $article->user?->companyProfile;
+          $authorName = $company?->company_name
+            ?: trim(($article->user?->fname ?? '') . ' ' . ($article->user?->lname ?? ''))
+            ?: 'JustGoom Member';
+          $initials = collect(preg_split('/\s+/', trim($authorName)))
+            ->filter()
+            ->take(2)
+            ->map(fn ($w) => mb_strtoupper(mb_substr($w, 0, 1)))
+            ->implode('') ?: 'JG';
+          $published = $article->published_at ?? $article->created_at;
+
+          return [
+            'title' => $article->title,
+            'excerpt' => \Illuminate\Support\Str::limit(strip_tags($article->body), 110),
+            'author' => $authorName,
+            'initials' => $initials,
+            'tag' => $article->user?->category?->name ?? 'Business',
+            'date' => $published?->format('M j, Y') ?? '',
+            'read' => max(1, (int) ceil(str_word_count(strip_tags($article->body)) / 200)) . ' min read',
+            'image' => $article->featured_image
+              ? asset($article->featured_image)
+              : $fallbackBlogImages[$index % count($fallbackBlogImages)],
+          ];
+        });
+
+        $blogCards = $dynamicBlogs
+          ->concat($staticBlogs)
+          ->take(6)
+          ->values();
+      @endphp
+
+      <div class="blog-grid">
+        @foreach($blogCards as $blog)
+        <a href="{{ route('front.articles') }}" class="blog-card blog-card-link">
+          <div class="blog-thumb">
+            <img src="{{ $blog['image'] }}" alt="{{ $blog['title'] }}" loading="lazy">
+          </div>
+          <div class="blog-body">
+            <div class="article-author-bar">
+              <span class="blog-author-avatar">{{ $blog['initials'] }}</span>
+              <div>
+                <strong>{{ $blog['author'] }}</strong>
+              </div>
+            </div>
+            <span class="blog-tag">{{ $blog['tag'] }}</span>
+            <h3>{{ $blog['title'] }}</h3>
+            <p>{{ $blog['excerpt'] }}</p>
+            <div class="blog-footer">
+              <span>{{ $blog['date'] }}</span>
+              <span>{{ $blog['read'] }}</span>
+            </div>
+          </div>
+        </a>
+        @endforeach
+      </div>
     </div>
   </section>
 
@@ -392,84 +552,6 @@
             </div>
           </div>
         </article>
-      </div>
-    </div>
-  </section> -->
-
-  <!-- Featured Articles (Platinum/Gold) -->
-  <!-- <section class="section" id="articles">
-    <div class="container">
-      <div class="section-header">
-        <div>
-          <h2 class="section-title">Featured Articles</h2>
-          <p class="section-subtitle">Promotional articles from subscribed members — globally published by Gold &amp; Platinum plans</p>
-        </div>
-        <a href="{{ route('front.articles') }}" class="view-all-link">View All →</a>
-      </div>
-      <div class="blog-grid">
-        <a href="{{ route('front.articles') }}" class="blog-card blog-card-link">
-          <div class="blog-thumb">
-            <img src="{{ asset('front/assets/images/blog-1.jpg') }}" alt="Gold investment guide">
-          </div>
-          <div class="blog-body">
-            <div class="article-author-bar">
-              <span class="blog-author-avatar">SG</span>
-              <div>
-                <strong>Shree Gold Jewellers</strong>
-                <span class="plan-badge plan-platinum plan-badge-sm">Platinum</span>
-              </div>
-            </div>
-            <span class="blog-tag">Jewellery</span>
-            <h3>Why 22K Gold is the Smart Choice for Wedding Jewellery</h3>
-            <p>Purity, making charges, and resale value explained for B2B buyers and retailers.</p>
-            <div class="blog-footer">
-              <span>May 28, 2026</span>
-              <span>5 min read</span>
-            </div>
-          </div>
-        </a>
-        <a href="{{ route('front.articles') }}" class="blog-card blog-card-link">
-          <div class="blog-thumb">
-            <img src="{{ asset('front/assets/images/cat-real-estate.jpg') }}" alt="Commercial property">
-          </div>
-          <div class="blog-body">
-            <div class="article-author-bar">
-              <span class="blog-author-avatar">MR</span>
-              <div>
-                <strong>Mehta Real Estate</strong>
-                <span class="plan-badge plan-gold plan-badge-sm">Gold</span>
-              </div>
-            </div>
-            <span class="blog-tag">Real Estate</span>
-            <h3>Commercial Property Investment Guide for SMEs</h3>
-            <p>What business owners should know before investing in office or warehouse space.</p>
-            <div class="blog-footer">
-              <span>May 25, 2026</span>
-              <span>8 min read</span>
-            </div>
-          </div>
-        </a>
-        <a href="{{ route('front.articles') }}" class="blog-card blog-card-link">
-          <div class="blog-thumb">
-            <img src="{{ asset('front/assets/images/blog-3.jpg') }}" alt="MSME growth">
-          </div>
-          <div class="blog-body">
-            <div class="article-author-bar">
-              <span class="blog-author-avatar">AM</span>
-              <div>
-                <strong>Amit Mehta Consulting</strong>
-                <span class="plan-badge plan-platinum plan-badge-sm">Platinum</span>
-              </div>
-            </div>
-            <span class="blog-tag">Business</span>
-            <h3>5 Ways to Grow Your Local Business Online in 2026</h3>
-            <p>From listing optimization to customer engagement — practical MSME strategies.</p>
-            <div class="blog-footer">
-              <span>May 22, 2026</span>
-              <span>4 min read</span>
-            </div>
-          </div>
-        </a>
       </div>
     </div>
   </section> -->
