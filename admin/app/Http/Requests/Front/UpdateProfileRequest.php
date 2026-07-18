@@ -48,7 +48,7 @@ class UpdateProfileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'company_name' => ['required', 'string', 'min:4', 'max:200', 'regex:/^[a-zA-Z0-9\s\-\'&.,()]+$/'],
+            'company_name' => ['required', 'string', 'min:4', 'max:200', 'regex:/^[a-zA-Z0-9]+(?:\s[a-zA-Z0-9]+)*$/'],
             'category_id' => ['required', 'exists:categories,id'],
             'sub_category_id' => ['required', 'exists:sub_categories,id'],
             'tagline' => ['nullable', 'string', 'max:255'],
@@ -77,6 +77,7 @@ class UpdateProfileRequest extends FormRequest
             'company_name.required' => 'Business name is required.',
             'company_name.min' => 'Business name must be at least 4 characters.',
             'company_name.max' => 'Business name must not exceed 200 characters.',
+            'company_name.regex' => 'Business name may only contain letters, numbers, and spaces.',
             'category_id.required' => 'Please select a category.',
             'category_id.exists' => 'Selected category is invalid.',
             'sub_category_id.required' => 'Please select a sub category.',

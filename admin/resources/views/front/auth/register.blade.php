@@ -61,6 +61,7 @@
             <div class="form-group" data-field="company_slug">
               <label for="regSlug">Company Slug <span class="req">*</span></label>
               <input type="text" id="regSlug" name="company_slug" class="form-input form-input-readonly @error('company_slug') is-invalid @enderror" value="{{ old('company_slug') }}" placeholder="Auto-generated from company name" readonly tabindex="-1" aria-readonly="true">
+              <span class="form-hint-slug" id="regSlugHint" style="display:none;"></span>
               <span class="field-error" id="regSlugError">@error('company_slug'){{ $message }}@enderror</span>
             </div>
           </div>

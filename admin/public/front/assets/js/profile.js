@@ -5,11 +5,15 @@
 
   var rules = {
     company_name: {
-      test: function (v) { return v.trim().length >= 4 && v.trim().length <= 200; },
+      test: function (v) {
+        var value = v.trim();
+        return value.length >= 4 && value.length <= 200 && /^[a-zA-Z0-9]+(?:\s[a-zA-Z0-9]+)*$/.test(value);
+      },
       message: function (v) {
         if (v.trim().length === 0) return 'Business name is required.';
         if (v.trim().length < 4) return 'Business name must be at least 4 characters.';
-        return 'Business name must not exceed 200 characters.';
+        if (v.trim().length > 200) return 'Business name must not exceed 200 characters.';
+        return 'Business name may only contain letters, numbers, and spaces.';
       }
     },
     category_id: {

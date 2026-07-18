@@ -31,7 +31,9 @@ class RegisterService
             CompanyProfile::create([
                 'user_id' => $user->id,
                 'company_name' => $data['company_name'],
-                'slug' => $data['company_slug'],
+                'slug' => CompanyProfile::uniqueSlug(
+                    Str::slug($data['company_name']) ?: $data['company_slug']
+                ),
                 'owner_name' => trim("{$data['fname']} {$data['lname']}"),
                 'phone' => $data['mobile'],
                 'email' => $data['email'],

@@ -43,4 +43,31 @@ class CompanyProfile extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * Return a unique company slug. If $baseSlug is taken, append -01, -02, …
+     */
+    public static function uniqueSlug(string $baseSlug): string
+    {
+        $baseSlug = strtolower(trim($baseSlug));
+        $baseSlug = (string) preg_replace('/[^a-z0-9]+/', '-', $baseSlug);
+        $baseSlug = trim($baseSlug, '-');
+
+        if ($baseSlug === '') {
+            $baseSlug = 'company';
+        }
+
+        if (! static::query()->where('slug', $baseSlug)->exists()) {
+            return $baseSlug;
+        }
+
+        $suffix = 1;
+
+        do {
+            $slug = $baseSlug.'-'.str_pad((string) $suffix, 2, '0', STR_PAD_LEFT);
+            $suffix++;
+        } while (static::query()->where('slug', $slug)->exists());
+
+        return $slug;
+    }
 }

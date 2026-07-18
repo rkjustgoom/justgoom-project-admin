@@ -2,8 +2,14 @@
 (function () {
   var rules = {
     company_name: {
-      test: function (v) { return v.trim().length >= 4; },
-      message: 'Company name must be at least 4 characters.'
+      test: function (v) {
+        var value = v.trim();
+        return value.length >= 4 && /^[a-zA-Z0-9]+(?:\s[a-zA-Z0-9]+)*$/.test(value);
+      },
+      message: function (v) {
+        if (v.trim().length < 4) return 'Company name must be at least 4 characters.';
+        return 'Company name may only contain letters, numbers, and spaces.';
+      }
     },
     category_id: {
       test: function (v) { return v !== ''; },
@@ -14,12 +20,24 @@
       message: 'Please select a sub category.'
     },
     fname: {
-      test: function (v) { return v.trim().length >= 2; },
-      message: 'First name must be at least 2 characters.'
+      test: function (v) {
+        var value = v.trim();
+        return value.length >= 2 && /^[a-zA-Z]+(?:\s[a-zA-Z]+)*$/.test(value);
+      },
+      message: function (v) {
+        if (v.trim().length < 2) return 'First name must be at least 2 characters.';
+        return 'First name may only contain letters and spaces.';
+      }
     },
     lname: {
-      test: function (v) { return v.trim().length >= 2; },
-      message: 'Last name must be at least 2 characters.'
+      test: function (v) {
+        var value = v.trim();
+        return value.length >= 2 && /^[a-zA-Z]+(?:\s[a-zA-Z]+)*$/.test(value);
+      },
+      message: function (v) {
+        if (v.trim().length < 2) return 'Last name must be at least 2 characters.';
+        return 'Last name may only contain letters and spaces.';
+      }
     },
     mobile: {
       test: function (v) { return /^\d{10}$/.test(v); },
@@ -90,6 +108,7 @@
     var phoneInput = document.getElementById('regPhone');
     var termsCheckbox = form.querySelector('.auth-terms input[type="checkbox"]');
     var slugErrorEl = document.getElementById('regSlugError');
+    var slugHintEl = document.getElementById('regSlugHint');
 
     document.querySelectorAll('.field-error').forEach(function (el) {
       if (el.textContent.trim()) {
@@ -105,6 +124,12 @@
     function syncSlugFromCompany() {
       if (!companyInput || !slugInput) return;
       slugInput.value = makeSlug(companyInput.value);
+    }
+
+    function setSlugHint(message) {
+      if (!slugHintEl) return;
+      slugHintEl.textContent = message || '';
+      slugHintEl.style.display = message ? 'block' : 'none';
     }
 
     function getFieldValue(fieldName) {
@@ -126,7 +151,6 @@
 
     function validateField(fieldName, showError) {
       if (fieldName === 'company_slug') {
-        syncSlugFromCompany();
         var slug = getFieldValue('company_slug');
         if (slug === '') {
           if (showError) setFieldError('company_slug', 'Company slug is required.');
@@ -137,7 +161,7 @@
           return false;
         }
         if (slugAvailable === false) {
-          if (showError) setFieldError('company_slug', 'This company slug is already taken. Please choose another.');
+          if (showError) setFieldError('company_slug', 'Unable to generate a unique company slug.');
           return false;
         }
         if (!slugErrorEl || !slugErrorEl.dataset.serverError) clearFieldError('company_slug');
@@ -175,7 +199,8 @@
           if (fieldName === 'mobile' && value.length === 0) {
             setFieldError('mobile', 'Mobile number is required.');
           } else {
-            setFieldError(fieldName, rule.message);
+            var message = typeof rule.message === 'function' ? rule.message(value) : rule.message;
+            setFieldError(fieldName, message);
           }
         }
         return false;
@@ -197,33 +222,44 @@
       if (!slugInput) return Promise.resolve(true);
 
       syncSlugFromCompany();
-      var slug = slugInput.value;
+      var baseSlug = slugInput.value;
 
-      if (slug === '') {
+      if (baseSlug === '') {
         slugAvailable = null;
+        setSlugHint('');
         return Promise.resolve(false);
       }
 
-      if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
+      if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(baseSlug)) {
         slugAvailable = false;
+        setSlugHint('');
         setFieldError('company_slug', 'Slug may only contain lowercase letters, numbers, and hyphens.');
         return Promise.resolve(false);
       }
 
       var requestId = ++slugCheckRequestId;
-      return fetch(window.REGISTER_CHECK_SLUG_URL + '?slug=' + encodeURIComponent(slug), {
+      return fetch(window.REGISTER_CHECK_SLUG_URL + '?slug=' + encodeURIComponent(baseSlug), {
         headers: { Accept: 'application/json' }
       })
         .then(function (res) { return res.json(); })
         .then(function (data) {
           if (requestId !== slugCheckRequestId) return slugAvailable !== false;
+
+          if (data.slug) {
+            slugInput.value = data.slug;
+          }
+
           slugAvailable = !!data.available;
+
           if (data.available) {
             if (slugErrorEl) slugErrorEl.dataset.serverError = '';
             clearFieldError('company_slug');
+            setSlugHint(data.adjusted ? (data.message || 'Slug updated automatically because it was already taken.') : '');
           } else {
-            setFieldError('company_slug', data.message || 'This company slug is already taken. Please choose another.');
+            setSlugHint('');
+            setFieldError('company_slug', data.message || 'Unable to generate a unique company slug.');
           }
+
           return slugAvailable;
         })
         .catch(function () {
@@ -234,10 +270,14 @@
 
     if (companyInput && slugInput) {
       syncSlugFromCompany();
+      if (slugInput.value.length > 0) {
+        scheduleSlugCheck();
+      }
       companyInput.addEventListener('input', function () {
         syncSlugFromCompany();
         validateField('company_name', false);
         if (slugErrorEl) slugErrorEl.dataset.serverError = '';
+        setSlugHint('');
         if (slugInput.value.length > 0) {
           scheduleSlugCheck();
         } else {
@@ -246,7 +286,9 @@
       });
       companyInput.addEventListener('blur', function () {
         validateField('company_name', true);
-        validateField('company_slug', true);
+        checkSlugAvailability().then(function () {
+          validateField('company_slug', true);
+        });
       });
     }
 
@@ -303,7 +345,6 @@
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
-      syncSlugFromCompany();
       if (phoneInput) phoneInput.value = normalizeMobile(phoneInput.value);
 
       if (!validateForm()) return;

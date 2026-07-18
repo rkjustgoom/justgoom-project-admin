@@ -51,6 +51,7 @@ class RegisterController extends Controller
         if ($slug === '') {
             return response()->json([
                 'available' => false,
+                'slug' => '',
                 'message' => 'Company slug is required.',
             ]);
         }
@@ -58,16 +59,19 @@ class RegisterController extends Controller
         if (! preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $slug)) {
             return response()->json([
                 'available' => false,
+                'slug' => $slug,
                 'message' => 'Slug may only contain lowercase letters, numbers, and hyphens.',
             ]);
         }
 
-        $exists = CompanyProfile::query()->where('slug', $slug)->exists();
+        $uniqueSlug = CompanyProfile::uniqueSlug($slug);
 
         return response()->json([
-            'available' => ! $exists,
-            'message' => $exists
-                ? 'This company slug is already taken. Please choose another.'
+            'available' => true,
+            'slug' => $uniqueSlug,
+            'adjusted' => $uniqueSlug !== $slug,
+            'message' => $uniqueSlug !== $slug
+                ? 'Slug was already taken, so it was updated automatically.'
                 : 'This slug is available.',
         ]);
     }
