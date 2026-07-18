@@ -133,7 +133,7 @@ class ArticleController extends Controller
 
     private function authorizeArticle(Article $article): void
     {
-        abort_unless($article->user_id === auth()->id(), 403);
+        abort_unless((int) $article->user_id === (int) auth()->id(), 403);
     }
 
     private function resolvePerPage(Request $request): int

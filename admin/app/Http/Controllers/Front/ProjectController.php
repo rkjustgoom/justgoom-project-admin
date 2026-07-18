@@ -144,7 +144,7 @@ class ProjectController extends Controller
 
     private function authorizeProject(Project $project): void
     {
-        abort_unless($project->user_id === auth()->id(), 403);
+        abort_unless((int) $project->user_id === (int) auth()->id(), 403);
     }
 
     private function resolvePerPage(Request $request): int
