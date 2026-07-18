@@ -83,7 +83,7 @@
           <button type="button" data-tab="product">Product</button>
           <button type="button" data-tab="videos">Videos</button>
           <button type="button" data-tab="blog">My Blog</button>
-          <button type="button" data-tab="location">My Adevtiment / Offerings</button>
+          <button type="button" data-tab="offers">My Advertisement / Offerings</button>
         </nav>
       </div>
     </div>
@@ -460,30 +460,44 @@
         </div>
       </div>
 
-      <div class="profile-tab-pane" data-pane="location">
+      <div class="profile-tab-pane" data-pane="offers" id="offers">
         <div class="profile-card">
-          <h3>My Location</h3>
-          <p class="profile-location-text">
-            <svg class="profile-meta-icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z"/></svg>
-            {{ $fullAddress ?: ($location ?: 'Location not set') }}
-          </p>
-          @if($mapEmbedUrl)
-            <div class="profile-map-embed profile-map-embed-lg">
-              <iframe
-                title="Business location map"
-                src="{{ $mapEmbedUrl }}"
-                loading="lazy"
-                referrerpolicy="no-referrer-when-downgrade"
-                allowfullscreen
-              ></iframe>
+          <h3>My Advertisement / Offerings <span class="profile-section-count">({{ $offers->count() }})</span></h3>
+          @if($offers->isNotEmpty())
+            <div class="profile-items-scroll profile-items-scroll--cards {{ $offers->count() > 8 ? 'is-scrollable' : '' }}">
+              <div class="profile-offers-grid">
+                @foreach($offers as $offer)
+                  @php
+                    $offerImage = $offer->banner_image
+                      ? asset($offer->banner_image)
+                      : asset('front/assets/images/cat-business.jpg');
+                    $offerUrl = $offer->link_url ?: '#';
+                    $hasOfferLink = filled($offer->link_url);
+                  @endphp
+                  <article class="profile-offer-card">
+                    <div class="profile-offer-thumb">
+                      <img src="{{ $offerImage }}" alt="{{ $offer->title }}" loading="lazy">
+                    </div>
+                    <div class="profile-offer-body">
+                      <h4>{{ $offer->title }}</h4>
+                      @if($offer->description)
+                        <p>{{ \Illuminate\Support\Str::limit(strip_tags($offer->description), 100) }}</p>
+                      @endif
+                      <span class="profile-offer-dates">
+                        {{ $offer->start_date->format('M j') }} – {{ $offer->end_date->format('M j, Y') }}
+                      </span>
+                      <div class="profile-offer-actions">
+                        @if($hasOfferLink)
+                          <a href="{{ $offerUrl }}" class="btn btn-primary btn-sm" target="_blank" rel="noopener">Explore</a>
+                        @endif
+                      </div>
+                    </div>
+                  </article>
+                @endforeach
+              </div>
             </div>
-            @if($mapOpenUrl)
-              <a href="{{ $mapOpenUrl }}" class="btn btn-outline btn-sm" target="_blank" rel="noopener" style="margin-top:12px;display:inline-flex">Open in Maps</a>
-            @endif
           @else
-            <div class="profile-map-placeholder">
-              <span>Location not set</span>
-            </div>
+            <p class="profile-empty-note">No active offers available right now.</p>
           @endif
         </div>
       </div>
@@ -556,6 +570,18 @@
 
 @push('scripts')
 <script src="{{ asset('front/assets/js/profile-qr-share.js') }}?v=7"></script>
+<script>
+(function () {
+  document.querySelectorAll('.js-profile-offer-explore').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var target = btn.getAttribute('data-tab-target') || 'overview';
+      var tabBtn = document.querySelector('#profileTabs button[data-tab="' + target + '"]');
+      if (tabBtn) tabBtn.click();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+})();
+</script>
 <script>
 (function () {
   function loadImage(src) {

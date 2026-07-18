@@ -66,15 +66,34 @@ function initProfileTabs() {
   const buttons = tabNav.querySelectorAll('button[data-tab]');
   const panes = document.querySelectorAll('.profile-tab-pane');
 
+  function activateTab(tab) {
+    if (!tab) return false;
+    const btn = tabNav.querySelector(`button[data-tab="${tab}"]`);
+    const pane = document.querySelector(`.profile-tab-pane[data-pane="${tab}"]`);
+    if (!btn || !pane) return false;
+    buttons.forEach(b => b.classList.remove('active'));
+    panes.forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    pane.classList.add('active');
+    return true;
+  }
+
   buttons.forEach(btn => {
     btn.addEventListener('click', () => {
       const tab = btn.dataset.tab;
-      buttons.forEach(b => b.classList.remove('active'));
-      panes.forEach(p => p.classList.remove('active'));
-      btn.classList.add('active');
-      document.querySelector(`.profile-tab-pane[data-pane="${tab}"]`)?.classList.add('active');
+      activateTab(tab);
+      if (history.replaceState) {
+        history.replaceState(null, '', '#' + tab);
+      } else {
+        location.hash = tab;
+      }
     });
   });
+
+  const hashTab = (location.hash || '').replace(/^#/, '');
+  if (hashTab) {
+    activateTab(hashTab);
+  }
 }
 
 function initTeamFilter() {

@@ -1,6 +1,6 @@
 @extends('front.layouts.app')
 
-@section('title', 'Just Goom LLP — India\'s B2B Business Discovery Platform')
+@section('title', 'Just Goom LLP — Global B2B Business Discovery Platform')
 @section('meta_description', 'JustGoom — Connect with verified business profiles, browse categories, and grow your business across India.')
 @section('body_attrs', 'class="home-b2b" data-page="home"')
 
@@ -10,7 +10,7 @@
     <div class="container">
       <div class="b2b-hero-inner">
         <div class="b2b-hero-content">
-          <div class="hero-badge">India's B2B Business Discovery Platform</div>
+          <div class="hero-badge">Global B2B Business Discovery Platform</div>
           <h1>Connect Buyers with Verified Business Profiles</h1>
           <p>Discover trusted suppliers, service providers, and local businesses — all in one place. Search by category, city, or business name.</p>
 
@@ -286,82 +286,70 @@
       </div>
 
       @php
-        $staticOffers = [
-          [
-            'discount' => 'Up to 25% OFF',
-            'title' => 'on Business Listings',
-            'tagline' => 'Boost your visibility across India',
-            'cta' => 'View Offer',
-            'cta_url' => route('front.register'),
-            'logo' => asset('front/assets/images/justgoom-logo.png'),
-            'logo_alt' => 'JustGoom',
-            'image' => asset('front/assets/images/cat-business.jpg'),
-            'theme' => 'purple',
-          ],
-          [
-            'discount' => 'Flat 30% OFF',
-            'title' => 'on Food & Catering',
-            'tagline' => 'Partner with verified food suppliers',
-            'cta' => 'Shop now',
-            'cta_url' => route('front.all-profiles', ['category' => 'food']),
-            'logo' => asset('front/assets/images/justgoom-logo.png'),
-            'logo_alt' => 'JustGoom Food',
-            'image' => asset('front/assets/images/cat-food.jpg'),
-            'theme' => 'amber',
-          ],
-          [
-            'discount' => 'Save 20%',
-            'title' => 'on Health Services',
-            'tagline' => 'Trusted clinics & wellness partners',
-            'cta' => 'Explore',
-            'cta_url' => route('front.all-profiles', ['category' => 'health']),
-            'logo' => asset('front/assets/images/justgoom-logo.png'),
-            'logo_alt' => 'JustGoom Health',
-            'image' => asset('front/assets/images/cat-health.jpg'),
-            'theme' => 'teal',
-          ],
-          [
-            'discount' => 'Up to 40% OFF',
-            'title' => 'on Real Estate',
-            'tagline' => 'Premium spaces from verified agents',
-            'cta' => 'Shop now',
-            'cta_url' => route('front.all-profiles', ['category' => 'real-estate']),
-            'logo' => asset('front/assets/images/justgoom-logo.png'),
-            'logo_alt' => 'JustGoom Realty',
-            'image' => asset('front/assets/images/cat-real-estate.jpg'),
-            'theme' => 'navy',
-          ],
+        $offerThemes = ['purple', 'amber', 'teal', 'navy'];
+        $fallbackOfferImages = [
+          asset('front/assets/images/cat-business.jpg'),
+          asset('front/assets/images/cat-food.jpg'),
+          asset('front/assets/images/cat-health.jpg'),
+          asset('front/assets/images/cat-real-estate.jpg'),
         ];
+        $defaultLogo = asset('front/assets/images/justgoom-logo.png');
+
+        $offerCards = collect($runningOffers ?? [])->map(function ($offer, $index) use ($offerThemes, $fallbackOfferImages, $defaultLogo) {
+          $company = $offer->user?->companyProfile;
+          $companyName = $company?->company_name
+            ?: trim(($offer->user?->fname ?? '') . ' ' . ($offer->user?->lname ?? ''))
+            ?: 'JustGoom Member';
+          $companyTagLine = $company?->tagline ?: $companyName;
+          $offerUrl = route('front.profile.show', $company->slug) . '#offers';
+
+          return [
+            'title' => $offer->title,
+            'offer_url' => $offerUrl,
+            'tagline' => $companyTagLine,
+            'logo' => $company?->logo ? asset($company->logo) : $defaultLogo,
+            'logo_alt' => $companyName,
+            'image' => $offer->banner_image
+              ? asset($offer->banner_image)
+              : $fallbackOfferImages[$index % count($fallbackOfferImages)],
+            'theme' => $offerThemes[$index % count($offerThemes)],
+            'company' => $companyName,
+          ];
+        })->values();
       @endphp
 
+      @if($offerCards->isNotEmpty())
       <div class="offers-promo-carousel" id="offersCarousel">
         <button type="button" class="offers-promo-nav prev" aria-label="Previous offer">‹</button>
         <div class="offers-promo-track" id="offersTrack">
-          @foreach($staticOffers as $offer)
-          <article class="offer-promo-card offer-promo-{{ $offer['theme'] }}">
+          @foreach($offerCards as $offer)
+          <a href="{{ $offer['offer_url'] }}" class="offer-promo-card offer-promo-{{ $offer['theme'] }}" @if(\Illuminate\Support\Str::startsWith($offer['offer_url'], ['http://', 'https://'])) target="_blank" rel="noopener" @endif>
             <img class="offer-promo-bg" src="{{ $offer['image'] }}" alt="" loading="lazy" aria-hidden="true">
             <div class="offer-promo-overlay" aria-hidden="true"></div>
             <div class="offer-promo-wave" aria-hidden="true"></div>
             <div class="offer-promo-content">
-              <div class="offer-promo-text">
-                <h3 class="offer-promo-discount">{{ $offer['discount'] }}</h3>
-                <p class="offer-promo-title">{{ $offer['title'] }}</p>
-                <p class="offer-promo-tagline">{{ $offer['tagline'] }}</p>
-                <a href="{{ $offer['cta_url'] }}" class="offer-promo-cta">{{ $offer['cta'] }}</a>
-              </div>
-              <div class="offer-promo-brand">
-                <div class="offer-promo-logo">
-                  <img src="{{ $offer['logo'] }}" alt="{{ $offer['logo_alt'] }}">
+              <div class="offer-promo-top">
+                <div class="offer-promo-text">
+                  <h3 class="offer-promo-discount" title="{{ $offer['title'] }}">{{ \Illuminate\Support\Str::limit($offer['title'], 50) }}</h3>
+                  <p class="offer-promo-tagline" title="{{ $offer['tagline'] }}">{{ \Illuminate\Support\Str::limit($offer['tagline'], 70) }}</p>
+                </div>
+                <div class="offer-promo-brand">
+                  <div class="offer-promo-logo">
+                    <img src="{{ $offer['logo'] }}" alt="{{ $offer['logo_alt'] }}">
+                  </div>
                 </div>
               </div>
             </div>
             <span class="offer-promo-ad">Ad</span>
-          </article>
+          </a>
           @endforeach
         </div>
         <button type="button" class="offers-promo-nav next" aria-label="Next offer">›</button>
         <div class="offers-promo-dots" id="offersDots" role="tablist" aria-label="Offer slides"></div>
       </div>
+      @else
+      <p class="section-subtitle" style="margin:0;">No running offers right now. Check back soon for new promotions.</p>
+      @endif
 
       @if(!empty($advertisements) && count($advertisements) > 0)
       <div class="ads-banner-row" style="margin-top:28px;">

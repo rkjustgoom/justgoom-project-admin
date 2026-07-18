@@ -50,6 +50,7 @@ class PublicProfileController extends Controller
         $documents = $this->documentService->listForPublicProfile($user);
         $projects = $user->projects()->where('status', 1)->latest()->get();
         $articles = $user->articles()->where('status', 'published')->latest('published_at')->get();
+        $offers = $user->offers()->active()->orderByDesc('is_featured')->orderByDesc('created_at')->get();
         $videos = collect(DB::table('videos')
             ->where('user_id', $user->id)
             ->where('status', 1)
@@ -91,6 +92,7 @@ class PublicProfileController extends Controller
             'documents' => $documents,
             'projects' => $projects,
             'articles' => $articles,
+            'offers' => $offers,
             'videos' => $videos,
             'activities' => $activities,
             'completionPercent' => $this->profileService->completionPercent($user),

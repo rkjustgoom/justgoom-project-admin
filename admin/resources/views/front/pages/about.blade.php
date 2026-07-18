@@ -14,7 +14,7 @@
         <span>About Us</span>
       </nav>
       <h1>About Just Goom LLP</h1>
-      <p>India's B2B business discovery platform — connecting buyers with verified suppliers, service providers, and local businesses.</p>
+      <p>Global B2B business discovery platform — connecting buyers with verified suppliers, service providers, and local businesses.</p>
     </div>
     <div class="pixel-deco orange"><span></span><span></span><span></span><span></span></div>
   </section>
