@@ -111,12 +111,27 @@
           @if($profile->email)
             <li><span>E-mail :</span><strong>{{ $profile->email }}</strong></li>
           @endif
-          @if($location)
-            <li><span>Location :</span><strong>{{ $location }}</strong></li>
-          @endif
         </ul>
       </div>
-
+      @if($mapQuery)
+        <div class="profile-card profile-location-card">
+          <h3>Location</h3>
+          <p class="profile-sidebar-address">
+            <svg class="profile-meta-icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z"/></svg>
+            <span>{{ $mapQuery }}</span>
+          </p>
+          <div class="profile-map-embed">
+            <iframe
+              title="Business location map"
+              src="{{ $mapEmbedUrl }}"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              allowfullscreen
+            ></iframe>
+          </div>
+          <a href="{{ $mapOpenUrl }}" class="btn btn-outline btn-sm btn-block" target="_blank" rel="noopener">Open in Maps</a>
+        </div>
+      @endif
       @if($profile->social_website || $profile->social_facebook || $profile->social_twitter || $profile->social_linkedin)
         <div class="profile-card">
           <h3>Portfolio</h3>
@@ -169,26 +184,6 @@
         </button>
         <button type="button" class="btn btn-outline btn-sm btn-block" id="downloadProfileQrBtn">Download QR</button>
       </div>
-
-      @if($mapQuery)
-        <div class="profile-card profile-location-card">
-          <h3>Location</h3>
-          <p class="profile-sidebar-address">
-            <svg class="profile-meta-icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z"/></svg>
-            <span>{{ $mapQuery }}</span>
-          </p>
-          <div class="profile-map-embed">
-            <iframe
-              title="Business location map"
-              src="{{ $mapEmbedUrl }}"
-              loading="lazy"
-              referrerpolicy="no-referrer-when-downgrade"
-              allowfullscreen
-            ></iframe>
-          </div>
-          <a href="{{ $mapOpenUrl }}" class="btn btn-outline btn-sm btn-block" target="_blank" rel="noopener">Open in Maps</a>
-        </div>
-      @endif
     </aside>
 
     <main class="profile-content">
@@ -237,60 +232,7 @@
           </div>
         </div>
 
-        <div class="profile-card profile-team-card">
-          <div class="profile-team-header">
-            <h3>Team <span class="profile-section-count">({{ $teams->count() }})</span></h3>
-          </div>
-          @if($teams->isNotEmpty())
-            <div class="profile-items-scroll profile-items-scroll--grid {{ $teams->count() > 16 ? 'is-scrollable' : '' }}">
-              <div class="profile-team-grid">
-                @foreach($teams as $member)
-                  @php
-                    $memberInitials = collect(explode(' ', $member->name))
-                      ->filter()
-                      ->take(2)
-                      ->map(fn ($part) => strtoupper(substr($part, 0, 1)))
-                      ->implode('');
-                    $avatarColor = $avatarColors[crc32($member->name) % count($avatarColors)];
-                    $memberImage = $member->image ? asset($member->image) : '';
-                  @endphp
-                  <article class="team-member-card">
-                    @if($member->image)
-                      <img src="{{ $memberImage }}" alt="{{ $member->name }}" class="team-avatar-img">
-                    @else
-                      <div class="team-avatar" style="background:{{ $avatarColor }}">{{ $memberInitials }}</div>
-                    @endif
-                    <h4 title="{{ $member->name }}">{{ $member->name }}</h4>
-                    @if($member->designation)
-                      <p class="team-role" title="{{ $member->designation }}">{{ $member->designation }}</p>
-                    @endif
-                    @if($member->department)
-                      <p class="team-department">
-                        <svg class="team-department-icon" viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><path fill="currentColor" d="M20 18c1.1 0 1.99-.9 1.99-2L22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z"/></svg>
-                        {{ $member->department }}
-                      </p>
-                    @endif
-                    <button
-                      type="button"
-                      class="btn btn-primary btn-block btn-sm js-team-view-profile"
-                      data-name="{{ $member->name }}"
-                      data-designation="{{ $member->designation }}"
-                      data-phone="{{ $member->phone }}"
-                      data-email="{{ $member->email }}"
-                      data-department="{{ $member->department }}"
-                      data-info="{{ $member->short_info }}"
-                      data-image="{{ $memberImage }}"
-                      data-initials="{{ $memberInitials }}"
-                      data-color="{{ $avatarColor }}"
-                    >View Profile</button>
-                  </article>
-                @endforeach
-              </div>
-            </div>
-          @else
-            <p class="profile-empty-note">No team members added yet.</p>
-          @endif
-        </div>
+        
       </div>
 
       <div class="profile-tab-pane" data-pane="activities">

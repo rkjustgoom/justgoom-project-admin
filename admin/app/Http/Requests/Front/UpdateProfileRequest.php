@@ -22,6 +22,11 @@ class UpdateProfileRequest extends FormRequest
             'email' => strtolower(trim((string) $this->input('email', ''))),
             'address' => $this->filled('address') ? trim((string) $this->input('address')) : null,
             'city' => trim((string) $this->input('city', '')),
+            'social_website' => $this->filled('social_website') ? trim((string) $this->input('social_website')) : null,
+            'social_subwebsite' => $this->filled('social_subwebsite') ? trim((string) $this->input('social_subwebsite')) : null,
+            'social_facebook' => $this->filled('social_facebook') ? trim((string) $this->input('social_facebook')) : null,
+            'social_twitter' => $this->filled('social_twitter') ? trim((string) $this->input('social_twitter')) : null,
+            'social_linkedin' => $this->filled('social_linkedin') ? trim((string) $this->input('social_linkedin')) : null,
         ]);
 
         $days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
@@ -52,6 +57,11 @@ class UpdateProfileRequest extends FormRequest
             'email' => ['required', 'email', 'max:191', Rule::unique('users', 'email')->ignore($this->user()->id)],
             'address' => ['nullable', 'string', 'max:500'],
             'city' => ['required', 'string', 'max:100'],
+            'social_website' => ['nullable', 'url', 'max:255'],
+            'social_subwebsite' => ['nullable', 'url', 'max:255'],
+            'social_facebook' => ['nullable', 'url', 'max:255'],
+            'social_twitter' => ['nullable', 'url', 'max:255'],
+            'social_linkedin' => ['nullable', 'url', 'max:255'],
             'logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp,gif', 'max:2048'],
             'business_hours' => ['required', 'array'],
             'business_hours.*' => ['required', 'array'],
@@ -84,6 +94,11 @@ class UpdateProfileRequest extends FormRequest
             'address.max' => 'Address must not exceed 500 characters.',
             'city.required' => 'City is required.',
             'city.max' => 'City must not exceed 100 characters.',
+            'social_website.url' => 'Enter a valid website URL.',
+            'social_subwebsite.url' => 'Enter a valid sub website URL.',
+            'social_facebook.url' => 'Enter a valid Facebook URL.',
+            'social_twitter.url' => 'Enter a valid Twitter / X URL.',
+            'social_linkedin.url' => 'Enter a valid LinkedIn URL.',
             'logo.image' => 'Logo must be JPG, PNG, WebP, or GIF.',
             'logo.mimes' => 'Logo must be JPG, PNG, WebP, or GIF.',
             'logo.max' => 'Logo must not be larger than 2 MB.',
@@ -102,6 +117,11 @@ class UpdateProfileRequest extends FormRequest
             'email' => 'email',
             'address' => 'address',
             'city' => 'city',
+            'social_website' => 'website',
+            'social_subwebsite' => 'sub website',
+            'social_facebook' => 'Facebook',
+            'social_twitter' => 'Twitter / X',
+            'social_linkedin' => 'LinkedIn',
             'logo' => 'company logo',
         ];
     }

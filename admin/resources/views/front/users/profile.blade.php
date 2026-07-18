@@ -101,6 +101,35 @@
             <small class="user-field-error">@error('address'){{ $message }}@enderror</small>
           </div>
           <div class="user-form-row">
+            <div class="user-form-group" data-field="social_website">
+              <label>Website</label>
+              <input type="url" name="social_website" class="user-form-control @error('social_website') is-invalid @enderror" value="{{ old('social_website', $profile->social_website) }}" placeholder="https://www.example.com" maxlength="255">
+              <small class="user-field-error">@error('social_website'){{ $message }}@enderror</small>
+            </div>
+            <div class="user-form-group" data-field="social_subwebsite">
+              <label>Sub Website</label>
+              <input type="url" name="social_subwebsite" class="user-form-control @error('social_subwebsite') is-invalid @enderror" value="{{ old('social_subwebsite', $profile->social_subwebsite) }}" placeholder="https://shop.example.com" maxlength="255">
+              <small class="user-field-error">@error('social_subwebsite'){{ $message }}@enderror</small>
+            </div>
+          </div>
+          <div class="user-form-row">
+            <div class="user-form-group" data-field="social_facebook">
+              <label>Facebook</label>
+              <input type="url" name="social_facebook" class="user-form-control @error('social_facebook') is-invalid @enderror" value="{{ old('social_facebook', $profile->social_facebook) }}" placeholder="https://facebook.com/yourpage" maxlength="255">
+              <small class="user-field-error">@error('social_facebook'){{ $message }}@enderror</small>
+            </div>
+            <div class="user-form-group" data-field="social_twitter">
+              <label>Twitter / X</label>
+              <input type="url" name="social_twitter" class="user-form-control @error('social_twitter') is-invalid @enderror" value="{{ old('social_twitter', $profile->social_twitter) }}" placeholder="https://x.com/yourhandle" maxlength="255">
+              <small class="user-field-error">@error('social_twitter'){{ $message }}@enderror</small>
+            </div>
+          </div>
+          <div class="user-form-group" data-field="social_linkedin">
+            <label>LinkedIn</label>
+            <input type="url" name="social_linkedin" class="user-form-control @error('social_linkedin') is-invalid @enderror" value="{{ old('social_linkedin', $profile->social_linkedin) }}" placeholder="https://linkedin.com/company/yourcompany" maxlength="255">
+            <small class="user-field-error">@error('social_linkedin'){{ $message }}@enderror</small>
+          </div>
+          <div class="user-form-row">
             <div class="user-form-group">
               <label>Plan</label>
               <input type="text" class="user-form-control" value="{{ $planName }}" readonly>

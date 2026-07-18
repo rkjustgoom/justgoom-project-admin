@@ -52,6 +52,11 @@ class ProfileService
                 'address' => $data['address'] ?? null,
                 'city' => $data['city'],
                 'business_hours' => $data['business_hours'] ?? null,
+                'social_website' => $data['social_website'] ?? null,
+                'social_subwebsite' => $data['social_subwebsite'] ?? null,
+                'social_facebook' => $data['social_facebook'] ?? null,
+                'social_twitter' => $data['social_twitter'] ?? null,
+                'social_linkedin' => $data['social_linkedin'] ?? null,
             ];
 
             if (($data['logo'] ?? null) instanceof UploadedFile) {
