@@ -437,18 +437,21 @@
             'image' => $article->featured_image
               ? asset($article->featured_image)
               : $fallbackBlogImages[$index % count($fallbackBlogImages)],
+            'url' => route('front.articles.show', $article->slug),
           ];
         });
 
         $blogCards = $dynamicBlogs
-          ->concat($staticBlogs)
+          ->concat(collect($staticBlogs)->map(fn ($blog) => array_merge($blog, [
+            'url' => route('front.articles'),
+          ])))
           ->take(6)
           ->values();
       @endphp
 
       <div class="blog-grid">
         @foreach($blogCards as $blog)
-        <a href="{{ route('front.articles') }}" class="blog-card blog-card-link">
+        <a href="{{ $blog['url'] }}" class="blog-card blog-card-link">
           <div class="blog-thumb">
             <img src="{{ $blog['image'] }}" alt="{{ $blog['title'] }}" loading="lazy">
           </div>

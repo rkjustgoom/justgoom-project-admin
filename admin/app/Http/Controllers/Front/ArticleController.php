@@ -11,6 +11,27 @@ use Illuminate\Support\Str;
 
 class ArticleController extends Controller
 {
+    public function listing()
+    {
+        $articles = Article::published()
+            ->with(['user.companyProfile', 'user.category'])
+            ->latest('published_at')
+            ->latest('created_at')
+            ->paginate(9);
+
+        $featured = $articles->getCollection();
+        $featuredMain = $featured->first();
+        $featuredSide = $featured->slice(1, 3)->values();
+        $gridArticles = $articles->getCollection();
+
+        return view('front.pages.articles', compact(
+            'articles',
+            'featuredMain',
+            'featuredSide',
+            'gridArticles'
+        ));
+    }
+
     public function index(Request $request)
     {
         $user = $request->user();
@@ -28,6 +49,38 @@ class ArticleController extends Controller
         ];
 
         return view('front.users.articles', compact('articles', 'stats'));
+    }
+
+    public function show(string $slug)
+    {
+        $article = Article::published()
+            ->where('slug', $slug)
+            ->with(['user.companyProfile', 'user.category'])
+            ->firstOrFail();
+
+        $relatedArticles = Article::published()
+            ->where('id', '!=', $article->id)
+            ->with(['user.companyProfile', 'user.category'])
+            ->latest('published_at')
+            ->take(3)
+            ->get();
+
+        $author = $article->user;
+        $company = $author?->companyProfile;
+        $authorName = $company?->company_name
+            ?: trim(($author?->fname ?? '').' '.($author?->lname ?? ''))
+            ?: 'JustGoom Member';
+        $wordCount = str_word_count(strip_tags($article->body));
+        $readMinutes = max(1, (int) ceil($wordCount / 200));
+
+        return view('front.pages.article-detail', compact(
+            'article',
+            'relatedArticles',
+            'author',
+            'company',
+            'authorName',
+            'readMinutes'
+        ));
     }
 
     public function create()

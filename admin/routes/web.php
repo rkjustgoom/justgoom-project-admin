@@ -52,7 +52,10 @@ Route::get('/email/verify/{id}/{hash}', VerifyEmailController::class)
 Route::post('/logout', [FrontLoginController::class, 'logout'])->name('front.logout');
 
 Route::get('/about', fn () => app(PageController::class)->publicPage('about'))->name('front.about');
-Route::get('/articles', fn () => app(PageController::class)->publicPage('articles'))->name('front.articles');
+Route::get('/articles', [ArticleController::class, 'listing'])->name('front.articles');
+Route::get('/articles/{slug}', [ArticleController::class, 'show'])
+    ->where('slug', '[a-z0-9\-]+')
+    ->name('front.articles.show');
 Route::get('/calculators', fn () => app(PageController::class)->publicPage('calculators'))->name('front.calculators');
 Route::get('/categories', [FrontCategoryController::class, 'index'])->name('front.categories');
 Route::get('/category-details', fn () => app(PageController::class)->publicPage('category-details'))->name('front.category-details');

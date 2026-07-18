@@ -447,7 +447,7 @@
             <div class="profile-items-scroll {{ $articles->count() > 16 ? 'is-scrollable' : '' }}">
               <div class="profile-blog-list">
                 @foreach($articles as $article)
-                  <a href="{{ route('front.articles') }}" class="profile-blog-item">
+                  <a href="{{ route('front.articles.show', $article->slug) }}" class="profile-blog-item">
                     <strong>{{ $article->title }}</strong>
                     <span>{{ ($article->published_at ?? $article->created_at)?->format('M j, Y') }}</span>
                   </a>

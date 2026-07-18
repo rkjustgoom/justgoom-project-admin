@@ -20,7 +20,7 @@
       <a href="{{ route('front.about') }}" data-nav="about" @class(['active' => request()->routeIs('front.about')])>About Us</a>
       <a href="{{ route('front.categories') }}" data-nav="categories" @class(['active' => request()->routeIs('front.categories', 'front.category-details')])>Categories</a>
       <a href="{{ route('front.all-profiles') }}" data-nav="all-profiles" @class(['active' => request()->routeIs('front.all-profiles', 'front.profile.show', 'front.profile')])>All Profiles</a>
-      <a href="{{ route('front.articles') }}" data-nav="articles" @class(['active' => request()->routeIs('front.articles')])>Articles</a>
+      <a href="{{ route('front.articles') }}" data-nav="articles" @class(['active' => request()->routeIs('front.articles', 'front.articles.show')])>Articles</a>
       <a href="{{ route('front.contact') }}" data-nav="contact" @class(['active' => request()->routeIs('front.contact')])>Contact Us</a>
     </nav>
     <div class="header-actions">
@@ -74,7 +74,7 @@
       <a href="{{ route('front.about') }}" data-nav="about" @class(['active' => request()->routeIs('front.about')])>About Us</a>
       <a href="{{ route('front.categories') }}" data-nav="categories" @class(['active' => request()->routeIs('front.categories', 'front.category-details')])>Categories</a>
       <a href="{{ route('front.all-profiles') }}" data-nav="all-profiles" @class(['active' => request()->routeIs('front.all-profiles', 'front.profile.show', 'front.profile')])>All Profiles</a>
-      <a href="{{ route('front.articles') }}" data-nav="articles" @class(['active' => request()->routeIs('front.articles')])>Articles</a>
+      <a href="{{ route('front.articles') }}" data-nav="articles" @class(['active' => request()->routeIs('front.articles', 'front.articles.show')])>Articles</a>
       <a href="{{ route('front.contact') }}" data-nav="contact" @class(['active' => request()->routeIs('front.contact')])>Contact Us</a>
     </nav>
     <div class="mobile-nav-actions">
