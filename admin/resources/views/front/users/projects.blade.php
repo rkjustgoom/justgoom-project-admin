@@ -30,7 +30,7 @@
                 @elseif($project->type === 'video')
                   <span class="user-badge user-badge-warning">Video</span>
                 @else
-                  <span class="user-badge user-badge-info">Link</span>
+                  <span class="user-badge user-badge-info">External Link</span>
                 @endif
               </td>
               <td>
@@ -44,10 +44,12 @@
               <td>{{ Str::limit($project->description, 60) ?: '—' }}</td>
               <td>{{ $project->created_at?->format('M j, Y') }}</td>
               <td>
-                @if($project->external_url)
-                  <a href="{{ $project->external_url }}" target="_blank" class="user-table-action">View</a> ·
-                @elseif($project->file_path)
-                  <a href="{{ asset($project->file_path) }}" target="_blank" class="user-table-action">Download</a> ·
+                @if($project->type === 'document' && $project->file_path)
+                  <a href="{{ asset($project->file_path) }}" target="_blank" download class="user-table-action">Download</a> ·
+                @elseif($project->type === 'video' && $project->file_path)
+                  <a href="{{ asset($project->file_path) }}" target="_blank" rel="noopener" class="user-table-action">Watch</a> ·
+                @elseif($project->external_url)
+                  <a href="{{ $project->external_url }}" target="_blank" rel="noopener" class="user-table-action">Open Link</a> ·
                 @endif
                 <a href="{{ route('front.users.projects.edit', $project) }}" class="user-table-action">Edit</a>
                 ·

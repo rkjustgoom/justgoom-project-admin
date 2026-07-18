@@ -42,9 +42,12 @@ class ProjectController extends Controller
             'title' => 'required|string|max:200',
             'description' => 'nullable|string|max:2000',
             'type' => 'required|in:document,video,link',
-            'file' => 'required_unless:type,link|nullable|file|max:51200|mimes:pdf,doc,docx,ppt,pptx,mp4,avi,mov,wmv',
+            'file' => 'required_unless:type,link|nullable|file|max:102400|mimes:pdf,doc,docx,ppt,pptx,mp4,avi,mov,wmv',
             'external_url' => 'required_if:type,link|nullable|url|max:500',
             'thumbnail' => 'nullable|image|max:2048',
+        ], [
+            'file.max' => 'The uploaded file may not be greater than 100MB.',
+            'file.mimes' => 'Allowed file types: PDF, DOC, DOCX, PPT, PPTX, MP4, AVI, MOV, WMV.',
         ]);
 
         $project = new Project();
@@ -87,9 +90,12 @@ class ProjectController extends Controller
             'title' => 'required|string|max:200',
             'description' => 'nullable|string|max:2000',
             'type' => 'required|in:document,video,link',
-            'file' => 'nullable|file|max:51200|mimes:pdf,doc,docx,ppt,pptx,mp4,avi,mov,wmv',
+            'file' => 'nullable|file|max:102400|mimes:pdf,doc,docx,ppt,pptx,mp4,avi,mov,wmv',
             'external_url' => 'nullable|url|max:500',
             'thumbnail' => 'nullable|image|max:2048',
+        ], [
+            'file.max' => 'The uploaded file may not be greater than 100MB.',
+            'file.mimes' => 'Allowed file types: PDF, DOC, DOCX, PPT, PPTX, MP4, AVI, MOV, WMV.',
         ]);
 
         $project->title = $validated['title'];

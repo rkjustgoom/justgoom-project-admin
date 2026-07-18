@@ -44,9 +44,9 @@
             <label>Upload File</label>
             <div class="user-upload-zone">
               <input type="file" name="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.mp4,.avi,.mov,.wmv" hidden>
-              <p>Upload file (max 50MB)</p>
+              <p>Upload file (max 100MB)</p>
             </div>
-            <p class="user-form-hint">PDF, DOC, DOCX, PPT, PPTX, MP4, AVI, MOV, WMV</p>
+            <p class="user-form-hint">PDF, DOC, DOCX, PPT, PPTX, MP4, AVI, MOV, WMV (max 100MB)</p>
             <small class="user-field-error">@error('file'){{ $message }}@enderror</small>
           </div>
           <div class="user-form-group" data-field="external_url" id="urlGroup" style="display:none;">

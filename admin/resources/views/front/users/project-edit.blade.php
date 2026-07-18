@@ -44,10 +44,12 @@
             <label>Replace File (optional)</label>
             <div class="user-upload-zone">
               <input type="file" name="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.mp4,.avi,.mov,.wmv" hidden>
-              <p>Upload new file to replace current</p>
+              <p>Upload new file to replace current (max 100MB)</p>
             </div>
             @if($project->file_path)
-              <p class="user-form-hint">Current: <a href="{{ asset($project->file_path) }}" target="_blank">View file</a></p>
+              <p class="user-form-hint">Current: <a href="{{ asset($project->file_path) }}" target="_blank">View file</a> · Max 100MB</p>
+            @else
+              <p class="user-form-hint">PDF, DOC, DOCX, PPT, PPTX, MP4, AVI, MOV, WMV (max 100MB)</p>
             @endif
             <small class="user-field-error">@error('file'){{ $message }}@enderror</small>
           </div>

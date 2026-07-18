@@ -315,13 +315,64 @@
         <div class="profile-card">
           <h3>Projects <span class="profile-section-count">({{ $projects->count() }})</span></h3>
           @if($projects->isNotEmpty())
-            <div class="profile-items-scroll {{ $projects->count() > 16 ? 'is-scrollable' : '' }}">
-              <div class="profile-projects-grid">
+            <div class="profile-items-scroll profile-items-scroll--cards {{ $projects->count() > 16 ? 'is-scrollable' : '' }}">
+              <div class="profile-services-grid profile-services-cards">
                 @foreach($projects as $project)
-                  <div class="profile-project-item">
-                    <strong>{{ $project->title }}</strong>
-                    <span>{{ ucfirst($project->type) }}@if($project->description) Â· {{ Str::limit(strip_tags($project->description), 60) }}@endif</span>
-                  </div>
+                  @php
+                    $typeLabel = match ($project->type) {
+                      'document' => 'Document',
+                      'video' => 'Video',
+                      'link' => 'External Link',
+                      default => ucfirst((string) $project->type),
+                    };
+                    $actionUrl = null;
+                    $actionLabel = null;
+                    $isDownload = false;
+                    if ($project->type === 'document' && $project->file_path) {
+                      $actionUrl = asset($project->file_path);
+                      $actionLabel = 'Download';
+                      $isDownload = true;
+                    } elseif ($project->type === 'video' && $project->file_path) {
+                      $actionUrl = asset($project->file_path);
+                      $actionLabel = 'Watch';
+                    } elseif ($project->type === 'link' && $project->external_url) {
+                      $actionUrl = $project->external_url;
+                      $actionLabel = 'Open Link';
+                    } elseif ($project->external_url) {
+                      $actionUrl = $project->external_url;
+                      $actionLabel = 'Open Link';
+                    } elseif ($project->file_path) {
+                      $actionUrl = asset($project->file_path);
+                      $actionLabel = 'View';
+                    }
+                  @endphp
+                  <article class="profile-service-card">
+                    @if($project->thumbnail)
+                      <img src="{{ asset($project->thumbnail) }}" alt="{{ $project->title }}">
+                    @else
+                      <div class="profile-service-card-placeholder" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="36" height="36"><path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                      </div>
+                    @endif
+                    <div class="profile-service-card-body">
+                      <h4>{{ $project->title }}</h4>
+                      @if($project->type)
+                        <span class="profile-project-type">{{ $typeLabel }}</span>
+                      @endif
+                      @if($project->description)
+                        <p>{{ Str::limit(strip_tags($project->description), 90) }}</p>
+                      @endif
+                      @if($actionUrl)
+                        <a
+                          href="{{ $actionUrl }}"
+                          class="profile-inline-link"
+                          target="_blank"
+                          rel="noopener"
+                          @if($isDownload) download @endif
+                        >{{ $actionLabel }}</a>
+                      @endif
+                    </div>
+                  </article>
                 @endforeach
               </div>
             </div>
@@ -341,7 +392,7 @@
                   <li>
                     <span>
                       <strong>{{ $document->title }}</strong>
-                      <small>{{ $document->fileTypeLabel() }} Â· {{ $document->created_at?->format('M j, Y') }}</small>
+                      <small>{{ $document->fileTypeLabel() }} &middot; {{ $document->created_at?->format('M j, Y') }}</small>
                     </span>
                     <a href="{{ asset($document->attachment) }}" target="_blank" rel="noopener">Download</a>
                   </li>
@@ -428,7 +479,7 @@
                   @endphp
                   <div class="profile-project-item">
                     <strong>{{ $video->title }}</strong>
-                    <span>{{ str_starts_with($video->link, 'http') ? 'External link' : 'Uploaded video' }} Â· {{ \Carbon\Carbon::parse($video->created_at)->format('M j, Y') }}</span>
+                    <span>{{ str_starts_with($video->link, 'http') ? 'External link' : 'Uploaded video' }} &middot; {{ \Carbon\Carbon::parse($video->created_at)->format('M j, Y') }}</span>
                     <a href="{{ $videoUrl }}" target="_blank" rel="noopener" class="profile-inline-link">Watch</a>
                   </div>
                 @endforeach
@@ -444,12 +495,46 @@
         <div class="profile-card">
           <h3>My Blog <span class="profile-section-count">({{ $articles->count() }})</span></h3>
           @if($articles->isNotEmpty())
-            <div class="profile-items-scroll {{ $articles->count() > 16 ? 'is-scrollable' : '' }}">
-              <div class="profile-blog-list">
-                @foreach($articles as $article)
-                  <a href="{{ route('front.articles.show', $article->slug) }}" class="profile-blog-item">
-                    <strong>{{ $article->title }}</strong>
-                    <span>{{ ($article->published_at ?? $article->created_at)?->format('M j, Y') }}</span>
+            @php
+              $blogFallbackImages = [
+                asset('front/assets/images/blog-1.jpg'),
+                asset('front/assets/images/blog-2.jpg'),
+                asset('front/assets/images/blog-3.jpg'),
+              ];
+              $blogAuthorName = $profile->company_name ?: 'JustGoom Member';
+              $blogAuthorInitials = $initials ?: 'JG';
+              $blogTag = $user->category->name ?? 'Business';
+            @endphp
+            <div class="profile-items-scroll profile-items-scroll--cards {{ $articles->count() > 6 ? 'is-scrollable' : '' }}">
+              <div class="blog-grid profile-blog-grid">
+                @foreach($articles as $index => $article)
+                  @php
+                    $published = $article->published_at ?? $article->created_at;
+                    $excerpt = \Illuminate\Support\Str::limit(strip_tags($article->body), 110);
+                    $readMins = max(1, (int) ceil(str_word_count(strip_tags($article->body)) / 200));
+                    $blogImage = $article->featured_image
+                      ? asset($article->featured_image)
+                      : $blogFallbackImages[$index % count($blogFallbackImages)];
+                  @endphp
+                  <a href="{{ route('front.articles.show', $article->slug) }}" class="blog-card blog-card-link">
+                    <div class="blog-thumb">
+                      <img src="{{ $blogImage }}" alt="{{ $article->title }}" loading="lazy">
+                    </div>
+                    <div class="blog-body">
+                      <div class="article-author-bar">
+                        <span class="blog-author-avatar">{{ $blogAuthorInitials }}</span>
+                        <div>
+                          <strong>{{ $blogAuthorName }}</strong>
+                        </div>
+                      </div>
+                      <span class="blog-tag">{{ $blogTag }}</span>
+                      <h3>{{ $article->title }}</h3>
+                      <p>{{ $excerpt }}</p>
+                      <div class="blog-footer">
+                        <span>{{ $published?->format('M j, Y') }}</span>
+                        <span>{{ $readMins }} min read</span>
+                      </div>
+                    </div>
                   </a>
                 @endforeach
               </div>
@@ -505,7 +590,7 @@
   </div>
 
   @if($isOwner)
-    <a href="{{ route('front.users.profile') }}" class="profile-fab" aria-label="Edit profile">âš™</a>
+    <a href="{{ route('front.users.profile') }}" class="profile-fab" aria-label="Edit profile">&#9881;</a>
   @endif
 
   <div class="team-profile-modal" id="teamProfileModal" hidden>
