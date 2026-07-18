@@ -29,7 +29,7 @@
           <div class="user-form-group" data-field="file_type">
             <label>Document Type *</label>
             <select name="file_type" id="documentFileType" class="user-form-control @error('file_type') is-invalid @enderror">
-              @foreach(['pdf' => 'PDF', 'image' => 'Image', 'word' => 'Word', 'excel' => 'Excel'] as $value => $label)
+              @foreach(['pdf' => 'PDF', 'word' => 'Word', 'excel' => 'Excel'] as $value => $label)
                 <option value="{{ $value }}" @selected(old('file_type', 'pdf') === $value)>{{ $label }}</option>
               @endforeach
             </select>

@@ -77,13 +77,13 @@
         <nav class="profile-tabs" id="profileTabs">
           <button type="button" class="active" data-tab="overview">Overview</button>
           <!-- <button type="button" data-tab="activities">Activities</button> -->
+          <button type="button" data-tab="services">Services</button>
+          <button type="button" data-tab="product">Products</button>
           <button type="button" data-tab="projects">Projects</button>
           <button type="button" data-tab="documents">Documents</button>
-          <button type="button" data-tab="services">Services</button>
-          <button type="button" data-tab="product">Product</button>
           <button type="button" data-tab="videos">Videos</button>
           <button type="button" data-tab="blog">My Blog</button>
-          <button type="button" data-tab="offers">My Advertisement / Offerings</button>
+          <button type="button" data-tab="offers">My Advertisement</button>
         </nav>
       </div>
     </div>
@@ -232,7 +232,60 @@
           </div>
         </div>
 
-        
+        <div class="profile-card profile-team-card">
+          <div class="profile-team-header">
+            <h3>Team <span class="profile-section-count">({{ $teams->count() }})</span></h3>
+          </div>
+          @if($teams->isNotEmpty())
+            <div class="profile-items-scroll profile-items-scroll--grid {{ $teams->count() > 16 ? 'is-scrollable' : '' }}">
+              <div class="profile-team-grid">
+                @foreach($teams as $member)
+                  @php
+                    $memberInitials = collect(explode(' ', $member->name))
+                      ->filter()
+                      ->take(2)
+                      ->map(fn ($part) => strtoupper(substr($part, 0, 1)))
+                      ->implode('');
+                    $avatarColor = $avatarColors[crc32($member->name) % count($avatarColors)];
+                    $memberImage = $member->image ? asset($member->image) : '';
+                  @endphp
+                  <article class="team-member-card">
+                    @if($member->image)
+                      <img src="{{ $memberImage }}" alt="{{ $member->name }}" class="team-avatar-img">
+                    @else
+                      <div class="team-avatar" style="background:{{ $avatarColor }}">{{ $memberInitials }}</div>
+                    @endif
+                    <h4 title="{{ $member->name }}">{{ $member->name }}</h4>
+                    @if($member->designation)
+                      <p class="team-role" title="{{ $member->designation }}">{{ $member->designation }}</p>
+                    @endif
+                    @if($member->department)
+                      <p class="team-department">
+                        <svg class="team-department-icon" viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><path fill="currentColor" d="M20 18c1.1 0 1.99-.9 1.99-2L22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z"/></svg>
+                        {{ $member->department }}
+                      </p>
+                    @endif
+                    <button
+                      type="button"
+                      class="btn btn-primary btn-block btn-sm js-team-view-profile"
+                      data-name="{{ $member->name }}"
+                      data-designation="{{ $member->designation }}"
+                      data-phone="{{ $member->phone }}"
+                      data-email="{{ $member->email }}"
+                      data-department="{{ $member->department }}"
+                      data-info="{{ $member->short_info }}"
+                      data-image="{{ $memberImage }}"
+                      data-initials="{{ $memberInitials }}"
+                      data-color="{{ $avatarColor }}"
+                    >View Profile</button>
+                  </article>
+                @endforeach
+              </div>
+            </div>
+          @else
+            <p class="profile-empty-note">No team members added yet.</p>
+          @endif
+        </div>
       </div>
 
       <div class="profile-tab-pane" data-pane="activities">
@@ -249,6 +302,68 @@
             </ul>
           @else
             <p class="profile-empty-note">No recent activities.</p>
+          @endif
+        </div>
+      </div>
+
+      <div class="profile-tab-pane" data-pane="services">
+        <div class="profile-card">
+          <h3>Services <span class="profile-section-count">({{ $services->count() }})</span></h3>
+          @if($services->isNotEmpty())
+            <div class="profile-items-scroll profile-items-scroll--cards {{ $services->count() > 16 ? 'is-scrollable' : '' }}">
+              <div class="profile-services-grid profile-services-cards">
+                @foreach($services as $service)
+                  <article class="profile-service-card">
+                    @if($service->product_image)
+                      <img src="{{ asset($service->product_image) }}" alt="{{ $service->product_name }}">
+                    @else
+                      <div class="profile-service-card-placeholder" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="36" height="36"><path fill="currentColor" d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg>
+                      </div>
+                    @endif
+                    <div class="profile-service-card-body">
+                      <h4>{{ $service->product_name }}</h4>
+                      @if($service->product_desc)
+                        <p>{{ Str::limit($service->product_desc, 90) }}</p>
+                      @endif
+                    </div>
+                  </article>
+                @endforeach
+              </div>
+            </div>
+          @else
+            <p class="profile-empty-note">No services listed yet.</p>
+          @endif
+        </div>
+      </div>
+
+      <div class="profile-tab-pane" data-pane="product">
+        <div class="profile-card">
+          <h3>Products <span class="profile-section-count">({{ $products->count() }})</span></h3>
+          @if($products->isNotEmpty())
+            <div class="profile-items-scroll profile-items-scroll--cards {{ $products->count() > 16 ? 'is-scrollable' : '' }}">
+              <div class="profile-services-grid profile-services-cards">
+                @foreach($products as $product)
+                  <article class="profile-service-card">
+                    @if($product->product_image)
+                      <img src="{{ asset($product->product_image) }}" alt="{{ $product->product_name }}">
+                    @else
+                      <div class="profile-service-card-placeholder" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="36" height="36"><path fill="currentColor" d="M20 6H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 13H4V8h16v11zM8 10h2v2H8v-2zm0 4h2v2H8v-2zm4-4h2v2h-2v-2zm0 4h2v2h-2v-2zm4-4h2v2h-2v-2zm0 4h2v2h-2v-2z"/></svg>
+                      </div>
+                    @endif
+                    <div class="profile-service-card-body">
+                      <h4>{{ $product->product_name }}</h4>
+                      @if($product->product_desc)
+                        <p>{{ Str::limit($product->product_desc, 90) }}</p>
+                      @endif
+                    </div>
+                  </article>
+                @endforeach
+              </div>
+            </div>
+          @else
+            <p class="profile-empty-note">No products listed yet.</p>
           @endif
         </div>
       </div>
@@ -331,12 +446,42 @@
             <div class="profile-items-scroll {{ $documents->count() > 16 ? 'is-scrollable' : '' }}">
               <ul class="profile-doc-list">
                 @foreach($documents as $document)
-                  <li>
-                    <span>
+                  @php $docType = $document->file_type ?: 'pdf'; @endphp
+                  <li class="profile-doc-item profile-doc-item--{{ $docType }}">
+                    <div class="profile-doc-icon" aria-hidden="true">
+                      @if($docType === 'excel')
+                        <svg viewBox="0 0 48 48" width="40" height="40" focusable="false">
+                          <path fill="#1D6F42" d="M10 4h20l10 10v30a4 4 0 0 1-4 4H10a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4z"/>
+                          <path fill="#ffffff" opacity=".25" d="M30 4v10h10"/>
+                          <text x="24" y="32" text-anchor="middle" fill="#fff" font-size="11" font-weight="700" font-family="Arial,sans-serif">XLS</text>
+                        </svg>
+                      @elseif($docType === 'word')
+                        <svg viewBox="0 0 48 48" width="40" height="40" focusable="false">
+                          <path fill="#2B579A" d="M10 4h20l10 10v30a4 4 0 0 1-4 4H10a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4z"/>
+                          <path fill="#ffffff" opacity=".25" d="M30 4v10h10"/>
+                          <text x="24" y="32" text-anchor="middle" fill="#fff" font-size="14" font-weight="700" font-family="Arial,sans-serif">W</text>
+                        </svg>
+                      @elseif($docType === 'image')
+                        <svg viewBox="0 0 48 48" width="40" height="40" focusable="false">
+                          <path fill="#0D8ABC" d="M10 4h20l10 10v30a4 4 0 0 1-4 4H10a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4z"/>
+                          <path fill="#ffffff" opacity=".25" d="M30 4v10h10"/>
+                          <rect x="12" y="18" width="24" height="18" rx="2" fill="#fff"/>
+                          <circle cx="18" cy="24" r="2.5" fill="#0D8ABC"/>
+                          <path fill="#0D8ABC" d="M14 34l6-7 4 5 3-4 7 6H14z"/>
+                        </svg>
+                      @else
+                        <svg viewBox="0 0 48 48" width="40" height="40" focusable="false">
+                          <path fill="#E53935" d="M10 4h20l10 10v30a4 4 0 0 1-4 4H10a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4z"/>
+                          <path fill="#ffffff" opacity=".25" d="M30 4v10h10"/>
+                          <text x="24" y="32" text-anchor="middle" fill="#fff" font-size="11" font-weight="700" font-family="Arial,sans-serif">PDF</text>
+                        </svg>
+                      @endif
+                    </div>
+                    <div class="profile-doc-body">
                       <strong>{{ $document->title }}</strong>
                       <small>{{ $document->fileTypeLabel() }} &middot; {{ $document->created_at?->format('M j, Y') }}</small>
-                    </span>
-                    <a href="{{ asset($document->attachment) }}" target="_blank" rel="noopener">Download</a>
+                      <a href="{{ asset($document->attachment) }}" target="_blank" rel="noopener" download>Download</a>
+                    </div>
                   </li>
                 @endforeach
               </ul>
@@ -347,83 +492,126 @@
         </div>
       </div>
 
-      <div class="profile-tab-pane" data-pane="services">
-        <div class="profile-card">
-          <h3>Services <span class="profile-section-count">({{ $services->count() }})</span></h3>
-          @if($services->isNotEmpty())
-            <div class="profile-items-scroll profile-items-scroll--cards {{ $services->count() > 16 ? 'is-scrollable' : '' }}">
-              <div class="profile-services-grid profile-services-cards">
-                @foreach($services as $service)
-                  <article class="profile-service-card">
-                    @if($service->product_image)
-                      <img src="{{ asset($service->product_image) }}" alt="{{ $service->product_name }}">
-                    @else
-                      <div class="profile-service-card-placeholder" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" width="36" height="36"><path fill="currentColor" d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg>
-                      </div>
-                    @endif
-                    <div class="profile-service-card-body">
-                      <h4>{{ $service->product_name }}</h4>
-                      @if($service->product_desc)
-                        <p>{{ Str::limit($service->product_desc, 90) }}</p>
-                      @endif
-                    </div>
-                  </article>
-                @endforeach
-              </div>
-            </div>
-          @else
-            <p class="profile-empty-note">No services listed yet.</p>
-          @endif
-        </div>
-      </div>
-
-      <div class="profile-tab-pane" data-pane="product">
-        <div class="profile-card">
-          <h3>Products <span class="profile-section-count">({{ $products->count() }})</span></h3>
-          @if($products->isNotEmpty())
-            <div class="profile-items-scroll profile-items-scroll--cards {{ $products->count() > 16 ? 'is-scrollable' : '' }}">
-              <div class="profile-services-grid profile-services-cards">
-                @foreach($products as $product)
-                  <article class="profile-service-card">
-                    @if($product->product_image)
-                      <img src="{{ asset($product->product_image) }}" alt="{{ $product->product_name }}">
-                    @else
-                      <div class="profile-service-card-placeholder" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" width="36" height="36"><path fill="currentColor" d="M20 6H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 13H4V8h16v11zM8 10h2v2H8v-2zm0 4h2v2H8v-2zm4-4h2v2h-2v-2zm0 4h2v2h-2v-2zm4-4h2v2h-2v-2zm0 4h2v2h-2v-2z"/></svg>
-                      </div>
-                    @endif
-                    <div class="profile-service-card-body">
-                      <h4>{{ $product->product_name }}</h4>
-                      @if($product->product_desc)
-                        <p>{{ Str::limit($product->product_desc, 90) }}</p>
-                      @endif
-                    </div>
-                  </article>
-                @endforeach
-              </div>
-            </div>
-          @else
-            <p class="profile-empty-note">No products listed yet.</p>
-          @endif
-        </div>
-      </div>
-
       <div class="profile-tab-pane" data-pane="videos">
         <div class="profile-card">
           <h3>Videos <span class="profile-section-count">({{ $videos->count() }})</span></h3>
           @if($videos->isNotEmpty())
-            <div class="profile-items-scroll {{ $videos->count() > 16 ? 'is-scrollable' : '' }}">
-              <div class="profile-projects-grid">
+            <div class="profile-items-scroll profile-items-scroll--cards {{ $videos->count() > 9 ? 'is-scrollable' : '' }}">
+              <div class="profile-videos-grid">
                 @foreach($videos as $video)
                   @php
-                    $videoUrl = str_starts_with($video->link, 'http') ? $video->link : asset($video->link);
+                    $rawLink = trim((string) $video->link);
+                    $isExternal = str_starts_with($rawLink, 'http');
+                    $embedUrl = null;
+                    $openUrl = null;
+                    $uploadedUrl = null;
+                    $sourceLabel = 'Uploaded video';
+                    $thumbUrl = null;
+                    $youtubeId = null;
+
+                    if (! empty($video->thumbnail)) {
+                      $thumbUrl = asset($video->thumbnail);
+                    }
+
+                    if ($isExternal) {
+                      if (preg_match('~(?:youtube\.com/watch\?v=|youtube\.com/embed/|youtu\.be/)([A-Za-z0-9_-]{6,})~', $rawLink, $m)) {
+                        $youtubeId = $m[1];
+                        $embedUrl = 'https://www.youtube.com/embed/' . $youtubeId;
+                        $sourceLabel = 'YouTube';
+                      } elseif (preg_match('~youtube\.com/shorts/([A-Za-z0-9_-]{6,})~', $rawLink, $m)) {
+                        $youtubeId = $m[1];
+                        $embedUrl = 'https://www.youtube.com/embed/' . $youtubeId;
+                        $sourceLabel = 'YouTube Shorts';
+                      } elseif (preg_match('~vimeo\.com/(?:video/)?(\d+)~', $rawLink, $m)) {
+                        $embedUrl = 'https://player.vimeo.com/video/' . $m[1];
+                        $sourceLabel = 'Vimeo';
+                      } elseif (preg_match('~instagram\.com/(reel|reels|p)/([A-Za-z0-9_-]+)~', $rawLink, $m)) {
+                        $igType = $m[1] === 'p' ? 'p' : 'reel';
+                        $openUrl = 'https://www.instagram.com/' . $igType . '/' . $m[2] . '/';
+                        $sourceLabel = $igType === 'p' ? 'Instagram Post' : 'Instagram Reel';
+                      } elseif (preg_match('~(?:facebook\.com|fb\.watch).*(?:reel|videos?)/|/reel/~i', $rawLink)) {
+                        $openUrl = $rawLink;
+                        $sourceLabel = 'Facebook Reel';
+                      } elseif (preg_match('~(?:tiktok\.com/|vm\.tiktok\.com/)~i', $rawLink)) {
+                        $openUrl = $rawLink;
+                        $sourceLabel = 'TikTok';
+                      } elseif (preg_match('~(?:reel|reels)~i', $rawLink)) {
+                        $openUrl = $rawLink;
+                        $sourceLabel = 'Reel';
+                      } else {
+                        $openUrl = $rawLink;
+                        $sourceLabel = 'External video';
+                      }
+                    } else {
+                      $uploadedUrl = asset($rawLink);
+                    }
+
+                    if (! $thumbUrl && $youtubeId) {
+                      $thumbUrl = 'https://img.youtube.com/vi/' . $youtubeId . '/hqdefault.jpg';
+                    }
+
+                    if (! $thumbUrl && $openUrl) {
+                      $fallbackThumbs = [
+                        asset('front/assets/images/movie-1.jpg'),
+                        asset('front/assets/images/movie-2.jpg'),
+                        asset('front/assets/images/movie-3.jpg'),
+                        asset('front/assets/images/movie-4.jpg'),
+                        asset('front/assets/images/movie-5.jpg'),
+                        asset('front/assets/images/movie-6.jpg'),
+                      ];
+                      $thumbUrl = $fallbackThumbs[$loop->index % count($fallbackThumbs)];
+                    }
                   @endphp
-                  <div class="profile-project-item">
-                    <strong>{{ $video->title }}</strong>
-                    <span>{{ str_starts_with($video->link, 'http') ? 'External link' : 'Uploaded video' }} &middot; {{ \Carbon\Carbon::parse($video->created_at)->format('M j, Y') }}</span>
-                    <a href="{{ $videoUrl }}" target="_blank" rel="noopener" class="profile-inline-link">Watch</a>
-                  </div>
+                  <article class="profile-video-card">
+                    <div class="profile-video-frame">
+                      @if($embedUrl)
+                        <iframe
+                          src="{{ $embedUrl }}"
+                          title="{{ $video->title }}"
+                          loading="lazy"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          allowfullscreen
+                          referrerpolicy="strict-origin-when-cross-origin"
+                        ></iframe>
+                      @elseif($openUrl)
+                        <a
+                          href="{{ $openUrl }}"
+                          class="profile-video-open"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label="Open {{ $video->title }}"
+                        >
+                          @if($thumbUrl)
+                            <img src="{{ $thumbUrl }}" alt="{{ $video->title }}" class="profile-video-thumb" loading="lazy">
+                          @endif
+                          <span class="profile-video-open-play" aria-hidden="true">▶</span>
+                          <span class="profile-video-open-text">Open {{ $sourceLabel }}</span>
+                        </a>
+                      @else
+                        @if($thumbUrl)
+                          <a href="{{ $uploadedUrl }}" class="profile-video-open" target="_blank" rel="noopener noreferrer" aria-label="Play {{ $video->title }}">
+                            <img src="{{ $thumbUrl }}" alt="{{ $video->title }}" class="profile-video-thumb" loading="lazy">
+                            <span class="profile-video-open-play" aria-hidden="true">▶</span>
+                          </a>
+                        @else
+                          <iframe
+                            src="{{ $uploadedUrl }}"
+                            title="{{ $video->title }}"
+                            loading="lazy"
+                            allow="autoplay; fullscreen; encrypted-media"
+                            allowfullscreen
+                          ></iframe>
+                        @endif
+                      @endif
+                    </div>
+                    <div class="profile-video-body">
+                      <strong>{{ $video->title }}</strong>
+                      <small>{{ $sourceLabel }} &middot; {{ \Carbon\Carbon::parse($video->created_at)->format('M j, Y') }}</small>
+                      @if($openUrl)
+                        <a href="{{ $openUrl }}" target="_blank" rel="noopener noreferrer" class="profile-inline-link">Open link</a>
+                      @endif
+                    </div>
+                  </article>
                 @endforeach
               </div>
             </div>
@@ -489,7 +677,7 @@
 
       <div class="profile-tab-pane" data-pane="offers" id="offers">
         <div class="profile-card">
-          <h3>My Advertisement / Offerings <span class="profile-section-count">({{ $offers->count() }})</span></h3>
+          <h3>My Advertisement <span class="profile-section-count">({{ $offers->count() }})</span></h3>
           @if($offers->isNotEmpty())
             <div class="profile-items-scroll profile-items-scroll--cards {{ $offers->count() > 8 ? 'is-scrollable' : '' }}">
               <div class="profile-offers-grid">

@@ -42,6 +42,15 @@
             <p class="user-form-hint">Supported: MP4, AVI, MOV, WMV, WebM @if($planLimits['max_video_size_mb'] > 0) · Max size: {{ $planLimits['max_video_size_mb'] }}MB @endif</p>
             <small class="user-field-error">@error('video_file'){{ $message }}@enderror</small>
           </div>
+          <div class="user-form-group" data-field="thumbnail">
+            <label>Thumbnail Image</label>
+            <div class="user-upload-zone">
+              <input type="file" name="thumbnail" accept="image/*" hidden>
+              <p>Upload thumbnail image (recommended for Instagram / reel links)</p>
+            </div>
+            <p class="user-form-hint">JPG, PNG, WEBP · Max 2MB</p>
+            <small class="user-field-error">@error('thumbnail'){{ $message }}@enderror</small>
+          </div>
           <div class="user-form-actions">
             <a href="{{ route('front.users.videos') }}" class="user-btn user-btn-default">Cancel</a>
             <button type="submit" class="user-btn user-btn-primary">Upload Video</button>

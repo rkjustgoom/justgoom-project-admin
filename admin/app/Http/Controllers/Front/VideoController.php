@@ -66,11 +66,14 @@ class VideoController extends Controller
             'title' => 'required|string|max:200',
             'link' => 'required_without:video_file|nullable|url|max:500',
             'video_file' => "required_without:link|nullable|file|max:{$maxSize}|mimes:mp4,avi,mov,wmv,webm",
+            'thumbnail' => 'nullable|image|max:2048',
         ], [
             'title.required' => 'Video title is required.',
             'link.required_without' => 'Provide an external video URL or upload a video file.',
             'video_file.required_without' => 'Provide an external video URL or upload a video file.',
             'link.url' => 'Enter a valid video URL.',
+            'thumbnail.image' => 'Thumbnail must be an image file.',
+            'thumbnail.max' => 'Thumbnail image may not be greater than 2MB.',
         ]);
 
         $link = $validated['link'] ?? null;
@@ -79,10 +82,16 @@ class VideoController extends Controller
             $link = $this->uploadFile($request->file('video_file'), 'videos');
         }
 
+        $thumbnail = null;
+        if ($request->hasFile('thumbnail')) {
+            $thumbnail = $this->uploadFile($request->file('thumbnail'), 'videos/thumbnails');
+        }
+
         DB::table('videos')->insert([
             'user_id' => $user->id,
             'title' => $validated['title'],
             'link' => $link,
+            'thumbnail' => $thumbnail,
             'status' => 1,
             'created_at' => now(),
             'updated_at' => now(),
@@ -103,6 +112,10 @@ class VideoController extends Controller
 
         if ($video->link && ! str_starts_with($video->link, 'http')) {
             $this->deleteFile($video->link);
+        }
+
+        if (! empty($video->thumbnail)) {
+            $this->deleteFile($video->thumbnail);
         }
 
         DB::table('videos')
