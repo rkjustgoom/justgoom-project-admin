@@ -286,7 +286,6 @@
       </div>
 
       @php
-        $offerThemes = ['purple', 'amber', 'teal', 'navy'];
         $fallbackOfferImages = [
           asset('front/assets/images/cat-business.jpg'),
           asset('front/assets/images/cat-food.jpg'),
@@ -295,13 +294,15 @@
         ];
         $defaultLogo = asset('front/assets/images/justgoom-logo.png');
 
-        $offerCards = collect($runningOffers ?? [])->map(function ($offer, $index) use ($offerThemes, $fallbackOfferImages, $defaultLogo) {
+        $offerCards = collect($runningOffers ?? [])->map(function ($offer, $index) use ($fallbackOfferImages, $defaultLogo) {
           $company = $offer->user?->companyProfile;
           $companyName = $company?->company_name
             ?: trim(($offer->user?->fname ?? '') . ' ' . ($offer->user?->lname ?? ''))
             ?: 'JustGoom Member';
           $companyTagLine = $company?->tagline ?: $companyName;
-          $offerUrl = route('front.profile.show', $company->slug) . '#offers';
+          $offerUrl = $company?->slug
+            ? route('front.profile.show', $company->slug) . '#offers'
+            : route('front.all-profiles');
 
           return [
             'title' => $offer->title,
@@ -312,7 +313,6 @@
             'image' => $offer->banner_image
               ? asset($offer->banner_image)
               : $fallbackOfferImages[$index % count($fallbackOfferImages)],
-            'theme' => $offerThemes[$index % count($offerThemes)],
             'company' => $companyName,
           ];
         })->values();
@@ -320,31 +320,34 @@
 
       @if($offerCards->isNotEmpty())
       <div class="offers-promo-carousel" id="offersCarousel">
-        <button type="button" class="offers-promo-nav prev" aria-label="Previous offer">‹</button>
+        <button type="button" class="offers-promo-nav prev" aria-label="Previous offer">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
         <div class="offers-promo-track" id="offersTrack">
           @foreach($offerCards as $offer)
-          <a href="{{ $offer['offer_url'] }}" class="offer-promo-card offer-promo-{{ $offer['theme'] }}" @if(\Illuminate\Support\Str::startsWith($offer['offer_url'], ['http://', 'https://'])) target="_blank" rel="noopener" @endif>
-            <img class="offer-promo-bg" src="{{ $offer['image'] }}" alt="" loading="lazy" aria-hidden="true">
-            <div class="offer-promo-overlay" aria-hidden="true"></div>
-            <div class="offer-promo-wave" aria-hidden="true"></div>
-            <div class="offer-promo-content">
-              <div class="offer-promo-top">
-                <div class="offer-promo-text">
-                  <h3 class="offer-promo-discount" title="{{ $offer['title'] }}">{{ \Illuminate\Support\Str::limit($offer['title'], 50) }}</h3>
-                  <p class="offer-promo-tagline" title="{{ $offer['tagline'] }}">{{ \Illuminate\Support\Str::limit($offer['tagline'], 70) }}</p>
-                </div>
-                <div class="offer-promo-brand">
-                  <div class="offer-promo-logo">
-                    <img src="{{ $offer['logo'] }}" alt="{{ $offer['logo_alt'] }}">
-                  </div>
-                </div>
-              </div>
+          <a href="{{ $offer['offer_url'] }}" class="offer-promo-card" @if(\Illuminate\Support\Str::startsWith($offer['offer_url'], ['http://', 'https://'])) target="_blank" rel="noopener" @endif>
+            <div class="offer-promo-media">
+              <img class="offer-promo-bg" src="{{ $offer['image'] }}" alt="" loading="lazy" aria-hidden="true">
+              <div class="offer-promo-overlay" aria-hidden="true"></div>
+              <span class="offer-promo-ad">Sponsored</span>
             </div>
-            <span class="offer-promo-ad">Ad</span>
+            <div class="offer-promo-content">
+              <div class="offer-promo-brand">
+                <div class="offer-promo-logo">
+                  <img src="{{ $offer['logo'] }}" alt="{{ $offer['logo_alt'] }}">
+                </div>
+                <span class="offer-promo-company" title="{{ $offer['company'] }}">{{ \Illuminate\Support\Str::limit($offer['company'], 28) }}</span>
+              </div>
+              <h3 class="offer-promo-title" title="{{ $offer['title'] }}">{{ \Illuminate\Support\Str::limit($offer['title'], 55) }}</h3>
+              <p class="offer-promo-tagline" title="{{ $offer['tagline'] }}">{{ \Illuminate\Support\Str::limit($offer['tagline'], 80) }}</p>
+              <span class="offer-promo-cta">View offer <span aria-hidden="true">→</span></span>
+            </div>
           </a>
           @endforeach
         </div>
-        <button type="button" class="offers-promo-nav next" aria-label="Next offer">›</button>
+        <button type="button" class="offers-promo-nav next" aria-label="Next offer">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
         <div class="offers-promo-dots" id="offersDots" role="tablist" aria-label="Offer slides"></div>
       </div>
       @else

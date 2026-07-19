@@ -2,6 +2,7 @@
 document.addEventListener('DOMContentLoaded', function() {
   initBannerCarousel();
   initOffersCarousel();
+  initBlogCarousel();
 });
 
 function initBannerCarousel() {
@@ -96,6 +97,134 @@ function initOffersCarousel() {
     dots.forEach(function(dot, i) {
       dot.classList.toggle('active', i === current);
     });
+    cards.forEach(function(card, i) {
+      card.classList.toggle('is-active', i === current);
+    });
+  }
+
+  function goTo(index, smooth) {
+    var step = cardStep();
+    current = ((index % cards.length) + cards.length) % cards.length;
+    track.scrollTo({
+      left: current * step,
+      behavior: smooth === false ? 'auto' : 'smooth'
+    });
+    updateDots(current);
+  }
+
+  function next() {
+    goTo(current >= cards.length - 1 ? 0 : current + 1);
+  }
+  function prev() {
+    goTo(current <= 0 ? cards.length - 1 : current - 1);
+  }
+
+  function stopAuto() {
+    clearInterval(timer);
+    clearTimeout(resumeTimer);
+  }
+
+  function startAuto() {
+    clearInterval(timer);
+    timer = setInterval(function() {
+      if (document.hidden || isPointerDown) return;
+      next();
+    }, 4000);
+  }
+
+  function restartAuto() {
+    stopAuto();
+    startAuto();
+  }
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', function() {
+      prev();
+      restartAuto();
+    });
+  }
+  if (nextBtn) {
+    nextBtn.addEventListener('click', function() {
+      next();
+      restartAuto();
+    });
+  }
+
+  track.addEventListener('scroll', function() {
+    updateDots(nearestIndex());
+  }, { passive: true });
+
+  track.addEventListener('pointerdown', function() {
+    isPointerDown = true;
+    stopAuto();
+  });
+
+  track.addEventListener('pointerup', function() {
+    isPointerDown = false;
+    updateDots(nearestIndex());
+    resumeTimer = setTimeout(startAuto, 2500);
+  });
+
+  track.addEventListener('mouseenter', stopAuto);
+  track.addEventListener('mouseleave', function() {
+    isPointerDown = false;
+    startAuto();
+  });
+
+  window.addEventListener('resize', function() {
+    goTo(current, false);
+  });
+
+  updateDots(0);
+  startAuto();
+}
+
+function initBlogCarousel() {
+  var carousel = document.getElementById('blogCarousel');
+  var track = document.getElementById('blogTrack');
+  if (!carousel || !track) return;
+
+  var cards = track.querySelectorAll('.blog-card');
+  var dotsContainer = document.getElementById('blogDots');
+  var prevBtn = carousel.querySelector('.blog-carousel-nav.prev');
+  var nextBtn = carousel.querySelector('.blog-carousel-nav.next');
+  var current = 0;
+  var timer;
+  var resumeTimer;
+  var isPointerDown = false;
+
+  if (!cards.length || !dotsContainer) return;
+
+  cards.forEach(function(_, i) {
+    var dot = document.createElement('button');
+    dot.type = 'button';
+    dot.className = 'blog-carousel-dot' + (i === 0 ? ' active' : '');
+    dot.setAttribute('aria-label', 'Go to article ' + (i + 1));
+    dot.addEventListener('click', function() {
+      goTo(i);
+      restartAuto();
+    });
+    dotsContainer.appendChild(dot);
+  });
+
+  var dots = dotsContainer.querySelectorAll('.blog-carousel-dot');
+
+  function cardStep() {
+    if (cards.length < 2) return cards[0].offsetWidth;
+    return cards[1].offsetLeft - cards[0].offsetLeft;
+  }
+
+  function nearestIndex() {
+    var step = cardStep();
+    if (!step) return 0;
+    return Math.round(track.scrollLeft / step);
+  }
+
+  function updateDots(index) {
+    current = ((index % cards.length) + cards.length) % cards.length;
+    dots.forEach(function(dot, i) {
+      dot.classList.toggle('active', i === current);
+    });
   }
 
   function goTo(index, smooth) {
@@ -121,7 +250,7 @@ function initOffersCarousel() {
     timer = setInterval(function() {
       if (document.hidden || isPointerDown) return;
       next();
-    }, 4000);
+    }, 4500);
   }
 
   function restartAuto() {
