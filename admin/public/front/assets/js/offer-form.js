@@ -101,6 +101,9 @@
       } else if (title.length > 200) {
         setError('title', 'Offer title must not exceed 200 characters.');
         valid = false;
+      } else if (!/^[a-zA-Z0-9]+(?:\s[a-zA-Z0-9]+)*$/.test(title)) {
+        setError('title', 'Offer title may only contain letters, numbers, and spaces.');
+        valid = false;
       } else {
         clearError('title');
       }

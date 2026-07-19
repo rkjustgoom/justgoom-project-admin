@@ -70,6 +70,9 @@
       } else if (title.value.trim().length > 200) {
         setError(titleGroup, 'Project title must not exceed 200 characters.');
         valid = false;
+      } else if (!/^[a-zA-Z0-9]+(?:\s[a-zA-Z0-9]+)*$/.test(title.value.trim())) {
+        setError(titleGroup, 'Project title may only contain letters, numbers, and spaces.');
+        valid = false;
       } else {
         clearError(titleGroup);
       }

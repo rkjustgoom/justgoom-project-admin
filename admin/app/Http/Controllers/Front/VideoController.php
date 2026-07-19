@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Front;
 
 use App\Http\Controllers\Controller;
 use App\Models\UserPlan;
+use App\Support\SafeText;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -63,12 +64,13 @@ class VideoController extends Controller
             : 51200;
 
         $validated = $request->validate([
-            'title' => 'required|string|max:200',
+            'title' => ['required', 'string', 'max:200', SafeText::titleRule()],
             'link' => 'required_without:video_file|nullable|url|max:500',
             'video_file' => "required_without:link|nullable|file|max:{$maxSize}|mimes:mp4,avi,mov,wmv,webm",
             'thumbnail' => 'nullable|image|max:2048',
         ], [
             'title.required' => 'Video title is required.',
+            'title.regex' => SafeText::titleMessage('Video title'),
             'link.required_without' => 'Provide an external video URL or upload a video file.',
             'video_file.required_without' => 'Provide an external video URL or upload a video file.',
             'link.url' => 'Enter a valid video URL.',

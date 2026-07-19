@@ -2,20 +2,30 @@
 (function () {
   var ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
   var MAX_IMAGE_BYTES = 2 * 1024 * 1024;
+  var PERSON_PATTERN = /^[a-zA-Z]+(?:\s[a-zA-Z]+)*$/;
+  var TITLE_PATTERN = /^[a-zA-Z0-9]+(?:\s[a-zA-Z0-9]+)*$/;
 
   var rules = {
     name: {
-      test: function (v) { return v.trim().length > 0 && v.trim().length <= 150; },
+      test: function (v) {
+        var trimmed = v.trim();
+        return trimmed.length > 0 && trimmed.length <= 150 && PERSON_PATTERN.test(trimmed);
+      },
       message: function (v) {
         if (v.trim().length === 0) return 'Full name is required.';
-        return 'Full name must not exceed 150 characters.';
+        if (v.trim().length > 150) return 'Full name must not exceed 150 characters.';
+        return 'Full name may only contain letters and spaces.';
       }
     },
     designation: {
-      test: function (v) { return v.trim().length > 0 && v.trim().length <= 150; },
+      test: function (v) {
+        var trimmed = v.trim();
+        return trimmed.length > 0 && trimmed.length <= 150 && TITLE_PATTERN.test(trimmed);
+      },
       message: function (v) {
         if (v.trim().length === 0) return 'Designation / role is required.';
-        return 'Designation must not exceed 150 characters.';
+        if (v.trim().length > 150) return 'Designation must not exceed 150 characters.';
+        return 'Designation may only contain letters, numbers, and spaces.';
       }
     },
     email: {
@@ -39,13 +49,14 @@
         if (!select || select.value !== '__other__') return true;
         var other = document.getElementById('teamDepartmentOther');
         var v = other ? other.value.trim() : '';
-        return v.length > 0 && v.length <= 100;
+        return v.length > 0 && v.length <= 100 && TITLE_PATTERN.test(v);
       },
       message: function () {
         var other = document.getElementById('teamDepartmentOther');
         var v = other ? other.value.trim() : '';
         if (v.length === 0) return 'Please enter a department name when Other is selected.';
-        return 'Department name must not exceed 100 characters.';
+        if (v.length > 100) return 'Department name must not exceed 100 characters.';
+        return 'Department name may only contain letters, numbers, and spaces.';
       }
     },
     short_info: {

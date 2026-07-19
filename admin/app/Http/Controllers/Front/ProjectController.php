@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Front;
 
 use App\Http\Controllers\Controller;
 use App\Models\Project;
+use App\Support\SafeText;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
@@ -39,13 +40,14 @@ class ProjectController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:200',
+            'title' => ['required', 'string', 'max:200', SafeText::titleRule()],
             'description' => 'nullable|string|max:2000',
             'type' => 'required|in:document,video,link',
             'file' => 'required_unless:type,link|nullable|file|max:102400|mimes:pdf,doc,docx,ppt,pptx,mp4,avi,mov,wmv',
             'external_url' => 'required_if:type,link|nullable|url|max:500',
             'thumbnail' => 'nullable|image|max:2048',
         ], [
+            'title.regex' => SafeText::titleMessage('Project title'),
             'file.max' => 'The uploaded file may not be greater than 100MB.',
             'file.mimes' => 'Allowed file types: PDF, DOC, DOCX, PPT, PPTX, MP4, AVI, MOV, WMV.',
         ]);
@@ -87,13 +89,14 @@ class ProjectController extends Controller
         $this->authorizeProject($project);
 
         $validated = $request->validate([
-            'title' => 'required|string|max:200',
+            'title' => ['required', 'string', 'max:200', SafeText::titleRule()],
             'description' => 'nullable|string|max:2000',
             'type' => 'required|in:document,video,link',
             'file' => 'nullable|file|max:102400|mimes:pdf,doc,docx,ppt,pptx,mp4,avi,mov,wmv',
             'external_url' => 'nullable|url|max:500',
             'thumbnail' => 'nullable|image|max:2048',
         ], [
+            'title.regex' => SafeText::titleMessage('Project title'),
             'file.max' => 'The uploaded file may not be greater than 100MB.',
             'file.mimes' => 'Allowed file types: PDF, DOC, DOCX, PPT, PPTX, MP4, AVI, MOV, WMV.',
         ]);

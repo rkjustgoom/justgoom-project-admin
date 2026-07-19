@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Front;
 
+use App\Support\SafeText;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -48,15 +49,15 @@ class UpdateProfileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'company_name' => ['required', 'string', 'min:4', 'max:200', 'regex:/^[a-zA-Z0-9]+(?:\s[a-zA-Z0-9]+)*$/'],
+            'company_name' => ['required', 'string', 'min:4', 'max:200', SafeText::titleRule()],
             'category_id' => ['required', 'exists:categories,id'],
             'sub_category_id' => ['required', 'exists:sub_categories,id'],
-            'tagline' => ['nullable', 'string', 'max:255'],
-            'business_desc' => ['required', 'string', 'min:20', 'max:5000', 'regex:/^[a-zA-Z0-9\s\-\'&.,()]+$/'],
+            'tagline' => ['nullable', 'string', 'max:255', SafeText::titleRule()],
+            'business_desc' => ['required', 'string', 'min:20', 'max:5000'],
             'phone' => ['required', 'digits:10'],
             'email' => ['required', 'email', 'max:191', Rule::unique('users', 'email')->ignore($this->user()->id)],
             'address' => ['nullable', 'string', 'max:500'],
-            'city' => ['required', 'string', 'max:100'],
+            'city' => ['required', 'string', 'max:100', SafeText::titleRule()],
             'social_website' => ['nullable', 'url', 'max:255'],
             'social_subwebsite' => ['nullable', 'url', 'max:255'],
             'social_facebook' => ['nullable', 'url', 'max:255'],
@@ -77,12 +78,13 @@ class UpdateProfileRequest extends FormRequest
             'company_name.required' => 'Business name is required.',
             'company_name.min' => 'Business name must be at least 4 characters.',
             'company_name.max' => 'Business name must not exceed 200 characters.',
-            'company_name.regex' => 'Business name may only contain letters, numbers, and spaces.',
+            'company_name.regex' => SafeText::titleMessage('Business name'),
             'category_id.required' => 'Please select a category.',
             'category_id.exists' => 'Selected category is invalid.',
             'sub_category_id.required' => 'Please select a sub category.',
             'sub_category_id.exists' => 'Selected sub category is invalid.',
             'tagline.max' => 'Tagline must not exceed 255 characters.',
+            'tagline.regex' => SafeText::titleMessage('Tagline'),
             'business_desc.required' => 'About business is required.',
             'business_desc.min' => 'About business must be at least 20 characters.',
             'business_desc.max' => 'About business must not exceed 5000 characters.',
@@ -95,6 +97,7 @@ class UpdateProfileRequest extends FormRequest
             'address.max' => 'Address must not exceed 500 characters.',
             'city.required' => 'City is required.',
             'city.max' => 'City must not exceed 100 characters.',
+            'city.regex' => SafeText::titleMessage('City'),
             'social_website.url' => 'Enter a valid website URL.',
             'social_subwebsite.url' => 'Enter a valid sub website URL.',
             'social_facebook.url' => 'Enter a valid Facebook URL.',

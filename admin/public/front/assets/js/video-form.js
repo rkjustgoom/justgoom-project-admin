@@ -47,6 +47,12 @@
       if (!title.trim()) {
         setError('title', 'Video title is required.');
         valid = false;
+      } else if (title.trim().length > 200) {
+        setError('title', 'Video title must not exceed 200 characters.');
+        valid = false;
+      } else if (!/^[a-zA-Z0-9]+(?:\s[a-zA-Z0-9]+)*$/.test(title.trim())) {
+        setError('title', 'Video title may only contain letters, numbers, and spaces.');
+        valid = false;
       } else {
         clearError('title');
       }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Front;
 
+use App\Support\SafeText;
 use Illuminate\Foundation\Http\FormRequest;
 
 class TeamMemberRequest extends FormRequest
@@ -35,13 +36,13 @@ class TeamMemberRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:150'],
-            'designation' => ['required', 'string', 'max:150'],
+            'name' => ['required', 'string', 'max:150', SafeText::personRule()],
+            'designation' => ['required', 'string', 'max:150', SafeText::titleRule()],
             'email' => ['required', 'email', 'max:191'],
             'phone' => ['required', 'digits:10'],
             'department_select' => ['nullable', 'string'],
-            'department_other' => ['nullable', 'required_if:department_select,__other__', 'string', 'max:100'],
-            'department' => ['nullable', 'string', 'max:100'],
+            'department_other' => ['nullable', 'required_if:department_select,__other__', 'string', 'max:100', SafeText::titleRule()],
+            'department' => ['nullable', 'string', 'max:100', SafeText::titleRule()],
             'status' => ['required', 'in:0,1'],
             'short_info' => ['nullable', 'string', 'max:5000'],
             'is_primary' => ['nullable', 'boolean'],
@@ -54,8 +55,10 @@ class TeamMemberRequest extends FormRequest
         return [
             'name.required' => 'Full name is required.',
             'name.max' => 'Full name must not exceed 150 characters.',
+            'name.regex' => SafeText::personMessage('Full name'),
             'designation.required' => 'Designation / role is required.',
             'designation.max' => 'Designation must not exceed 150 characters.',
+            'designation.regex' => SafeText::titleMessage('Designation'),
             'email.required' => 'Email is required.',
             'email.email' => 'Enter a valid email address.',
             'email.max' => 'Email must not exceed 191 characters.',
@@ -63,6 +66,8 @@ class TeamMemberRequest extends FormRequest
             'phone.digits' => 'Phone number must be exactly 10 digits.',
             'department_other.required_if' => 'Please enter a department name when Other is selected.',
             'department_other.max' => 'Department name must not exceed 100 characters.',
+            'department_other.regex' => SafeText::titleMessage('Department name'),
+            'department.regex' => SafeText::titleMessage('Department name'),
             'short_info.max' => 'Bio must not exceed 5000 characters.',
             'image.image' => 'Profile photo must be JPG, PNG, WebP, or GIF.',
             'image.mimes' => 'Profile photo must be JPG, PNG, WebP, or GIF.',

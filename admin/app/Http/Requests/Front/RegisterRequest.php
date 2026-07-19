@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Front;
 
 use App\Models\CompanyProfile;
+use App\Support\SafeText;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -44,7 +45,7 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'company_name' => ['required', 'string', 'min:4', 'max:200', 'regex:/^[a-zA-Z0-9]+(?:\s[a-zA-Z0-9]+)*$/'],
+            'company_name' => ['required', 'string', 'min:4', 'max:200', SafeText::titleRule()],
             'company_slug' => [
                 'required',
                 'string',
@@ -61,8 +62,8 @@ class RegisterRequest extends FormRequest
                         ->where('status', 1);
                 }),
             ],
-            'fname' => ['required', 'string', 'min:2', 'max:100', 'regex:/^[a-zA-Z]+(?:\s[a-zA-Z]+)*$/'],
-            'lname' => ['required', 'string', 'min:2', 'max:100', 'regex:/^[a-zA-Z]+(?:\s[a-zA-Z]+)*$/'],
+            'fname' => ['required', 'string', 'min:2', 'max:100', SafeText::personRule()],
+            'lname' => ['required', 'string', 'min:2', 'max:100', SafeText::personRule()],
             'mobile' => ['required', 'digits:10'],
             'email' => ['required', 'email', 'max:191', 'unique:users,email'],
             'password' => ['required', 'string', 'min:6', 'max:255', 'confirmed'],
@@ -76,7 +77,7 @@ class RegisterRequest extends FormRequest
         return [
             'company_name.required' => 'Company name is required.',
             'company_name.min' => 'Company name must be at least 4 characters.',
-            'company_name.regex' => 'Company name may only contain letters, numbers, and spaces.',
+            'company_name.regex' => SafeText::titleMessage('Company name'),
             'company_slug.required' => 'Company slug is required.',
             'company_slug.regex' => 'Slug may only contain lowercase letters, numbers, and hyphens.',
             'company_slug.unique' => 'This company slug is already taken. Please choose another.',
@@ -86,10 +87,10 @@ class RegisterRequest extends FormRequest
             'sub_category_id.exists' => 'Selected sub category does not belong to the chosen category.',
             'fname.required' => 'First name is required.',
             'fname.min' => 'First name must be at least 2 characters.',
-            'fname.regex' => 'First name may only contain letters and spaces.',
+            'fname.regex' => SafeText::personMessage('First name'),
             'lname.required' => 'Last name is required.',
             'lname.min' => 'Last name must be at least 2 characters.',
-            'lname.regex' => 'Last name may only contain letters and spaces.',
+            'lname.regex' => SafeText::personMessage('Last name'),
             'mobile.required' => 'Mobile number is required.',
             'mobile.digits' => 'Mobile number must be exactly 10 digits.',
             'email.required' => 'Email address is required.',

@@ -41,11 +41,15 @@
 
   var rules = {
     title: {
-      test: function (v) { return v.trim().length >= 2 && v.trim().length <= 200; },
+      test: function (v) {
+        var trimmed = v.trim();
+        return trimmed.length >= 2 && trimmed.length <= 200 && /^[a-zA-Z0-9]+(?:\s[a-zA-Z0-9]+)*$/.test(trimmed);
+      },
       message: function (v) {
         if (v.trim().length === 0) return 'Document name is required.';
         if (v.trim().length < 2) return 'Document name must be at least 2 characters.';
-        return 'Document name must not exceed 200 characters.';
+        if (v.trim().length > 200) return 'Document name must not exceed 200 characters.';
+        return 'Document name may only contain letters, numbers, and spaces.';
       }
     },
     file_type: {

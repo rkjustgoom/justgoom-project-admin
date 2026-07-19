@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Front;
 
+use App\Support\SafeText;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
 
@@ -32,7 +33,7 @@ class DocumentRequest extends FormRequest
         }
 
         return [
-            'title' => ['required', 'string', 'min:2', 'max:200', 'regex:/^[a-zA-Z0-9\s\-\'&.,()]+$/'],
+            'title' => ['required', 'string', 'min:2', 'max:200', SafeText::titleRule()],
             'file_type' => ['required', 'in:pdf,word,excel,image'],
             'attachment' => $attachmentRules,
         ];
@@ -64,6 +65,7 @@ class DocumentRequest extends FormRequest
             'title.required' => 'Document name is required.',
             'title.min' => 'Document name must be at least 2 characters.',
             'title.max' => 'Document name must not exceed 200 characters.',
+            'title.regex' => SafeText::titleMessage('Document name'),
             'file_type.required' => 'Document type is required.',
             'file_type.in' => 'Please select a valid document type.',
             'attachment.required' => 'Please upload a document file.',

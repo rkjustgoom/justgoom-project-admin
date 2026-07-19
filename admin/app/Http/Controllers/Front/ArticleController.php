@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Front;
 
 use App\Http\Controllers\Controller;
 use App\Models\Article;
+use App\Support\SafeText;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
@@ -91,10 +92,12 @@ class ArticleController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:300',
+            'title' => ['required', 'string', 'max:300', SafeText::titleRule()],
             'body' => 'required|string',
             'featured_image' => 'nullable|image|max:2048',
             'status' => 'required|in:draft,published',
+        ], [
+            'title.regex' => SafeText::titleMessage('Article title'),
         ]);
 
         $article = new Article();
@@ -130,10 +133,12 @@ class ArticleController extends Controller
         $this->authorizeArticle($article);
 
         $validated = $request->validate([
-            'title' => 'required|string|max:300',
+            'title' => ['required', 'string', 'max:300', SafeText::titleRule()],
             'body' => 'required|string',
             'featured_image' => 'nullable|image|max:2048',
             'status' => 'required|in:draft,published',
+        ], [
+            'title.regex' => SafeText::titleMessage('Article title'),
         ]);
 
         $article->title = $validated['title'];

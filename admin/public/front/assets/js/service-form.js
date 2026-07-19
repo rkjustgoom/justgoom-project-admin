@@ -3,7 +3,7 @@
   var ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
   var MAX_IMAGE_BYTES = 2 * 1024 * 1024;
   var PRICE_PATTERN = /^\d+(\.\d{1,2})?\+?$/;
-  var PRODUCT_NAME_PATTERN = /^[a-zA-Z0-9\s\-'&.,()]+$/;
+  var TITLE_PATTERN = /^[a-zA-Z0-9]+(?:\s[a-zA-Z0-9]+)*$/;
 
   var rules = {
     type: {
@@ -13,13 +13,13 @@
     product_name: {
       test: function (v) {
         var trimmed = v.trim();
-        return trimmed.length >= 2 && trimmed.length <= 200 && PRODUCT_NAME_PATTERN.test(trimmed);
+        return trimmed.length >= 2 && trimmed.length <= 200 && TITLE_PATTERN.test(trimmed);
       },
       message: function (v) {
         if (v.trim().length === 0) return 'Service name is required.';
         if (v.trim().length < 2) return 'Service name must be at least 2 characters.';
         if (v.trim().length > 200) return 'Service name must not exceed 200 characters.';
-        return 'Name must not contain special characters (e.g. +, @, #).';
+        return 'Service name may only contain letters, numbers, and spaces.';
       }
     },
     product_desc: {

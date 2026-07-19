@@ -49,6 +49,9 @@
       } else if (title.trim().length > 300) {
         setError('title', 'Article title must not exceed 300 characters.');
         valid = false;
+      } else if (!/^[a-zA-Z0-9]+(?:\s[a-zA-Z0-9]+)*$/.test(title.trim())) {
+        setError('title', 'Article title may only contain letters, numbers, and spaces.');
+        valid = false;
       } else {
         clearError('title');
       }

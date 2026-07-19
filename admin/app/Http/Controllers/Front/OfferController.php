@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Front;
 
 use App\Http\Controllers\Controller;
 use App\Models\Offer;
+use App\Support\SafeText;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
@@ -38,12 +39,14 @@ class OfferController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:200',
+            'title' => ['required', 'string', 'max:200', SafeText::titleRule()],
             'description' => 'nullable|string|max:2000',
             'banner_image' => 'nullable|image|max:2048',
             'link_url' => 'nullable|url|max:500',
             'start_date' => 'required|date|after_or_equal:today',
             'end_date' => 'required|date|after_or_equal:start_date',
+        ], [
+            'title.regex' => SafeText::titleMessage('Offer title'),
         ]);
 
         $offer = new Offer();
@@ -77,13 +80,15 @@ class OfferController extends Controller
         $this->authorizeOffer($offer);
 
         $validated = $request->validate([
-            'title' => 'required|string|max:200',
+            'title' => ['required', 'string', 'max:200', SafeText::titleRule()],
             'description' => 'nullable|string|max:2000',
             'banner_image' => 'nullable|image|max:2048',
             'link_url' => 'nullable|url|max:500',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'status' => 'required|in:active,paused',
+        ], [
+            'title.regex' => SafeText::titleMessage('Offer title'),
         ]);
 
         $offer->title = $validated['title'];

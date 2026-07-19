@@ -25,8 +25,15 @@
       message: function () { return 'Please select a sub category.'; }
     },
     tagline: {
-      test: function (v) { return v.length <= 255; },
-      message: function () { return 'Tagline must not exceed 255 characters.'; }
+      test: function (v) {
+        var trimmed = v.trim();
+        if (trimmed.length === 0) return true;
+        return trimmed.length <= 255 && /^[a-zA-Z0-9]+(?:\s[a-zA-Z0-9]+)*$/.test(trimmed);
+      },
+      message: function (v) {
+        if (v.trim().length > 255) return 'Tagline must not exceed 255 characters.';
+        return 'Tagline may only contain letters, numbers, and spaces.';
+      }
     },
     business_desc: {
       test: function (v) { return v.trim().length >= 20 && v.trim().length <= 5000; },
@@ -56,10 +63,14 @@
       message: function () { return 'Address must not exceed 500 characters.'; }
     },
     city: {
-      test: function (v) { return v.trim().length > 0 && v.trim().length <= 100; },
+      test: function (v) {
+        var trimmed = v.trim();
+        return trimmed.length > 0 && trimmed.length <= 100 && /^[a-zA-Z0-9]+(?:\s[a-zA-Z0-9]+)*$/.test(trimmed);
+      },
       message: function (v) {
         if (v.trim().length === 0) return 'City is required.';
-        return 'City must not exceed 100 characters.';
+        if (v.trim().length > 100) return 'City must not exceed 100 characters.';
+        return 'City may only contain letters, numbers, and spaces.';
       }
     },
     logo: {
