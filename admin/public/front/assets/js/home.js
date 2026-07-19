@@ -237,8 +237,12 @@ function initBlogCarousel() {
     updateDots(current);
   }
 
-  function next() { goTo(current + 1); }
-  function prev() { goTo(current - 1); }
+  function next() {
+    goTo(current >= cards.length - 1 ? 0 : current + 1);
+  }
+  function prev() {
+    goTo(current <= 0 ? cards.length - 1 : current - 1);
+  }
 
   function stopAuto() {
     clearInterval(timer);

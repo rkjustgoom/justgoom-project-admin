@@ -2628,7 +2628,7 @@ select.form-input:disabled {
 
 /* ── Globy-style Category Sectors ── */
 .globy-sectors-section {
-  background: var(--bg-white);
+  background: #f7f9fc;
   padding: 48px 0 56px;
   border-bottom: 1px solid var(--border);
 }
@@ -2694,15 +2694,18 @@ select.form-input:disabled {
   gap: 16px 24px;
 }
 .globy-sector-card {
-  background: var(--bg);
+  background: #fff;
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: 16px;
   padding: 20px 22px;
-  transition: border-color var(--transition), box-shadow var(--transition);
+  display: flex;
+  flex-direction: column;
+  transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
 }
 .globy-sector-card:hover {
-  border-color: rgba(26, 66, 138, 0.25);
-  box-shadow: var(--shadow-sm);
+  border-color: rgba(26, 66, 138, 0.22);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  transform: translateY(-2px);
 }
 .globy-sector-title {
   display: flex;
@@ -2747,9 +2750,49 @@ select.form-input:disabled {
   display: block;
 }
 .globy-sector-subs {
-  font-size: 13px;
-  line-height: 1.75;
-  color: var(--text-muted);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  align-content: flex-start;
+  gap: 8px;
+  margin-top: 2px;
+  flex: 1;
+}
+.globy-sub-chip {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  max-width: 100%;
+  height: 28px;
+  padding: 0 11px;
+  border-radius: 999px;
+  background: var(--primary-light);
+  border: 1px solid rgba(26, 66, 138, 0.1);
+  color: var(--primary-dark);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-sizing: border-box;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+.globy-sub-chip:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+  transform: translateY(-1px);
+}
+.globy-sub-chip-more {
+  background: var(--accent-light);
+  border-color: rgba(247, 148, 29, 0.22);
+  color: var(--accent-dark);
+}
+.globy-sub-chip-more:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
 }
 .globy-sub-link {
   color: var(--text-muted);
@@ -2981,28 +3024,36 @@ select.form-input:disabled {
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 10px;
+  margin-bottom: 14px;
 }
 .globy-sector-card-top .globy-sector-title { margin-bottom: 0; flex: 1; }
 .globy-sector-count {
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: 0.02em;
   color: var(--primary);
   background: var(--primary-light);
-  padding: 4px 10px;
+  padding: 5px 11px;
   border-radius: 50px;
   white-space: nowrap;
   flex-shrink: 0;
 }
 .globy-sector-view {
-  display: inline-block;
-  margin-top: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-light);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--accent);
-  transition: color var(--transition);
+  transition: color var(--transition), gap var(--transition);
 }
-.globy-sector-view:hover { color: var(--primary-dark); }
+.globy-sector-view:hover {
+  color: var(--primary-dark);
+  gap: 8px;
+}
 .categories-no-results {
   text-align: center;
   padding: 48px 20px;

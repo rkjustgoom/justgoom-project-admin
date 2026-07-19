@@ -205,28 +205,6 @@
     </div>
   </section>
 
-  <!-- Stats Bar -->
-  <div class="stats-bar">
-    <div class="container stats-grid">
-      <div class="stat-item">
-        <div class="stat-num">30+</div>
-        <div class="stat-label">Verified Businesses</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-num">24+</div>
-        <div class="stat-label">Business Sectors</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-num">50+</div>
-        <div class="stat-label">Cities Covered</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-num">10K+</div>
-        <div class="stat-label">Monthly Inquiries</div>
-      </div>
-    </div>
-  </div>
-
   <!-- Location Selection -->
   <section class="location-selector-section" id="location-selector">
     <div class="container">
@@ -366,6 +344,28 @@
     </div>
   </section>
 
+  <!-- Stats Bar -->
+  <div class="stats-bar">
+    <div class="container stats-grid">
+      <div class="stat-item">
+        <div class="stat-num">30+</div>
+        <div class="stat-label">Verified Businesses</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">24+</div>
+        <div class="stat-label">Business Sectors</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">50+</div>
+        <div class="stat-label">Cities Covered</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">10K+</div>
+        <div class="stat-label">Monthly Inquiries</div>
+      </div>
+    </div>
+  </div>
+
   <!-- Blog / Articles -->
   <section class="section home-blog-section" id="articles">
     <div class="container">
@@ -452,29 +452,34 @@
           ->values();
       @endphp
 
-      <div class="blog-grid">
-        @foreach($blogCards as $blog)
-        <a href="{{ $blog['url'] }}" class="blog-card blog-card-link">
-          <div class="blog-thumb">
-            <img src="{{ $blog['image'] }}" alt="{{ $blog['title'] }}" loading="lazy">
-          </div>
-          <div class="blog-body">
-            <div class="article-author-bar">
-              <span class="blog-author-avatar">{{ $blog['initials'] }}</span>
-              <div>
-                <strong>{{ $blog['author'] }}</strong>
+      <div class="blog-carousel" id="blogCarousel">
+        <button type="button" class="blog-carousel-nav prev" aria-label="Previous article">‹</button>
+        <div class="blog-carousel-track" id="blogTrack">
+          @foreach($blogCards as $blog)
+          <a href="{{ $blog['url'] }}" class="blog-card blog-card-link">
+            <div class="blog-thumb">
+              <img src="{{ $blog['image'] }}" alt="{{ $blog['title'] }}" loading="lazy">
+            </div>
+            <div class="blog-body">
+              <div class="article-author-bar">
+                <span class="blog-author-avatar">{{ $blog['initials'] }}</span>
+                <div>
+                  <strong>{{ $blog['author'] }}</strong>
+                </div>
+              </div>
+              <span class="blog-tag">{{ $blog['tag'] }}</span>
+              <h3>{{ $blog['title'] }}</h3>
+              <p>{{ $blog['excerpt'] }}</p>
+              <div class="blog-footer">
+                <span>{{ $blog['date'] }}</span>
+                <span>{{ $blog['read'] }}</span>
               </div>
             </div>
-            <span class="blog-tag">{{ $blog['tag'] }}</span>
-            <h3>{{ $blog['title'] }}</h3>
-            <p>{{ $blog['excerpt'] }}</p>
-            <div class="blog-footer">
-              <span>{{ $blog['date'] }}</span>
-              <span>{{ $blog['read'] }}</span>
-            </div>
-          </div>
-        </a>
-        @endforeach
+          </a>
+          @endforeach
+        </div>
+        <button type="button" class="blog-carousel-nav next" aria-label="Next article">›</button>
+        <div class="blog-carousel-dots" id="blogDots" role="tablist" aria-label="Article slides"></div>
       </div>
     </div>
   </section>

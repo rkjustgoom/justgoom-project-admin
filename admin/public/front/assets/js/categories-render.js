@@ -10,11 +10,19 @@ function renderCategoryIcon(sector) {
 }
 
 function renderSectorCard(sector) {
-  var subsHtml = sector.subs.map(function(sub, i) {
-    var sep = i < sector.subs.length - 1 ? '<span class="globy-sub-sep">, </span>' : '';
-    return '<a href="' + getCategoryProfileUrl(sub.slug) + '" class="globy-sub-link">' +
-      sub.name + '</a>' + sep;
+  var maxVisible = 6;
+  var visibleSubs = sector.subs.slice(0, maxVisible);
+  var remaining = sector.subs.length - visibleSubs.length;
+
+  var subsHtml = visibleSubs.map(function(sub) {
+    return '<a href="' + getCategoryProfileUrl(sub.slug) + '" class="globy-sub-chip" title="' + sub.name + '">' +
+      sub.name + '</a>';
   }).join('');
+
+  if (remaining > 0) {
+    subsHtml += '<a href="' + getCategoryProfileUrl(sector.slug) + '" class="globy-sub-chip globy-sub-chip-more">+' +
+      remaining + ' more</a>';
+  }
 
   return '<article class="globy-sector-card" data-sector-slug="' + sector.slug + '">' +
     '<div class="globy-sector-card-top">' +
