@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('company_profiles', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->unique()->constrained('users')->cascadeOnDelete();
+            $table->unsignedBigInteger('user_id')->unique();
             $table->string('company_name', 200);
             $table->string('slug')->unique();
             $table->string('owner_name', 200)->nullable();

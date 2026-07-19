@@ -16,7 +16,7 @@ return new class extends Migration
 
         Schema::create('states', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('country_id')->constrained('countries')->cascadeOnDelete();
+            $table->unsignedBigInteger('country_id');
             $table->string('name', 150);
 
             $table->index(['country_id', 'name']);
@@ -24,7 +24,7 @@ return new class extends Migration
 
         Schema::create('cities', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('state_id')->constrained('states')->cascadeOnDelete();
+            $table->unsignedBigInteger('state_id');
             $table->string('name', 150);
 
             $table->index(['state_id', 'name']);

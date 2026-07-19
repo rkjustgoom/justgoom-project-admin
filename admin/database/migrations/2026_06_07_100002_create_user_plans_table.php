@@ -10,8 +10,8 @@ return new class extends Migration
     {
         Schema::create('user_plans', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            $table->foreignId('plan_id')->constrained('plans')->restrictOnDelete();
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('plan_id');
             $table->date('purchase_date');
             $table->date('next_purchase_date');
 

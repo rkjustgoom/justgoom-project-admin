@@ -47,13 +47,13 @@ return new class extends Migration
 
         if (! Schema::hasColumn('users', 'category_id')) {
             Schema::table('users', function (Blueprint $table) {
-                $table->foreignId('category_id')->nullable()->constrained('categories')->restrictOnDelete();
+                $table->unsignedBigInteger('category_id')->nullable();
             });
         }
 
         if (! Schema::hasColumn('users', 'sub_category_id')) {
             Schema::table('users', function (Blueprint $table) {
-                $table->foreignId('sub_category_id')->nullable()->constrained('sub_categories')->restrictOnDelete();
+                $table->unsignedBigInteger('sub_category_id')->nullable();
             });
         }
 
@@ -94,10 +94,10 @@ return new class extends Migration
 
         Schema::table('users', function (Blueprint $table) {
             if (Schema::hasColumn('users', 'sub_category_id')) {
-                $table->dropConstrainedForeignId('sub_category_id');
+                $table->dropColumn('sub_category_id');
             }
             if (Schema::hasColumn('users', 'category_id')) {
-                $table->dropConstrainedForeignId('category_id');
+                $table->dropColumn('category_id');
             }
             $columns = ['fname', 'lname', 'phone', 'country', 'state', 'city', 'profile', 'status', 'referral_code'];
             foreach ($columns as $column) {

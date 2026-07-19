@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('sub_categories', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('category_id')->constrained('categories')->cascadeOnDelete();
+            $table->unsignedBigInteger('category_id');
             $table->string('name');
             $table->string('slug')->unique();
             $table->string('icon')->nullable();

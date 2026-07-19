@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('inquiries', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->unsignedBigInteger('user_id');
             $table->string('sender_name', 150);
             $table->string('sender_email')->nullable();
             $table->string('sender_phone', 20)->nullable();

@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('login_histories', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->unsignedBigInteger('user_id');
             $table->timestamp('login_at')->useCurrent();
             $table->timestamp('logout_at')->nullable();
             $table->string('ip_address', 45)->nullable();

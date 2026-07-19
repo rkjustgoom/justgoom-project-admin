@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('documents', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->unsignedBigInteger('user_id');
             $table->string('title', 200);
             $table->string('attachment');
             $table->enum('file_type', ['image', 'excel', 'word', 'pdf']);

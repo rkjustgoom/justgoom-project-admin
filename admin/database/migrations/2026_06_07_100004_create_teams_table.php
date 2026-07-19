@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('teams', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->unsignedBigInteger('user_id');
             $table->string('name', 150);
             $table->string('designation', 150)->nullable();
             $table->string('email')->nullable();
