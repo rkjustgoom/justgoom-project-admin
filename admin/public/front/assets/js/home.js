@@ -64,22 +64,31 @@ function initOffersCarousel() {
   var timer;
   var resumeTimer;
   var isPointerDown = false;
+  var isSingle = cards.length <= 1;
 
   if (!cards.length) return;
 
-  cards.forEach(function(_, i) {
-    var dot = document.createElement('button');
-    dot.type = 'button';
-    dot.className = 'offers-promo-dot' + (i === 0 ? ' active' : '');
-    dot.setAttribute('aria-label', 'Go to offer ' + (i + 1));
-    dot.addEventListener('click', function() {
-      goTo(i);
-      restartAuto();
-    });
-    dotsContainer.appendChild(dot);
-  });
+  carousel.classList.toggle('is-single', isSingle);
+  if (isSingle) {
+    cards[0].classList.add('is-active');
+    return;
+  }
 
-  var dots = dotsContainer.querySelectorAll('.offers-promo-dot');
+  if (dotsContainer) {
+    cards.forEach(function(_, i) {
+      var dot = document.createElement('button');
+      dot.type = 'button';
+      dot.className = 'offers-promo-dot' + (i === 0 ? ' active' : '');
+      dot.setAttribute('aria-label', 'Go to offer ' + (i + 1));
+      dot.addEventListener('click', function() {
+        goTo(i);
+        restartAuto();
+      });
+      dotsContainer.appendChild(dot);
+    });
+  }
+
+  var dots = dotsContainer ? dotsContainer.querySelectorAll('.offers-promo-dot') : [];
 
   function cardStep() {
     if (cards.length < 2) return cards[0].offsetWidth;
@@ -192,8 +201,14 @@ function initBlogCarousel() {
   var timer;
   var resumeTimer;
   var isPointerDown = false;
+  var isSingle = cards.length <= 1;
 
-  if (!cards.length || !dotsContainer) return;
+  if (!cards.length) return;
+
+  carousel.classList.toggle('is-single', isSingle);
+  if (isSingle) return;
+
+  if (!dotsContainer) return;
 
   cards.forEach(function(_, i) {
     var dot = document.createElement('button');
