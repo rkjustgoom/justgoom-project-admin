@@ -49,7 +49,12 @@ function initUserUpload() {
     input.addEventListener('change', function() {
       if (input.files.length) {
         var p = zone.querySelector('p');
-        if (p) p.innerHTML = '<strong>' + input.files[0].name + '</strong> selected';
+        if (!p) return;
+        if (input.files.length === 1) {
+          p.innerHTML = '<strong>' + input.files[0].name + '</strong> selected';
+        } else {
+          p.innerHTML = '<strong>' + input.files.length + ' files</strong> selected';
+        }
       }
     });
   });

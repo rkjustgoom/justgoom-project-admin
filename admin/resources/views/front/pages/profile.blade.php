@@ -79,7 +79,11 @@
           <!-- <button type="button" data-tab="activities">Activities</button> -->
           <button type="button" data-tab="services">Services</button>
           <button type="button" data-tab="product">Products</button>
-          <button type="button" data-tab="projects">Projects</button>
+          @php
+            $profileProjectSection = \App\Support\ProjectSection::forUser($user);
+            $profileProjectsTabLabel = \App\Support\ProjectSection::pluralLabel($profileProjectSection);
+          @endphp
+          <button type="button" data-tab="projects">{{ $profileProjectsTabLabel }}</button>
           <button type="button" data-tab="documents">Documents</button>
           <button type="button" data-tab="videos">Videos</button>
           <button type="button" data-tab="blog">My Blog</button>
@@ -370,71 +374,209 @@
 
       <div class="profile-tab-pane" data-pane="projects">
         <div class="profile-card">
-          <h3>Projects <span class="profile-section-count">({{ $projects->count() }})</span></h3>
-          @if($projects->isNotEmpty())
-            <div class="profile-items-scroll profile-items-scroll--cards {{ $projects->count() > 16 ? 'is-scrollable' : '' }}">
-              <div class="profile-services-grid profile-services-cards">
+          @php
+            $profileProjectSection = $profileProjectSection ?? \App\Support\ProjectSection::forUser($user);
+            $isRealEstateCategory = $profileProjectSection === \App\Support\ProjectSection::REAL_ESTATE;
+            $isEcommerceCategory = $profileProjectSection === \App\Support\ProjectSection::ECOMMERCE;
+          @endphp
+
+          @if($isRealEstateCategory)
+            <h3>{{ $profileProjectsTabLabel ?? 'Property Listings' }} <span class="profile-section-count">({{ $projects->count() }})</span></h3>
+            @if($projects->isNotEmpty())
+              <div class="profile-project-listings listing-cards {{ $projects->count() > 8 ? 'is-scrollable' : '' }}">
                 @foreach($projects as $project)
                   @php
-                    $typeLabel = match ($project->type) {
-                      'document' => 'Document',
-                      'video' => 'Video',
-                      'link' => 'External Link',
-                      default => ucfirst((string) $project->type),
-                    };
-                    $actionUrl = null;
-                    $actionLabel = null;
-                    $isDownload = false;
-                    if ($project->type === 'document' && $project->file_path) {
-                      $actionUrl = asset($project->file_path);
-                      $actionLabel = 'Download';
-                      $isDownload = true;
-                    } elseif ($project->type === 'video' && $project->file_path) {
-                      $actionUrl = asset($project->file_path);
-                      $actionLabel = 'Watch';
-                    } elseif ($project->type === 'link' && $project->external_url) {
-                      $actionUrl = $project->external_url;
-                      $actionLabel = 'Open Link';
-                    } elseif ($project->external_url) {
-                      $actionUrl = $project->external_url;
-                      $actionLabel = 'Open Link';
-                    } elseif ($project->file_path) {
-                      $actionUrl = asset($project->file_path);
-                      $actionLabel = 'View';
-                    }
+                    $listingImages = $project->mediaImages();
+                    $coverImage = $project->coverImage();
+                    $listingLocation = $project->metaValue('location') ?: $location;
+                    $photoCount = count($listingImages) ?: (int) ($project->metaValue('photo_count') ?: 0);
+                    $amenities = $project->amenitiesList();
+                    $actionUrl = $project->external_url ?: null;
+                    $actionLabel = $actionUrl ? 'View Details' : null;
+                    $postedLabel = trim(($profile->company_name ?: 'Owner').' · '.($project->created_at?->format('M j, Y') ?? ''));
                   @endphp
-                  <article class="profile-service-card">
-                    @if($project->thumbnail)
-                      <img src="{{ asset($project->thumbnail) }}" alt="{{ $project->title }}">
-                    @else
-                      <div class="profile-service-card-placeholder" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" width="36" height="36"><path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                  <article class="listing-card profile-project-listing">
+                    <div class="listing-card-img">
+                      @if($coverImage)
+                        <button
+                          type="button"
+                          class="listing-card-img-btn js-listing-gallery-open"
+                          data-title="{{ e($project->title) }}"
+                          data-images='@json(collect($listingImages)->map(fn ($img) => asset($img))->values())'
+                          aria-label="View photos of {{ $project->title }}"
+                        >
+                          <img src="{{ asset($coverImage) }}" alt="{{ $project->title }}">
+                        </button>
+                      @else
+                        <div class="profile-project-listing-placeholder" aria-hidden="true">
+                          <svg viewBox="0 0 24 24" width="48" height="48"><path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                        </div>
+                      @endif
+                      @if($photoCount > 0 && count($listingImages) > 0)
+                        <button
+                          type="button"
+                          class="photo-count js-listing-gallery-open"
+                          data-title="{{ e($project->title) }}"
+                          data-images='@json(collect($listingImages)->map(fn ($img) => asset($img))->values())'
+                          aria-label="View {{ $photoCount }} photos"
+                        >📷 {{ $photoCount }} Photos</button>
+                      @endif
+                    </div>
+                    <div class="listing-card-body">
+                      <div class="listing-card-top">
+                        <div>
+                          <h2>{{ $project->title }}</h2>
+                          @if($listingLocation)
+                            <p class="listing-location">📍 {{ $listingLocation }}</p>
+                          @endif
+                        </div>
+                        <div class="listing-price">
+                          <div class="amount">{{ $project->formattedPrice() ?: '—' }}</div>
+                          @if($project->metaValue('emi'))
+                            <div class="emi">{{ $project->metaValue('emi') }}</div>
+                          @endif
+                        </div>
                       </div>
-                    @endif
-                    <div class="profile-service-card-body">
-                      <h4>{{ $project->title }}</h4>
-                      @if($project->type)
-                        <span class="profile-project-type">{{ $typeLabel }}</span>
-                      @endif
+                      <div class="listing-specs">
+                        @if($project->metaValue('config'))
+                          <span class="spec-item">Config <strong>{{ $project->metaValue('config') }}</strong></span>
+                        @endif
+                        @if($project->metaValue('sale_type'))
+                          <span class="spec-item">Sale Type <strong>{{ $project->metaValue('sale_type') }}</strong></span>
+                        @endif
+                        @if($project->metaValue('possession'))
+                          <span class="spec-item">Possession <strong>{{ $project->metaValue('possession') }}</strong></span>
+                        @endif
+                        @if($project->metaValue('parking'))
+                          <span class="spec-item">Parking <strong>{{ $project->metaValue('parking') }}</strong></span>
+                        @endif
+                      </div>
                       @if($project->description)
-                        <p>{{ Str::limit(strip_tags($project->description), 90) }}</p>
+                        <p class="listing-desc">{{ Str::limit(strip_tags($project->description), 160) }}</p>
                       @endif
-                      @if($actionUrl)
-                        <a
-                          href="{{ $actionUrl }}"
-                          class="profile-inline-link"
-                          target="_blank"
-                          rel="noopener"
-                          @if($isDownload) download @endif
-                        >{{ $actionLabel }}</a>
+                      @if(count($amenities))
+                        <div class="listing-amenities">
+                          @foreach(array_slice($amenities, 0, 3) as $amenity)
+                            <span class="amenity-tag">{{ $amenity }}</span>
+                          @endforeach
+                          @if(count($amenities) > 3)
+                            <span class="amenity-tag">+more</span>
+                          @endif
+                        </div>
                       @endif
+                      <div class="listing-card-footer">
+                        <span class="listing-posted">by {{ $postedLabel }}</span>
+                        <div class="listing-actions">
+                          @if($actionUrl)
+                            <a href="{{ $actionUrl }}" class="btn btn-primary btn-sm" target="_blank" rel="noopener">{{ $actionLabel }}</a>
+                          @endif
+                          @if($profile->phone)
+                            <a href="tel:+91{{ preg_replace('/\D+/', '', $profile->phone) }}" class="btn btn-outline btn-sm">Contact</a>
+                          @endif
+                        </div>
+                      </div>
                     </div>
                   </article>
                 @endforeach
               </div>
-            </div>
+            @else
+              <p class="profile-empty-note">No property listings published yet.</p>
+            @endif
+          @elseif($isEcommerceCategory)
+            <h3>{{ $profileProjectsTabLabel ?? 'Products' }} <span class="profile-section-count">({{ $projects->count() }})</span></h3>
+            @if($projects->isNotEmpty())
+              <div class="profile-items-scroll profile-items-scroll--cards {{ $projects->count() > 16 ? 'is-scrollable' : '' }}">
+                <div class="profile-services-grid profile-services-cards">
+                  @foreach($projects as $project)
+                    <article class="profile-service-card">
+                      @if($project->thumbnail)
+                        <img src="{{ asset($project->thumbnail) }}" alt="{{ $project->title }}">
+                      @else
+                        <div class="profile-service-card-placeholder" aria-hidden="true">
+                          <svg viewBox="0 0 24 24" width="36" height="36"><path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                        </div>
+                      @endif
+                      <div class="profile-service-card-body">
+                        <h4>{{ $project->title }}</h4>
+                        @if($project->formattedPrice())
+                          <span class="profile-project-type">{{ $project->formattedPrice() }}</span>
+                        @endif
+                        @if($project->description)
+                          <p>{{ Str::limit(strip_tags($project->description), 90) }}</p>
+                        @endif
+                        @if($project->external_url)
+                          <a href="{{ $project->external_url }}" class="profile-inline-link" target="_blank" rel="noopener">View Product</a>
+                        @endif
+                      </div>
+                    </article>
+                  @endforeach
+                </div>
+              </div>
+            @else
+              <p class="profile-empty-note">No products published yet.</p>
+            @endif
           @else
-            <p class="profile-empty-note">No projects published yet.</p>
+            <h3>Projects <span class="profile-section-count">({{ $projects->count() }})</span></h3>
+            @if($projects->isNotEmpty())
+              <div class="profile-items-scroll profile-items-scroll--cards {{ $projects->count() > 16 ? 'is-scrollable' : '' }}">
+                <div class="profile-services-grid profile-services-cards">
+                  @foreach($projects as $project)
+                    @php
+                      $typeLabel = $project->typeLabel();
+                      $actionUrl = null;
+                      $actionLabel = null;
+                      $isDownload = false;
+                      if ($project->type === 'document' && $project->file_path) {
+                        $actionUrl = asset($project->file_path);
+                        $actionLabel = 'Download';
+                        $isDownload = true;
+                      } elseif ($project->type === 'video' && $project->file_path) {
+                        $actionUrl = asset($project->file_path);
+                        $actionLabel = 'Watch';
+                      } elseif ($project->type === 'link' && $project->external_url) {
+                        $actionUrl = $project->external_url;
+                        $actionLabel = 'Open Link';
+                      } elseif ($project->external_url) {
+                        $actionUrl = $project->external_url;
+                        $actionLabel = 'Open Link';
+                      } elseif ($project->file_path) {
+                        $actionUrl = asset($project->file_path);
+                        $actionLabel = 'View';
+                      }
+                    @endphp
+                    <article class="profile-service-card">
+                      @if($project->thumbnail)
+                        <img src="{{ asset($project->thumbnail) }}" alt="{{ $project->title }}">
+                      @else
+                        <div class="profile-service-card-placeholder" aria-hidden="true">
+                          <svg viewBox="0 0 24 24" width="36" height="36"><path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                        </div>
+                      @endif
+                      <div class="profile-service-card-body">
+                        <h4>{{ $project->title }}</h4>
+                        @if($project->type)
+                          <span class="profile-project-type">{{ $typeLabel }}</span>
+                        @endif
+                        @if($project->description)
+                          <p>{{ Str::limit(strip_tags($project->description), 90) }}</p>
+                        @endif
+                        @if($actionUrl)
+                          <a
+                            href="{{ $actionUrl }}"
+                            class="profile-inline-link"
+                            target="_blank"
+                            rel="noopener"
+                            @if($isDownload) download @endif
+                          >{{ $actionLabel }}</a>
+                        @endif
+                      </div>
+                    </article>
+                  @endforeach
+                </div>
+              </div>
+            @else
+              <p class="profile-empty-note">No projects published yet.</p>
+            @endif
           @endif
         </div>
       </div>
@@ -781,6 +923,25 @@
       </div>
     </div>
   </div>
+
+  <div class="listing-gallery-modal" id="listingGalleryModal" hidden>
+    <div class="listing-gallery-modal-backdrop js-listing-gallery-close"></div>
+    <div class="listing-gallery-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="listingGalleryTitle">
+      <div class="listing-gallery-modal-top">
+        <div>
+          <h3 id="listingGalleryTitle">Photos</h3>
+          <p id="listingGalleryCounter" class="listing-gallery-counter"></p>
+        </div>
+        <button type="button" class="listing-gallery-modal-close js-listing-gallery-close" aria-label="Close">&times;</button>
+      </div>
+      <div class="listing-gallery-stage">
+        <button type="button" class="listing-gallery-nav listing-gallery-prev" id="listingGalleryPrev" aria-label="Previous photo">‹</button>
+        <img id="listingGalleryMain" class="listing-gallery-main" alt="">
+        <button type="button" class="listing-gallery-nav listing-gallery-next" id="listingGalleryNext" aria-label="Next photo">›</button>
+      </div>
+      <div class="listing-gallery-thumbs" id="listingGalleryThumbs"></div>
+    </div>
+  </div>
 @endsection
 
 @push('scripts')
@@ -794,6 +955,105 @@
       if (tabBtn) tabBtn.click();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
+  });
+})();
+</script>
+<script>
+(function () {
+  var modal = document.getElementById('listingGalleryModal');
+  if (!modal) return;
+
+  var titleEl = document.getElementById('listingGalleryTitle');
+  var counterEl = document.getElementById('listingGalleryCounter');
+  var mainEl = document.getElementById('listingGalleryMain');
+  var thumbsEl = document.getElementById('listingGalleryThumbs');
+  var prevBtn = document.getElementById('listingGalleryPrev');
+  var nextBtn = document.getElementById('listingGalleryNext');
+  var images = [];
+  var index = 0;
+
+  function updateView() {
+    if (!images.length) return;
+    mainEl.src = images[index];
+    mainEl.alt = (titleEl.textContent || 'Photo') + ' ' + (index + 1);
+    counterEl.textContent = (index + 1) + ' / ' + images.length;
+    prevBtn.hidden = images.length < 2;
+    nextBtn.hidden = images.length < 2;
+    thumbsEl.querySelectorAll('button').forEach(function (btn, i) {
+      btn.classList.toggle('is-active', i === index);
+    });
+  }
+
+  function openGallery(btn) {
+    var raw = btn.getAttribute('data-images') || '[]';
+    try {
+      images = JSON.parse(raw);
+    } catch (e) {
+      images = [];
+    }
+    if (!Array.isArray(images) || !images.length) return;
+
+    titleEl.textContent = btn.getAttribute('data-title') || 'Photos';
+    index = 0;
+    thumbsEl.innerHTML = '';
+    images.forEach(function (src, i) {
+      var thumb = document.createElement('button');
+      thumb.type = 'button';
+      thumb.className = 'listing-gallery-thumb' + (i === 0 ? ' is-active' : '');
+      thumb.setAttribute('aria-label', 'Photo ' + (i + 1));
+      thumb.innerHTML = '<img src="' + src + '" alt="">';
+      thumb.addEventListener('click', function () {
+        index = i;
+        updateView();
+      });
+      thumbsEl.appendChild(thumb);
+    });
+
+    updateView();
+    modal.hidden = false;
+    document.body.classList.add('listing-gallery-open');
+  }
+
+  function closeGallery() {
+    modal.hidden = true;
+    document.body.classList.remove('listing-gallery-open');
+    images = [];
+    index = 0;
+    mainEl.removeAttribute('src');
+  }
+
+  function showPrev() {
+    if (images.length < 2) return;
+    index = (index - 1 + images.length) % images.length;
+    updateView();
+  }
+
+  function showNext() {
+    if (images.length < 2) return;
+    index = (index + 1) % images.length;
+    updateView();
+  }
+
+  document.querySelectorAll('.js-listing-gallery-open').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      openGallery(btn);
+    });
+  });
+
+  modal.querySelectorAll('.js-listing-gallery-close').forEach(function (el) {
+    el.addEventListener('click', closeGallery);
+  });
+
+  prevBtn.addEventListener('click', showPrev);
+  nextBtn.addEventListener('click', showNext);
+
+  document.addEventListener('keydown', function (e) {
+    if (modal.hidden) return;
+    if (e.key === 'Escape') closeGallery();
+    if (e.key === 'ArrowLeft') showPrev();
+    if (e.key === 'ArrowRight') showNext();
   });
 })();
 </script>

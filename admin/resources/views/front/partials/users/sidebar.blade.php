@@ -1,5 +1,9 @@
 @php
-  $sidebarUserPlan = auth()->user()
+  $sidebarUser = auth()->user();
+  if ($sidebarUser) {
+      $sidebarUser->loadMissing('category');
+  }
+  $sidebarUserPlan = $sidebarUser
     ? \App\Models\UserPlan::with('plan')
         ->where('user_id', auth()->id())
         ->where('next_purchase_date', '>=', now()->toDateString())
@@ -9,6 +13,17 @@
   $sidebarPlanName = $sidebarUserPlan?->plan?->name
     ?? \App\Models\Plan::where('name', 'Free')->value('name')
     ?? 'Free';
+  $sidebarProjectSection = \App\Support\ProjectSection::forUser($sidebarUser);
+  $sidebarProjectLabel = match ($sidebarProjectSection) {
+      \App\Support\ProjectSection::REAL_ESTATE => 'My Listings',
+      \App\Support\ProjectSection::ECOMMERCE => 'My Products',
+      default => 'My Projects',
+  };
+  $sidebarProjectIcon = match ($sidebarProjectSection) {
+      \App\Support\ProjectSection::REAL_ESTATE => '🏠',
+      \App\Support\ProjectSection::ECOMMERCE => '🛍️',
+      default => '📁',
+  };
 @endphp
 <button type="button" class="user-sidebar-close" aria-label="Close menu">✕</button>
 <div class="user-sidebar-brand">
@@ -33,7 +48,7 @@
     <a href="{{ route('front.users.team') }}" class="user-nav-link{{ request()->routeIs('front.users.team', 'front.users.team-*') ? ' active' : '' }}" data-nav="team"><span class="nav-icon">👥</span>My Team</a>
     <a href="{{ route('front.users.services') }}" class="user-nav-link{{ request()->routeIs('front.users.services', 'front.users.service-*') ? ' active' : '' }}" data-nav="services"><span class="nav-icon">💼</span>Services & Products</a>
     <a href="{{ route('front.users.documents') }}" class="user-nav-link{{ request()->routeIs('front.users.documents', 'front.users.document-*') ? ' active' : '' }}" data-nav="documents"><span class="nav-icon">📄</span>My Documents</a>
-    <a href="{{ route('front.users.projects') }}" class="user-nav-link{{ request()->routeIs('front.users.projects', 'front.users.project-*') ? ' active' : '' }}" data-nav="projects"><span class="nav-icon">📁</span>My Projects</a>
+    <a href="{{ route('front.users.projects') }}" class="user-nav-link{{ request()->routeIs('front.users.projects', 'front.users.project-*') ? ' active' : '' }}" data-nav="projects"><span class="nav-icon">{{ $sidebarProjectIcon }}</span>{{ $sidebarProjectLabel }}</a>
   </div>
   <div class="user-nav-section">
     <div class="user-nav-heading">Content & Marketing</div>

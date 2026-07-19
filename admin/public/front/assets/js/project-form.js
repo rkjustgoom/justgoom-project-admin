@@ -1,4 +1,4 @@
-/* JustGoom — Project form client validation */
+/* JustGoom — Project form client validation (section-aware) */
 (function () {
   function setError(group, message) {
     if (!group) return;
@@ -25,6 +25,8 @@
   document.addEventListener('DOMContentLoaded', function () {
     var form = document.querySelector('form[action*="projects"]');
     if (!form) return;
+
+    var sectionType = form.getAttribute('data-section-type') || 'normal';
 
     form.querySelectorAll('.user-field-error').forEach(function (el) {
       if (el.textContent.trim()) {
@@ -60,40 +62,86 @@
       var valid = true;
       var titleGroup = form.querySelector('[data-field="title"]');
       var title = form.querySelector('[name="title"]');
-      var type = typeSelect ? typeSelect.value : '';
-      var url = form.querySelector('[name="external_url"]');
-      var file = form.querySelector('[name="file"]');
 
       if (!title || !title.value.trim()) {
-        setError(titleGroup, 'Project title is required.');
+        setError(titleGroup, 'Title is required.');
         valid = false;
       } else if (title.value.trim().length > 200) {
-        setError(titleGroup, 'Project title must not exceed 200 characters.');
+        setError(titleGroup, 'Title must not exceed 200 characters.');
         valid = false;
       } else if (!/^[a-zA-Z0-9]+(?:\s[a-zA-Z0-9]+)*$/.test(title.value.trim())) {
-        setError(titleGroup, 'Project title may only contain letters, numbers, and spaces.');
+        setError(titleGroup, 'Title may only contain letters, numbers, and spaces.');
         valid = false;
       } else {
         clearError(titleGroup);
       }
 
-      if (type === 'link') {
-        var urlVal = url ? url.value.trim() : '';
-        if (!urlVal) {
-          setError(form.querySelector('[data-field="external_url"]'), 'External video URL is required for link projects.');
-          valid = false;
-        } else if (!/^https?:\/\/.+/i.test(urlVal)) {
-          setError(form.querySelector('[data-field="external_url"]'), 'Enter a valid URL starting with http:// or https://.');
-          valid = false;
-        } else {
-          clearError(form.querySelector('[data-field="external_url"]'));
+      if (sectionType === 'normal') {
+        var type = typeSelect ? typeSelect.value : '';
+        var url = form.querySelector('[name="external_url"]');
+        var file = form.querySelector('[name="file"]');
+
+        if (type === 'link') {
+          var urlVal = url ? url.value.trim() : '';
+          if (!urlVal) {
+            setError(form.querySelector('[data-field="external_url"]'), 'External video URL is required for link projects.');
+            valid = false;
+          } else if (!/^https?:\/\/.+/i.test(urlVal)) {
+            setError(form.querySelector('[data-field="external_url"]'), 'Enter a valid URL starting with http:// or https://.');
+            valid = false;
+          } else {
+            clearError(form.querySelector('[data-field="external_url"]'));
+          }
+        } else if (!isEdit) {
+          if (!file || !file.files || !file.files.length) {
+            setError(form.querySelector('[data-field="file"]'), 'Please upload a project file.');
+            valid = false;
+          } else {
+            clearError(form.querySelector('[data-field="file"]'));
+          }
         }
-      } else if (!isEdit) {
-        if (!file || !file.files || !file.files.length) {
-          setError(form.querySelector('[data-field="file"]'), 'Please upload a project file.');
+      }
+
+      if (sectionType === 'real_estate' || sectionType === 'ecommerce') {
+        var price = form.querySelector('[name="price"]');
+        if (!price || !price.value.trim()) {
+          setError(form.querySelector('[data-field="price"]'), 'Price is required.');
           valid = false;
         } else {
-          clearError(form.querySelector('[data-field="file"]'));
+          clearError(form.querySelector('[data-field="price"]'));
+        }
+
+        if (sectionType === 'real_estate') {
+          var location = form.querySelector('[name="location"]');
+          if (!location || !location.value.trim()) {
+            setError(form.querySelector('[data-field="location"]'), 'Location is required.');
+            valid = false;
+          } else {
+            clearError(form.querySelector('[data-field="location"]'));
+          }
+        }
+
+        if (!isEdit) {
+          if (sectionType === 'real_estate') {
+            var mediaInput = form.querySelector('[name="media[]"]');
+            if (!mediaInput || !mediaInput.files || !mediaInput.files.length) {
+              setError(form.querySelector('[data-field="media"]'), 'Please upload at least one listing image.');
+              valid = false;
+            } else if (mediaInput.files.length > 12) {
+              setError(form.querySelector('[data-field="media"]'), 'You may upload a maximum of 12 images.');
+              valid = false;
+            } else {
+              clearError(form.querySelector('[data-field="media"]'));
+            }
+          } else {
+            var thumb = form.querySelector('[name="thumbnail"]');
+            if (!thumb || !thumb.files || !thumb.files.length) {
+              setError(form.querySelector('[data-field="thumbnail"]'), 'Please upload an image.');
+              valid = false;
+            } else {
+              clearError(form.querySelector('[data-field="thumbnail"]'));
+            }
+          }
         }
       }
 
