@@ -14,22 +14,24 @@ class ProfileService
 {
     public function update(User $user, array $data): User
     {
-        $subCategory = SubCategory::query()
-            ->where('id', $data['sub_category_id'])
+        $subCategoryIds = array_values(array_unique(array_map('strval', $data['sub_category_id'] ?? [])));
+
+        $validCount = SubCategory::query()
+            ->whereIn('id', $subCategoryIds)
             ->where('category_id', $data['category_id'])
             ->where('status', 1)
-            ->first();
+            ->count();
 
-        if (! $subCategory) {
+        if ($subCategoryIds === [] || $validCount !== count($subCategoryIds)) {
             throw ValidationException::withMessages([
                 'sub_category_id' => 'Selected sub category does not belong to the chosen category.',
             ]);
         }
 
-        return DB::transaction(function () use ($user, $data) {
+        return DB::transaction(function () use ($user, $data, $subCategoryIds) {
             $user->update([
                 'category_id' => $data['category_id'],
-                'sub_category_id' => $data['sub_category_id'],
+                'sub_category_id' => implode(',', $subCategoryIds),
                 'phone' => $data['phone'],
                 'email' => $data['email'],
                 'city' => $data['city'],
@@ -66,7 +68,7 @@ class ProfileService
 
             $profile->update($profileData);
 
-            return $user->fresh(['companyProfile', 'category', 'subCategory', 'userPlans.plan']);
+            return $user->fresh(['companyProfile', 'category', 'userPlans.plan']);
         });
     }
 

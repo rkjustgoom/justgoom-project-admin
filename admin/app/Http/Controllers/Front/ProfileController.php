@@ -17,7 +17,7 @@ class ProfileController extends Controller
 
     public function show(Request $request)
     {
-        $user = $request->user()->load(['companyProfile', 'category', 'subCategory', 'userPlans.plan']);
+        $user = $request->user()->load(['companyProfile', 'category', 'userPlans.plan']);
         $profile = $user->companyProfile;
 
         abort_unless($profile, 404);

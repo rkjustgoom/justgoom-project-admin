@@ -30,6 +30,112 @@
   .auth-register-page .phone-prefix { padding: 7px 8px; font-size: 13px; }
   .auth-register-page .auth-terms { margin-bottom: 12px; }
   .auth-register-page .auth-switch { margin-top: 12px; }
+
+  /* Multiselect (reference style) */
+  .ms-wrap { position: relative; }
+  .ms-wrap.is-disabled { opacity: 0.65; pointer-events: none; }
+  .ms-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    height: 38px;
+    padding: 7px 10px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: #fff;
+    color: #64748b;
+    font-size: 13px;
+    text-align: left;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: border-color var(--transition);
+  }
+  .ms-trigger:hover { border-color: #cbd5e1; }
+  .ms-wrap.is-open .ms-trigger,
+  .ms-trigger:focus {
+    outline: none;
+    border-color: var(--primary);
+  }
+  .ms-trigger.is-invalid { border-color: #c0392b; }
+  .ms-trigger-text {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .ms-wrap.has-value .ms-trigger-text {
+    color: var(--text);
+    font-weight: 500;
+  }
+  .ms-chevron {
+    flex-shrink: 0;
+    width: 10px;
+    height: 10px;
+    border-right: 1.5px solid #94a3b8;
+    border-bottom: 1.5px solid #94a3b8;
+    transform: rotate(45deg) translateY(-2px);
+    transition: transform 0.2s ease;
+  }
+  .ms-wrap.is-open .ms-chevron {
+    transform: rotate(225deg) translateY(-1px);
+  }
+  .ms-dropdown {
+    position: absolute;
+    z-index: 50;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+    overflow: hidden;
+  }
+  .ms-dropdown[hidden] { display: none; }
+  .ms-list {
+    max-height: 220px;
+    overflow-y: auto;
+    padding: 6px 0;
+  }
+  .ms-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    margin: 0;
+    cursor: pointer;
+    font-size: 13px;
+    color: #475569;
+    user-select: none;
+  }
+  .ms-option:hover { background: #f8fafc; }
+  .ms-option-all {
+    font-weight: 600;
+    color: #334155;
+    border-bottom: 1px solid #f1f5f9;
+    margin-bottom: 2px;
+    padding-bottom: 11px;
+  }
+  .ms-option input {
+    width: 13px;
+    height: 13px;
+    margin: 0 10px 0 0;
+    accent-color: var(--primary);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .ms-option span {
+    line-height: 1.35;
+  }
+  .ms-empty {
+    padding: 14px;
+    font-size: 13px;
+    color: #94a3b8;
+    text-align: center;
+  }
 </style>
 @endpush
 
@@ -77,11 +183,21 @@
               <span class="field-error">@error('category_id'){{ $message }}@enderror</span>
             </div>
             <div class="form-group" data-field="sub_category_id">
-              <label for="regSubCategory">Sub Category <span class="req">*</span></label>
-              <select id="regSubCategory" name="sub_category_id" class="form-input @error('sub_category_id') is-invalid @enderror">
-                <option value="">Select sub category</option>
-              </select>
-              <span class="field-error">@error('sub_category_id'){{ $message }}@enderror</span>
+              <label>Sub Category <span class="req">*</span></label>
+              <div class="ms-wrap @error('sub_category_id') is-invalid @enderror @error('sub_category_id.*') is-invalid @enderror" id="regSubCategoryWrap">
+                <button type="button" class="ms-trigger @error('sub_category_id') is-invalid @enderror @error('sub_category_id.*') is-invalid @enderror" id="regSubCategoryTrigger" aria-haspopup="listbox" aria-expanded="false">
+                  <span class="ms-trigger-text" id="regSubCategoryText">None selected</span>
+                  <span class="ms-chevron" aria-hidden="true"></span>
+                </button>
+                <div class="ms-dropdown" id="regSubCategoryDropdown" hidden>
+                  <div class="ms-list" id="regSubCategory" role="listbox" aria-multiselectable="true"></div>
+                </div>
+                <div id="regSubCategoryInputs" aria-hidden="true"></div>
+              </div>
+              <span class="field-error">
+                @error('sub_category_id'){{ $message }}@enderror
+                @error('sub_category_id.*'){{ $message }}@enderror
+              </span>
             </div>
           </div>
           <div class="auth-form-row">

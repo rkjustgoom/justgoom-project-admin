@@ -54,8 +54,8 @@ class RegisterRequest extends FormRequest
                 Rule::unique('company_profiles', 'slug'),
             ],
             'category_id' => ['required', 'integer', 'exists:categories,id'],
-            'sub_category_id' => [
-                'required',
+            'sub_category_id' => ['required', 'array', 'min:1'],
+            'sub_category_id.*' => [
                 'integer',
                 Rule::exists('sub_categories', 'id')->where(function ($query) {
                     $query->where('category_id', $this->input('category_id'))
@@ -83,8 +83,9 @@ class RegisterRequest extends FormRequest
             'company_slug.unique' => 'This company slug is already taken. Please choose another.',
             'category_id.required' => 'Please select a category.',
             'category_id.exists' => 'Selected category is invalid.',
-            'sub_category_id.required' => 'Please select a sub category.',
-            'sub_category_id.exists' => 'Selected sub category does not belong to the chosen category.',
+            'sub_category_id.required' => 'Please select at least one sub category.',
+            'sub_category_id.min' => 'Please select at least one sub category.',
+            'sub_category_id.*.exists' => 'Selected sub category does not belong to the chosen category.',
             'fname.required' => 'First name is required.',
             'fname.min' => 'First name must be at least 2 characters.',
             'fname.regex' => SafeText::personMessage('First name'),
@@ -110,6 +111,7 @@ class RegisterRequest extends FormRequest
             'company_slug' => 'company slug',
             'category_id' => 'category',
             'sub_category_id' => 'sub category',
+            'sub_category_id.*' => 'sub category',
             'fname' => 'first name',
             'lname' => 'last name',
             'mobile' => 'mobile number',

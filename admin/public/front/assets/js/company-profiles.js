@@ -388,7 +388,8 @@ function cardMatchesSectorAndSub(card, sectorSlug, subSlug) {
   var cardSubSlug = (card.dataset.subcategorySlug || '').toLowerCase();
 
   if (subSlug && subSlug !== 'all') {
-    return cardSubSlug === subSlug.toLowerCase();
+    var selected = subSlug.toLowerCase();
+    return cardSubSlug.split(',').map(function (s) { return s.trim(); }).indexOf(selected) !== -1;
   }
   if (sectorSlug && sectorSlug !== 'all') {
     return cardCatSlug === sectorSlug.toLowerCase();

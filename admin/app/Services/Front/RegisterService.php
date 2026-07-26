@@ -22,7 +22,9 @@ class RegisterService
                 'password' => Hash::make($data['password']),
                 'phone' => $data['mobile'],
                 'category_id' => $data['category_id'],
-                'sub_category_id' => $data['sub_category_id'],
+                'sub_category_id' => is_array($data['sub_category_id'] ?? null)
+                    ? implode(',', array_unique(array_map('strval', $data['sub_category_id'])))
+                    : ($data['sub_category_id'] ?? null),
                 'status' => 1,
                 'email_verified_at' => null,
                 'referral_code' => $data['referral_code'] ?? $this->uniqueReferralCode(),

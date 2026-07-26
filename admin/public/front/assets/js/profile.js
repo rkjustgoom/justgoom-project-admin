@@ -1,4 +1,4 @@
-/* JustGoom — Profile form: sub-categories, logo preview, client validation */
+/* JustGoom — Profile form: multi sub-categories, logo preview, client validation */
 (function () {
   var ALLOWED_LOGO_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
   var MAX_LOGO_BYTES = 2 * 1024 * 1024;
@@ -22,7 +22,7 @@
     },
     sub_category_id: {
       test: function (v) { return v.length > 0; },
-      message: function () { return 'Please select a sub category.'; }
+      message: function () { return 'Please select at least one sub category.'; }
     },
     tagline: {
       test: function (v) {
@@ -93,10 +93,22 @@
     return value.replace(/\D+/g, '').slice(0, 10);
   }
 
+  function normalizeSelectedIds(selectedSubId) {
+    if (Array.isArray(selectedSubId)) {
+      return selectedSubId.map(String).filter(Boolean);
+    }
+    if (selectedSubId) {
+      return String(selectedSubId).split(',').map(function (id) {
+        return id.trim();
+      }).filter(Boolean);
+    }
+    return [];
+  }
+
   function setFieldError(form, fieldName, message) {
     var group = form.querySelector('[data-field="' + fieldName + '"]');
     if (!group) return;
-    group.querySelectorAll('input:not([type="hidden"]):not([readonly]), select, textarea').forEach(function (el) {
+    group.querySelectorAll('input:not([type="hidden"]):not([readonly]), select, textarea, .ms-trigger').forEach(function (el) {
       el.classList.add('is-invalid');
     });
     var errorEl = group.querySelector('.user-field-error');
@@ -109,7 +121,7 @@
   function clearFieldError(form, fieldName) {
     var group = form.querySelector('[data-field="' + fieldName + '"]');
     if (!group) return;
-    group.querySelectorAll('input:not([type="hidden"]):not([readonly]), select, textarea').forEach(function (el) {
+    group.querySelectorAll('input:not([type="hidden"]):not([readonly]), select, textarea, .ms-trigger').forEach(function (el) {
       el.classList.remove('is-invalid');
     });
     var errorEl = group.querySelector('.user-field-error');
@@ -141,6 +153,225 @@
     });
   }
 
+  function initSubCategoryMultiSelect(form) {
+    var categorySelect = document.getElementById('profileCategory');
+    var listEl = document.getElementById('profileSubCategory');
+    var wrap = document.getElementById('profileSubCategoryWrap');
+    var trigger = document.getElementById('profileSubCategoryTrigger');
+    var dropdown = document.getElementById('profileSubCategoryDropdown');
+    var textEl = document.getElementById('profileSubCategoryText');
+    var inputsEl = document.getElementById('profileSubCategoryInputs');
+    if (!categorySelect || !listEl || !wrap || !trigger || !dropdown || !textEl) return null;
+
+    var selectedMap = {};
+
+    function closeDropdown() {
+      wrap.classList.remove('is-open');
+      dropdown.hidden = true;
+      trigger.setAttribute('aria-expanded', 'false');
+    }
+
+    function openDropdown() {
+      if (wrap.classList.contains('is-disabled')) return;
+      wrap.classList.add('is-open');
+      dropdown.hidden = false;
+      trigger.setAttribute('aria-expanded', 'true');
+    }
+
+    function toggleDropdown() {
+      if (dropdown.hidden) openDropdown();
+      else closeDropdown();
+    }
+
+    function setDisabled(disabled) {
+      wrap.classList.toggle('is-disabled', !!disabled);
+      trigger.disabled = !!disabled;
+    }
+
+    function syncHiddenInputs() {
+      if (!inputsEl) return;
+      inputsEl.innerHTML = '';
+      Object.keys(selectedMap).forEach(function (id) {
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'sub_category_id[]';
+        input.value = id;
+        inputsEl.appendChild(input);
+      });
+    }
+
+    function syncTriggerText() {
+      var ids = Object.keys(selectedMap);
+      var count = ids.length;
+      wrap.classList.toggle('has-value', count > 0);
+
+      if (!categorySelect.value) {
+        textEl.textContent = 'Select category first';
+      } else if (count === 0) {
+        textEl.textContent = 'None selected';
+      } else if (count === 1) {
+        textEl.textContent = selectedMap[ids[0]];
+      } else if (count <= 2) {
+        textEl.textContent = ids.map(function (id) { return selectedMap[id]; }).join(', ');
+      } else {
+        textEl.textContent = count + ' selected';
+      }
+
+      syncHiddenInputs();
+    }
+
+    function syncSelectAllState() {
+      var selectAll = listEl.querySelector('.ms-option-all input');
+      if (!selectAll) return;
+      var itemChecks = listEl.querySelectorAll('.ms-option-item input');
+      var total = itemChecks.length;
+      var checked = 0;
+      itemChecks.forEach(function (cb) {
+        if (cb.checked) checked += 1;
+      });
+      selectAll.checked = total > 0 && checked === total;
+      selectAll.indeterminate = checked > 0 && checked < total;
+    }
+
+    function fillSubCategories(subs, selectedSubId) {
+      listEl.innerHTML = '';
+      selectedMap = {};
+      closeDropdown();
+
+      if (!categorySelect.value) {
+        setDisabled(true);
+        syncTriggerText();
+        return;
+      }
+
+      setDisabled(false);
+
+      if (!subs || !subs.length) {
+        listEl.innerHTML = '<div class="ms-empty">No sub categories found</div>';
+        syncTriggerText();
+        return;
+      }
+
+      var selectedIds = normalizeSelectedIds(selectedSubId);
+
+      var allLabel = document.createElement('label');
+      allLabel.className = 'ms-option ms-option-all';
+      var allCheckbox = document.createElement('input');
+      allCheckbox.type = 'checkbox';
+      var allText = document.createElement('span');
+      allText.textContent = 'Select all';
+      allLabel.appendChild(allCheckbox);
+      allLabel.appendChild(allText);
+      listEl.appendChild(allLabel);
+
+      allCheckbox.addEventListener('change', function () {
+        var checked = allCheckbox.checked;
+        listEl.querySelectorAll('.ms-option-item input').forEach(function (cb) {
+          cb.checked = checked;
+          if (checked) selectedMap[cb.value] = cb.getAttribute('data-name');
+          else delete selectedMap[cb.value];
+        });
+        syncTriggerText();
+        syncSelectAllState();
+        listEl.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+
+      subs.forEach(function (sub) {
+        var id = String(sub.id);
+        var label = document.createElement('label');
+        label.className = 'ms-option ms-option-item';
+
+        var checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.value = id;
+        checkbox.setAttribute('data-name', sub.name);
+
+        var text = document.createElement('span');
+        text.textContent = sub.name;
+
+        if (selectedIds.indexOf(id) !== -1) {
+          checkbox.checked = true;
+          selectedMap[id] = sub.name;
+        }
+
+        checkbox.addEventListener('change', function () {
+          if (checkbox.checked) selectedMap[id] = sub.name;
+          else delete selectedMap[id];
+          syncTriggerText();
+          syncSelectAllState();
+          listEl.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+
+        label.appendChild(checkbox);
+        label.appendChild(text);
+        listEl.appendChild(label);
+      });
+
+      syncTriggerText();
+      syncSelectAllState();
+    }
+
+    function loadSubCategories(categoryId, selectedId) {
+      listEl.innerHTML = '';
+      selectedMap = {};
+      closeDropdown();
+      setDisabled(true);
+      syncTriggerText();
+
+      if (!categoryId) return;
+
+      textEl.textContent = 'Loading...';
+
+      if (window.PROFILE_SUBCATEGORIES_URL) {
+        fetch(window.PROFILE_SUBCATEGORIES_URL + '/' + categoryId, {
+          headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+        })
+          .then(function (response) { return response.json(); })
+          .then(function (data) { fillSubCategories(data, selectedId); })
+          .catch(function () { fillSubCategories([], ''); });
+        return;
+      }
+
+      fillSubCategories(window.PROFILE_SUBCATEGORIES || [], selectedId);
+    }
+
+    trigger.addEventListener('click', function (e) {
+      e.preventDefault();
+      toggleDropdown();
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!wrap.contains(e.target)) closeDropdown();
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeDropdown();
+    });
+
+    categorySelect.addEventListener('change', function () {
+      loadSubCategories(categorySelect.value, '');
+    });
+
+    if (categorySelect.value) {
+      var initialSelected = window.PROFILE_OLD ? window.PROFILE_OLD.sub_category_id : [];
+      if (window.PROFILE_SUBCATEGORIES && window.PROFILE_SUBCATEGORIES.length) {
+        fillSubCategories(window.PROFILE_SUBCATEGORIES, initialSelected);
+      } else {
+        loadSubCategories(categorySelect.value, initialSelected);
+      }
+    } else {
+      setDisabled(true);
+      syncTriggerText();
+    }
+
+    return {
+      getValue: function () {
+        return Object.keys(selectedMap).join(',');
+      },
+      listEl: listEl
+    };
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     var form = document.getElementById('profileForm');
     if (!form) return;
@@ -148,7 +379,7 @@
     initBusinessHours();
 
     var categorySelect = document.getElementById('profileCategory');
-    var subCategorySelect = document.getElementById('profileSubCategory');
+    var subMulti = initSubCategoryMultiSelect(form);
     var phoneInput = form.querySelector('input[name="phone"]');
     var logoInput = form.querySelector('input[name="logo"]');
     var logoPreview = document.getElementById('profileLogoPreview');
@@ -166,7 +397,7 @@
       switch (fieldName) {
         case 'company_name': return form.querySelector('input[name="company_name"]')?.value || '';
         case 'category_id': return categorySelect ? categorySelect.value : '';
-        case 'sub_category_id': return subCategorySelect ? subCategorySelect.value : '';
+        case 'sub_category_id': return subMulti ? subMulti.getValue() : '';
         case 'tagline': return form.querySelector('input[name="tagline"]')?.value || '';
         case 'business_desc': return form.querySelector('textarea[name="business_desc"]')?.value || '';
         case 'phone': return phoneInput ? phoneInput.value : '';
@@ -209,7 +440,7 @@
       });
 
       if (!valid) {
-        var firstInvalid = form.querySelector('.user-form-control.is-invalid');
+        var firstInvalid = form.querySelector('.user-form-control.is-invalid, .ms-trigger.is-invalid');
         if (firstInvalid) firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
 
@@ -255,9 +486,10 @@
       categorySelect.addEventListener('blur', function () { validateField('category_id', true); });
     }
 
-    if (subCategorySelect) {
-      subCategorySelect.addEventListener('change', function () { validateField('sub_category_id', true); });
-      subCategorySelect.addEventListener('blur', function () { validateField('sub_category_id', true); });
+    if (subMulti && subMulti.listEl) {
+      subMulti.listEl.addEventListener('change', function () {
+        validateField('sub_category_id', true);
+      });
     }
 
     form.addEventListener('submit', function (e) {
@@ -266,45 +498,5 @@
         e.preventDefault();
       }
     });
-
-    function setSubCategories(items, selectedId) {
-      if (!subCategorySelect) return;
-      subCategorySelect.innerHTML = '<option value="">Select sub category</option>';
-      items.forEach(function (item) {
-        var option = document.createElement('option');
-        option.value = item.id;
-        option.textContent = item.name;
-        if (String(selectedId) === String(item.id)) {
-          option.selected = true;
-        }
-        subCategorySelect.appendChild(option);
-      });
-      subCategorySelect.disabled = items.length === 0;
-    }
-
-    function loadSubCategories(categoryId, selectedId) {
-      if (!categorySelect || !subCategorySelect) return;
-      if (!categoryId) {
-        setSubCategories([], '');
-        return;
-      }
-
-      fetch(window.PROFILE_SUBCATEGORIES_URL + '/' + categoryId, {
-        headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
-      })
-        .then(function (response) { return response.json(); })
-        .then(function (data) { setSubCategories(data, selectedId); })
-        .catch(function () { setSubCategories([], ''); });
-    }
-
-    if (categorySelect && subCategorySelect) {
-      categorySelect.addEventListener('change', function () {
-        loadSubCategories(categorySelect.value, '');
-      });
-
-      if (categorySelect.value && subCategorySelect.options.length <= 1) {
-        loadSubCategories(categorySelect.value, window.PROFILE_OLD?.sub_category_id || '');
-      }
-    }
   });
 })();

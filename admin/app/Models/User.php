@@ -80,6 +80,42 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo(SubCategory::class);
     }
 
+    /**
+     * @return list<string>
+     */
+    public function subCategoryIds(): array
+    {
+        if (! filled($this->sub_category_id)) {
+            return [];
+        }
+
+        return array_values(array_unique(array_filter(array_map(
+            static fn ($id) => trim((string) $id),
+            explode(',', (string) $this->sub_category_id)
+        ), static fn ($id) => $id !== '')));
+    }
+
+    public function subCategories()
+    {
+        $ids = $this->subCategoryIds();
+
+        if ($ids === []) {
+            return collect();
+        }
+
+        return SubCategory::query()
+            ->whereIn('id', $ids)
+            ->orderBy('name')
+            ->get();
+    }
+
+    public function subCategoryNames(string $separator = ', '): string
+    {
+        $names = $this->subCategories()->pluck('name')->filter()->values();
+
+        return $names->isEmpty() ? '' : $names->implode($separator);
+    }
+
     public function companyProfile(): HasOne
     {
         return $this->hasOne(CompanyProfile::class);

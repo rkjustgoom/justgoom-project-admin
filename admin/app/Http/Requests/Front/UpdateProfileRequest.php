@@ -51,7 +51,14 @@ class UpdateProfileRequest extends FormRequest
         return [
             'company_name' => ['required', 'string', 'min:4', 'max:200', SafeText::titleRule()],
             'category_id' => ['required', 'exists:categories,id'],
-            'sub_category_id' => ['required', 'exists:sub_categories,id'],
+            'sub_category_id' => ['required', 'array', 'min:1'],
+            'sub_category_id.*' => [
+                'integer',
+                Rule::exists('sub_categories', 'id')->where(function ($query) {
+                    $query->where('category_id', $this->input('category_id'))
+                        ->where('status', 1);
+                }),
+            ],
             'tagline' => ['nullable', 'string', 'max:255', SafeText::titleRule()],
             'business_desc' => ['required', 'string', 'min:20', 'max:5000'],
             'phone' => ['required', 'digits:10'],
@@ -81,8 +88,9 @@ class UpdateProfileRequest extends FormRequest
             'company_name.regex' => SafeText::titleMessage('Business name'),
             'category_id.required' => 'Please select a category.',
             'category_id.exists' => 'Selected category is invalid.',
-            'sub_category_id.required' => 'Please select a sub category.',
-            'sub_category_id.exists' => 'Selected sub category is invalid.',
+            'sub_category_id.required' => 'Please select at least one sub category.',
+            'sub_category_id.min' => 'Please select at least one sub category.',
+            'sub_category_id.*.exists' => 'Selected sub category does not belong to the chosen category.',
             'tagline.max' => 'Tagline must not exceed 255 characters.',
             'tagline.regex' => SafeText::titleMessage('Tagline'),
             'business_desc.required' => 'About business is required.',
@@ -115,6 +123,7 @@ class UpdateProfileRequest extends FormRequest
             'company_name' => 'business name',
             'category_id' => 'category',
             'sub_category_id' => 'sub category',
+            'sub_category_id.*' => 'sub category',
             'tagline' => 'tagline',
             'business_desc' => 'about business',
             'phone' => 'phone number',

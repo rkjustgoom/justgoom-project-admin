@@ -17,7 +17,7 @@
     },
     sub_category_id: {
       test: function (v) { return v !== ''; },
-      message: 'Please select a sub category.'
+      message: 'Please select at least one sub category.'
     },
     fname: {
       test: function (v) {
@@ -76,7 +76,7 @@
   function setFieldError(fieldName, message) {
     var group = document.querySelector('[data-field="' + fieldName + '"]');
     if (!group) return;
-    var input = group.querySelector('input, select');
+    var input = group.querySelector('.ms-trigger') || group.querySelector('input, select');
     var errorEl = group.querySelector('.field-error');
     if (input) input.classList.add('is-invalid');
     if (errorEl) {
@@ -88,7 +88,7 @@
   function clearFieldError(fieldName) {
     var group = document.querySelector('[data-field="' + fieldName + '"]');
     if (!group) return;
-    var input = group.querySelector('input, select');
+    var input = group.querySelector('.ms-trigger') || group.querySelector('input, select');
     var errorEl = group.querySelector('.field-error');
     if (input) input.classList.remove('is-invalid');
     if (errorEl && !errorEl.dataset.serverError) {
@@ -104,7 +104,7 @@
     var companyInput = document.getElementById('regCompany');
     var slugInput = document.getElementById('regSlug');
     var categorySelect = document.getElementById('regCategory');
-    var subCategorySelect = document.getElementById('regSubCategory');
+    var subCategoryList = document.getElementById('regSubCategory');
     var phoneInput = document.getElementById('regPhone');
     var termsCheckbox = form.querySelector('.auth-terms input[type="checkbox"]');
     var slugErrorEl = document.getElementById('regSlugError');
@@ -137,7 +137,10 @@
         case 'company_name': return companyInput ? companyInput.value : '';
         case 'company_slug': return slugInput ? slugInput.value : '';
         case 'category_id': return categorySelect ? categorySelect.value : '';
-        case 'sub_category_id': return subCategorySelect ? subCategorySelect.value : '';
+        case 'sub_category_id':
+          return Array.from(document.querySelectorAll('#regSubCategoryInputs input[name="sub_category_id[]"]'))
+            .map(function (input) { return input.value; })
+            .join(',');
         case 'fname': return document.getElementById('regFname')?.value || '';
         case 'lname': return document.getElementById('regLname')?.value || '';
         case 'mobile': return phoneInput ? phoneInput.value : '';
@@ -292,7 +295,7 @@
       });
     }
 
-    ['category_id', 'sub_category_id', 'fname', 'lname', 'email', 'password', 'password_confirmation'].forEach(function (field) {
+    ['category_id', 'fname', 'lname', 'email', 'password', 'password_confirmation'].forEach(function (field) {
       var group = document.querySelector('[data-field="' + field + '"]');
       if (!group) return;
       var input = group.querySelector('input, select');
@@ -303,10 +306,19 @@
           validateField('password_confirmation', true);
         }
       });
+      input.addEventListener('change', function () {
+        validateField(field, false);
+      });
       input.addEventListener('input', function () {
         validateField(field, false);
       });
     });
+
+    if (subCategoryList) {
+      subCategoryList.addEventListener('change', function () {
+        validateField('sub_category_id', true);
+      });
+    }
 
     if (phoneInput) {
       phoneInput.addEventListener('input', function () {
@@ -336,7 +348,7 @@
       });
 
       if (!valid) {
-        var firstInvalid = form.querySelector('.form-input.is-invalid, select.is-invalid');
+        var firstInvalid = form.querySelector('.form-input.is-invalid, select.is-invalid, .ms-trigger.is-invalid');
         if (firstInvalid) firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
 

@@ -10,7 +10,7 @@ class PublicProfileListingService
     public function listForFrontend(): array
     {
         return CompanyProfile::query()
-            ->with(['user.category', 'user.subCategory'])
+            ->with(['user.category'])
             ->whereHas('user', fn ($q) => $this->applyPublicUserConstraints($q))
             ->latest()
             ->get()
@@ -53,7 +53,7 @@ class PublicProfileListingService
     public function findPublicProfile(string $slug): CompanyProfile
     {
         return CompanyProfile::query()
-            ->with(['user.category', 'user.subCategory', 'user.userPlans.plan'])
+            ->with(['user.category', 'user.userPlans.plan'])
             ->where('slug', $slug)
             ->whereHas('user', fn ($q) => $this->applyPublicUserConstraints($q))
             ->firstOrFail();
@@ -80,8 +80,10 @@ class PublicProfileListingService
             'slug' => $profile->slug,
             'category' => $user->category->name ?? 'Uncategorized',
             'categorySlug' => $user->category->slug ?? '',
-            'subCategory' => $user->subCategory->name ?? '',
-            'subCategorySlug' => $user->subCategory->slug ?? '',
+            'subCategory' => $user?->subCategoryNames() ?? '',
+            'subCategorySlug' => $user
+                ? $user->subCategories()->pluck('slug')->filter()->implode(',')
+                : '',
             'projects' => 0,
             'tasks' => 0,
             'city' => $profile->city ?: ($user->city ?: 'N/A'),

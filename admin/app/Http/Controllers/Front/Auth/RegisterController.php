@@ -28,7 +28,7 @@ class RegisterController extends Controller
 
         $registerOld = [
             'category_id' => old('category_id'),
-            'sub_category_id' => old('sub_category_id'),
+            'sub_category_id' => old('sub_category_id', []),
         ];
 
         return view('front.auth.register', compact('categories', 'registerOld'));

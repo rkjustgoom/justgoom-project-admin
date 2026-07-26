@@ -53,7 +53,7 @@ return new class extends Migration
 
         if (! Schema::hasColumn('users', 'sub_category_id')) {
             Schema::table('users', function (Blueprint $table) {
-                $table->unsignedBigInteger('sub_category_id')->nullable();
+                $table->string('sub_category_id', 255)->nullable();
             });
         }
 

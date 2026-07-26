@@ -243,32 +243,179 @@ function initAuthRegister() {
 
 function initRegisterCategoriesFromServer() {
   var categorySelect = document.getElementById('regCategory');
-  var subCategorySelect = document.getElementById('regSubCategory');
-  if (!categorySelect || !subCategorySelect) return;
+  var listEl = document.getElementById('regSubCategory');
+  var wrap = document.getElementById('regSubCategoryWrap');
+  var trigger = document.getElementById('regSubCategoryTrigger');
+  var dropdown = document.getElementById('regSubCategoryDropdown');
+  var textEl = document.getElementById('regSubCategoryText');
+  var inputsEl = document.getElementById('regSubCategoryInputs');
+  if (!categorySelect || !listEl || !wrap || !trigger || !dropdown || !textEl) return;
+
+  var selectedMap = {};
+
+  function normalizeSelectedIds(selectedSubId) {
+    if (Array.isArray(selectedSubId)) {
+      return selectedSubId.map(String).filter(Boolean);
+    }
+    if (selectedSubId) {
+      return String(selectedSubId).split(',').map(function (id) {
+        return id.trim();
+      }).filter(Boolean);
+    }
+    return [];
+  }
+
+  function closeDropdown() {
+    wrap.classList.remove('is-open');
+    dropdown.hidden = true;
+    trigger.setAttribute('aria-expanded', 'false');
+  }
+
+  function openDropdown() {
+    if (wrap.classList.contains('is-disabled')) return;
+    wrap.classList.add('is-open');
+    dropdown.hidden = false;
+    trigger.setAttribute('aria-expanded', 'true');
+  }
+
+  function toggleDropdown() {
+    if (dropdown.hidden) openDropdown();
+    else closeDropdown();
+  }
+
+  function setDisabled(disabled) {
+    wrap.classList.toggle('is-disabled', !!disabled);
+    trigger.disabled = !!disabled;
+  }
+
+  function syncHiddenInputs() {
+    if (!inputsEl) return;
+    inputsEl.innerHTML = '';
+    Object.keys(selectedMap).forEach(function (id) {
+      var input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'sub_category_id[]';
+      input.value = id;
+      inputsEl.appendChild(input);
+    });
+  }
+
+  function syncTriggerText() {
+    var ids = Object.keys(selectedMap);
+    var count = ids.length;
+    wrap.classList.toggle('has-value', count > 0);
+
+    if (!categorySelect.value) {
+      textEl.textContent = 'Select category first';
+    } else if (count === 0) {
+      textEl.textContent = 'None selected';
+    } else if (count === 1) {
+      textEl.textContent = selectedMap[ids[0]];
+    } else if (count <= 2) {
+      textEl.textContent = ids.map(function (id) { return selectedMap[id]; }).join(', ');
+    } else {
+      textEl.textContent = count + ' selected';
+    }
+
+    syncHiddenInputs();
+  }
+
+  function syncSelectAllState() {
+    var selectAll = listEl.querySelector('.ms-option-all input');
+    if (!selectAll) return;
+    var itemChecks = listEl.querySelectorAll('.ms-option-item input');
+    var total = itemChecks.length;
+    var checked = 0;
+    itemChecks.forEach(function (cb) {
+      if (cb.checked) checked += 1;
+    });
+    selectAll.checked = total > 0 && checked === total;
+    selectAll.indeterminate = checked > 0 && checked < total;
+  }
 
   function fillSubCategoriesFromData(categoryId, selectedSubId, subs) {
-    subCategorySelect.innerHTML = '<option value="">Select sub category</option>';
-    subCategorySelect.disabled = !categoryId;
+    listEl.innerHTML = '';
+    selectedMap = {};
+    closeDropdown();
 
-    if (!categoryId || !subs || !subs.length) return;
+    if (!categoryId) {
+      setDisabled(true);
+      syncTriggerText();
+      return;
+    }
 
-    subs.forEach(function(sub) {
-      var option = document.createElement('option');
-      option.value = sub.id;
-      option.textContent = sub.name;
-      if (selectedSubId && String(selectedSubId) === String(sub.id)) {
-        option.selected = true;
-      }
-      subCategorySelect.appendChild(option);
+    setDisabled(false);
+
+    if (!subs || !subs.length) {
+      listEl.innerHTML = '<div class="ms-empty">No sub categories found</div>';
+      syncTriggerText();
+      return;
+    }
+
+    var selectedIds = normalizeSelectedIds(selectedSubId);
+
+    var allLabel = document.createElement('label');
+    allLabel.className = 'ms-option ms-option-all';
+    var allCheckbox = document.createElement('input');
+    allCheckbox.type = 'checkbox';
+    var allText = document.createElement('span');
+    allText.textContent = 'Select all';
+    allLabel.appendChild(allCheckbox);
+    allLabel.appendChild(allText);
+    listEl.appendChild(allLabel);
+
+    allCheckbox.addEventListener('change', function () {
+      var checked = allCheckbox.checked;
+      listEl.querySelectorAll('.ms-option-item input').forEach(function (cb) {
+        cb.checked = checked;
+        if (checked) selectedMap[cb.value] = cb.getAttribute('data-name');
+        else delete selectedMap[cb.value];
+      });
+      syncTriggerText();
+      syncSelectAllState();
+      listEl.dispatchEvent(new Event('change', { bubbles: true }));
     });
 
-    subCategorySelect.disabled = false;
+    subs.forEach(function (sub) {
+      var id = String(sub.id);
+      var label = document.createElement('label');
+      label.className = 'ms-option ms-option-item';
+      label.setAttribute('role', 'option');
+
+      var checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.value = id;
+      checkbox.setAttribute('data-name', sub.name);
+
+      var text = document.createElement('span');
+      text.textContent = sub.name;
+
+      if (selectedIds.indexOf(id) !== -1) {
+        checkbox.checked = true;
+        selectedMap[id] = sub.name;
+      }
+
+      checkbox.addEventListener('change', function () {
+        if (checkbox.checked) selectedMap[id] = sub.name;
+        else delete selectedMap[id];
+        syncTriggerText();
+        syncSelectAllState();
+        listEl.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+
+      label.appendChild(checkbox);
+      label.appendChild(text);
+      listEl.appendChild(label);
+    });
+
+    syncTriggerText();
+    syncSelectAllState();
   }
 
   function fillSubCategoriesFromEmbedded(categoryId, selectedSubId) {
     if (!window.REGISTER_CATEGORIES) return false;
 
-    var category = window.REGISTER_CATEGORIES.find(function(item) {
+    var category = window.REGISTER_CATEGORIES.find(function (item) {
       return String(item.id) === String(categoryId);
     });
 
@@ -279,23 +426,28 @@ function initRegisterCategoriesFromServer() {
   }
 
   function loadSubCategories(categoryId, selectedSubId) {
-    subCategorySelect.innerHTML = '<option value="">Select sub category</option>';
-    subCategorySelect.disabled = true;
+    listEl.innerHTML = '';
+    selectedMap = {};
+    closeDropdown();
+    setDisabled(true);
+    syncTriggerText();
 
     if (!categoryId) return;
+
+    textEl.textContent = 'Loading...';
 
     if (window.REGISTER_SUBCATEGORIES_URL) {
       fetch(window.REGISTER_SUBCATEGORIES_URL + '/' + categoryId, {
         headers: { 'Accept': 'application/json' }
       })
-        .then(function(res) {
+        .then(function (res) {
           if (!res.ok) throw new Error('Failed to load sub categories');
           return res.json();
         })
-        .then(function(subs) {
+        .then(function (subs) {
           fillSubCategoriesFromData(categoryId, selectedSubId, subs);
         })
-        .catch(function(err) {
+        .catch(function (err) {
           console.error(err);
           fillSubCategoriesFromEmbedded(categoryId, selectedSubId);
         });
@@ -305,13 +457,29 @@ function initRegisterCategoriesFromServer() {
     fillSubCategoriesFromEmbedded(categoryId, selectedSubId);
   }
 
-  categorySelect.addEventListener('change', function() {
+  trigger.addEventListener('click', function (e) {
+    e.preventDefault();
+    toggleDropdown();
+  });
+
+  document.addEventListener('click', function (e) {
+    if (!wrap.contains(e.target)) closeDropdown();
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeDropdown();
+  });
+
+  categorySelect.addEventListener('change', function () {
     loadSubCategories(categorySelect.value, null);
   });
 
   if (categorySelect.value) {
     var oldSubId = window.REGISTER_OLD ? window.REGISTER_OLD.sub_category_id : null;
     loadSubCategories(categorySelect.value, oldSubId);
+  } else {
+    setDisabled(true);
+    syncTriggerText();
   }
 }
 

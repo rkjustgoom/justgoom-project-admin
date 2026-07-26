@@ -160,8 +160,23 @@
       <div class="profile-card">
         <h3>Category</h3>
         <ul class="profile-info-list">
-          <li><span>Category :</span><strong>{{ $user->category->name ?? '-' }}</strong></li>
-          <li><span>Sub Category :</span><strong>{{ $user->subCategory->name ?? '-' }}</strong></li>
+          <li>
+            <span>Category :</span>
+            <strong>{{ $user->category->name ?? '-' }}</strong>
+          </li>
+          <li>
+            <span>Sub Category :</span>
+            @php $subCategories = $user->subCategories(); @endphp
+            @if($subCategories->isNotEmpty())
+              <div class="profile-subcat-tags">
+                @foreach($subCategories as $subCategory)
+                  <span class="profile-subcat-tag">{{ $subCategory->name }}</span>
+                @endforeach
+              </div>
+            @else
+              <strong>-</strong>
+            @endif
+          </li>
         </ul>
       </div>
       <div
