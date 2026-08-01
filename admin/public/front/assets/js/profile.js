@@ -211,10 +211,9 @@
         textEl.textContent = 'None selected';
       } else if (count === 1) {
         textEl.textContent = selectedMap[ids[0]];
-      } else if (count <= 2) {
-        textEl.textContent = ids.map(function (id) { return selectedMap[id]; }).join(', ');
       } else {
-        textEl.textContent = count + ' selected';
+        // Show first name + remaining count so ellipsis does not hide selection size
+        textEl.textContent = selectedMap[ids[0]] + ' +' + (count - 1);
       }
 
       syncHiddenInputs();
