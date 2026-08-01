@@ -16,11 +16,13 @@
   $sidebarProjectSection = \App\Support\ProjectSection::forUser($sidebarUser);
   $sidebarProjectLabel = match ($sidebarProjectSection) {
       \App\Support\ProjectSection::REAL_ESTATE => 'My Listings',
+      \App\Support\ProjectSection::ENGINEERING => 'My Listings',
       \App\Support\ProjectSection::ECOMMERCE => 'My Products',
       default => 'My Projects',
   };
   $sidebarProjectIcon = match ($sidebarProjectSection) {
       \App\Support\ProjectSection::REAL_ESTATE => '🏠',
+      \App\Support\ProjectSection::ENGINEERING => '⚙️',
       \App\Support\ProjectSection::ECOMMERCE => '🛍️',
       default => '📁',
   };

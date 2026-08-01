@@ -70,7 +70,7 @@ class ProjectController extends Controller
                 $project->external_url = $validated['external_url'];
             }
 
-            if ($sectionType === ProjectSection::REAL_ESTATE) {
+            if (ProjectSection::usesGalleryMedia($sectionType)) {
                 $paths = $this->uploadMediaFiles($request);
                 $project->media = implode(',', $paths);
                 $project->thumbnail = $paths[0] ?? null;
@@ -132,7 +132,7 @@ class ProjectController extends Controller
             $project->type = ProjectSection::mediaTypeFor($sectionType);
             $project->external_url = $validated['external_url'] ?? $project->external_url;
 
-            if ($sectionType === ProjectSection::REAL_ESTATE) {
+            if (ProjectSection::usesGalleryMedia($sectionType)) {
                 $existing = $project->mediaImages();
                 $remove = array_filter((array) $request->input('remove_media', []));
                 if ($remove) {
@@ -252,6 +252,29 @@ class ProjectController extends Controller
             ]);
         }
 
+        if ($sectionType === ProjectSection::ENGINEERING) {
+            $hasExistingMedia = $isUpdate && filled($request->route('project')?->media ?? $request->route('project')?->thumbnail);
+            $rules = array_merge($rules, [
+                'price' => 'required|string|max:100',
+                'price_note' => 'nullable|string|max:150',
+                'location' => 'required|string|max:200',
+                'service_type' => 'nullable|string|max:100',
+                'domain' => 'nullable|string|max:100',
+                'lead_time' => 'nullable|string|max:100',
+                'capacity' => 'nullable|string|max:100',
+                'features' => 'nullable|string|max:500',
+                'media' => [
+                    Rule::requiredIf(fn () => ! $isUpdate || ! $hasExistingMedia),
+                    'nullable',
+                    'array',
+                    'max:12',
+                ],
+                'media.*' => ['image', 'max:2048'],
+                'remove_media' => 'nullable|array',
+                'remove_media.*' => 'string|max:500',
+            ]);
+        }
+
         if ($sectionType === ProjectSection::ECOMMERCE) {
             $rules = array_merge($rules, [
                 'price' => 'required|string|max:100',
@@ -297,6 +320,19 @@ class ProjectController extends Controller
             ]);
         }
 
+        if ($sectionType === ProjectSection::ENGINEERING) {
+            return array_merge($existing, [
+                'price' => $validated['price'] ?? null,
+                'price_note' => $validated['price_note'] ?? null,
+                'location' => $validated['location'] ?? null,
+                'service_type' => $validated['service_type'] ?? null,
+                'domain' => $validated['domain'] ?? null,
+                'lead_time' => $validated['lead_time'] ?? null,
+                'capacity' => $validated['capacity'] ?? null,
+                'features' => $validated['features'] ?? null,
+            ]);
+        }
+
         if ($sectionType === ProjectSection::ECOMMERCE) {
             return array_merge($existing, [
                 'price' => $validated['price'] ?? null,
@@ -332,6 +368,14 @@ class ProjectController extends Controller
         if ($sectionType === ProjectSection::REAL_ESTATE) {
             return $base + [
                 'listings' => $user->projects()->where('section_type', ProjectSection::REAL_ESTATE)->count(),
+                'active' => $user->projects()->where('status', 1)->count(),
+                'inactive' => $user->projects()->where('status', 0)->count(),
+            ];
+        }
+
+        if ($sectionType === ProjectSection::ENGINEERING) {
+            return $base + [
+                'listings' => $user->projects()->where('section_type', ProjectSection::ENGINEERING)->count(),
                 'active' => $user->projects()->where('status', 1)->count(),
                 'inactive' => $user->projects()->where('status', 0)->count(),
             ];

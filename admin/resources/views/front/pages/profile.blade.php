@@ -392,11 +392,13 @@
           @php
             $profileProjectSection = $profileProjectSection ?? \App\Support\ProjectSection::forUser($user);
             $isRealEstateCategory = $profileProjectSection === \App\Support\ProjectSection::REAL_ESTATE;
+            $isEngineeringCategory = $profileProjectSection === \App\Support\ProjectSection::ENGINEERING;
             $isEcommerceCategory = $profileProjectSection === \App\Support\ProjectSection::ECOMMERCE;
+            $isGalleryListingCategory = $isRealEstateCategory || $isEngineeringCategory;
           @endphp
 
-          @if($isRealEstateCategory)
-            <h3>{{ $profileProjectsTabLabel ?? 'Property Listings' }} <span class="profile-section-count">({{ $projects->count() }})</span></h3>
+          @if($isGalleryListingCategory)
+            <h3>{{ $profileProjectsTabLabel ?? ($isEngineeringCategory ? 'Engineering Listings' : 'Property Listings') }} <span class="profile-section-count">({{ $projects->count() }})</span></h3>
             @if($projects->isNotEmpty())
               <div class="profile-project-listings listing-cards {{ $projects->count() > 8 ? 'is-scrollable' : '' }}">
                 @foreach($projects as $project)
@@ -405,7 +407,10 @@
                     $coverImage = $project->coverImage();
                     $listingLocation = $project->metaValue('location') ?: $location;
                     $photoCount = count($listingImages) ?: (int) ($project->metaValue('photo_count') ?: 0);
-                    $amenities = $project->amenitiesList();
+                    $tagList = $isEngineeringCategory ? $project->featuresList() : $project->amenitiesList();
+                    $priceNote = $isEngineeringCategory
+                      ? $project->metaValue('price_note')
+                      : $project->metaValue('emi');
                     $actionUrl = $project->external_url ?: null;
                     $actionLabel = $actionUrl ? 'View Details' : null;
                     $postedLabel = trim(($profile->company_name ?: 'Owner').' · '.($project->created_at?->format('M j, Y') ?? ''));
@@ -447,34 +452,49 @@
                         </div>
                         <div class="listing-price">
                           <div class="amount">{{ $project->formattedPrice() ?: '—' }}</div>
-                          @if($project->metaValue('emi'))
-                            <div class="emi">{{ $project->metaValue('emi') }}</div>
+                          @if($priceNote)
+                            <div class="emi">{{ $priceNote }}</div>
                           @endif
                         </div>
                       </div>
                       <div class="listing-specs">
-                        @if($project->metaValue('config'))
-                          <span class="spec-item">Config <strong>{{ $project->metaValue('config') }}</strong></span>
-                        @endif
-                        @if($project->metaValue('sale_type'))
-                          <span class="spec-item">Sale Type <strong>{{ $project->metaValue('sale_type') }}</strong></span>
-                        @endif
-                        @if($project->metaValue('possession'))
-                          <span class="spec-item">Possession <strong>{{ $project->metaValue('possession') }}</strong></span>
-                        @endif
-                        @if($project->metaValue('parking'))
-                          <span class="spec-item">Parking <strong>{{ $project->metaValue('parking') }}</strong></span>
+                        @if($isEngineeringCategory)
+                          @if($project->metaValue('service_type'))
+                            <span class="spec-item">Service <strong>{{ $project->metaValue('service_type') }}</strong></span>
+                          @endif
+                          @if($project->metaValue('domain'))
+                            <span class="spec-item">Domain <strong>{{ $project->metaValue('domain') }}</strong></span>
+                          @endif
+                          @if($project->metaValue('lead_time'))
+                            <span class="spec-item">Lead Time <strong>{{ $project->metaValue('lead_time') }}</strong></span>
+                          @endif
+                          @if($project->metaValue('capacity'))
+                            <span class="spec-item">Capacity <strong>{{ $project->metaValue('capacity') }}</strong></span>
+                          @endif
+                        @else
+                          @if($project->metaValue('config'))
+                            <span class="spec-item">Config <strong>{{ $project->metaValue('config') }}</strong></span>
+                          @endif
+                          @if($project->metaValue('sale_type'))
+                            <span class="spec-item">Sale Type <strong>{{ $project->metaValue('sale_type') }}</strong></span>
+                          @endif
+                          @if($project->metaValue('possession'))
+                            <span class="spec-item">Possession <strong>{{ $project->metaValue('possession') }}</strong></span>
+                          @endif
+                          @if($project->metaValue('parking'))
+                            <span class="spec-item">Parking <strong>{{ $project->metaValue('parking') }}</strong></span>
+                          @endif
                         @endif
                       </div>
                       @if($project->description)
                         <p class="listing-desc">{{ Str::limit(strip_tags($project->description), 160) }}</p>
                       @endif
-                      @if(count($amenities))
+                      @if(count($tagList))
                         <div class="listing-amenities">
-                          @foreach(array_slice($amenities, 0, 3) as $amenity)
-                            <span class="amenity-tag">{{ $amenity }}</span>
+                          @foreach(array_slice($tagList, 0, 3) as $tag)
+                            <span class="amenity-tag">{{ $tag }}</span>
                           @endforeach
-                          @if(count($amenities) > 3)
+                          @if(count($tagList) > 3)
                             <span class="amenity-tag">+more</span>
                           @endif
                         </div>
@@ -495,7 +515,7 @@
                 @endforeach
               </div>
             @else
-              <p class="profile-empty-note">No property listings published yet.</p>
+              <p class="profile-empty-note">{{ $isEngineeringCategory ? 'No engineering listings published yet.' : 'No property listings published yet.' }}</p>
             @endif
           @elseif($isEcommerceCategory)
             <h3>{{ $profileProjectsTabLabel ?? 'Products' }} <span class="profile-section-count">({{ $projects->count() }})</span></h3>

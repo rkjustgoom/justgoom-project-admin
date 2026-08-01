@@ -52,6 +52,8 @@
             <label>
               @if($sectionType === \App\Support\ProjectSection::REAL_ESTATE)
                 Listing Title *
+              @elseif($sectionType === \App\Support\ProjectSection::ENGINEERING)
+                Project / Listing Title *
               @elseif($sectionType === \App\Support\ProjectSection::ECOMMERCE)
                 Product Name *
               @else
@@ -151,6 +153,58 @@
             </div>
           @endif
 
+          @if($sectionType === \App\Support\ProjectSection::ENGINEERING)
+            <div class="user-form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+              <div class="user-form-group" data-field="price">
+                <label>Price / Quote *</label>
+                <input type="text" name="price" class="user-form-control @error('price') is-invalid @enderror" value="{{ $val('price') }}" placeholder="e.g. 2.5 Lakh or Quote on request" maxlength="100">
+                <small class="user-field-error">@error('price'){{ $message }}@enderror</small>
+              </div>
+              <div class="user-form-group" data-field="price_note">
+                <label>Price Note</label>
+                <input type="text" name="price_note" class="user-form-control @error('price_note') is-invalid @enderror" value="{{ $val('price_note') }}" placeholder="e.g. Starting from ₹50,000 / unit" maxlength="150">
+                <small class="user-field-error">@error('price_note'){{ $message }}@enderror</small>
+              </div>
+            </div>
+            <div class="user-form-group" data-field="location">
+              <label>Location / Site *</label>
+              <input type="text" name="location" class="user-form-control @error('location') is-invalid @enderror" value="{{ $val('location') }}" placeholder="e.g. GIDC Vatva, Ahmedabad" maxlength="200">
+              <small class="user-field-error">@error('location'){{ $message }}@enderror</small>
+            </div>
+            <div class="user-form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+              <div class="user-form-group" data-field="service_type">
+                <label>Service Type</label>
+                <input type="text" name="service_type" class="user-form-control @error('service_type') is-invalid @enderror" value="{{ $val('service_type') }}" placeholder="e.g. Fabrication / Installation / Design" maxlength="100">
+                <small class="user-field-error">@error('service_type'){{ $message }}@enderror</small>
+              </div>
+              <div class="user-form-group" data-field="domain">
+                <label>Industry / Domain</label>
+                <input type="text" name="domain" class="user-form-control @error('domain') is-invalid @enderror" value="{{ $val('domain') }}" placeholder="e.g. Automobile / Pharma / Heavy Machinery" maxlength="100">
+                <small class="user-field-error">@error('domain'){{ $message }}@enderror</small>
+              </div>
+              <div class="user-form-group" data-field="lead_time">
+                <label>Lead Time</label>
+                <input type="text" name="lead_time" class="user-form-control @error('lead_time') is-invalid @enderror" value="{{ $val('lead_time') }}" placeholder="e.g. 4–6 weeks / Immediate" maxlength="100">
+                <small class="user-field-error">@error('lead_time'){{ $message }}@enderror</small>
+              </div>
+              <div class="user-form-group" data-field="capacity">
+                <label>Capacity / Spec</label>
+                <input type="text" name="capacity" class="user-form-control @error('capacity') is-invalid @enderror" value="{{ $val('capacity') }}" placeholder="e.g. 50 Ton / CNC / ISO certified" maxlength="100">
+                <small class="user-field-error">@error('capacity'){{ $message }}@enderror</small>
+              </div>
+            </div>
+            <div class="user-form-group" data-field="features">
+              <label>Capabilities / Features</label>
+              <input type="text" name="features" class="user-form-control @error('features') is-invalid @enderror" value="{{ $val('features') }}" placeholder="Comma separated: CNC machining, Welding, On-site install" maxlength="500">
+              <small class="user-field-error">@error('features'){{ $message }}@enderror</small>
+            </div>
+            <div class="user-form-group" data-field="external_url">
+              <label>Details / Brochure URL (optional)</label>
+              <input type="url" name="external_url" class="user-form-control @error('external_url') is-invalid @enderror" value="{{ $val('external_url') }}" placeholder="https://...">
+              <small class="user-field-error">@error('external_url'){{ $message }}@enderror</small>
+            </div>
+          @endif
+
           @if($sectionType === \App\Support\ProjectSection::ECOMMERCE)
             <div class="user-form-group" data-field="price">
               <label>Price *</label>
@@ -164,7 +218,7 @@
             </div>
           @endif
 
-          @if($sectionType === \App\Support\ProjectSection::REAL_ESTATE)
+          @if(\App\Support\ProjectSection::usesGalleryMedia($sectionType))
             <div class="user-form-group" data-field="media">
               <label>Listing Images {{ $isEdit ? '' : '*' }}</label>
               <div class="user-upload-zone">

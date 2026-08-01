@@ -13,6 +13,13 @@
           <div class="user-stat-card red"><span class="user-stat-icon">✅</span><div class="user-stat-info"><h3>{{ $stats['active'] }}</h3><span>Active</span></div></div>
           <div class="user-stat-card grey"><span class="user-stat-icon">⏸</span><div class="user-stat-info"><h3>{{ $stats['inactive'] }}</h3><span>Inactive</span></div></div>
         </div>
+      @elseif($sectionType === \App\Support\ProjectSection::ENGINEERING)
+        <div class="user-stat-row" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px">
+          <div class="user-stat-card green"><span class="user-stat-icon">⚙️</span><div class="user-stat-info"><h3>{{ $stats['total'] }}</h3><span>Total Listings</span></div></div>
+          <div class="user-stat-card yellow"><span class="user-stat-icon">📋</span><div class="user-stat-info"><h3>{{ $stats['listings'] }}</h3><span>Engineering Listings</span></div></div>
+          <div class="user-stat-card red"><span class="user-stat-icon">✅</span><div class="user-stat-info"><h3>{{ $stats['active'] }}</h3><span>Active</span></div></div>
+          <div class="user-stat-card grey"><span class="user-stat-icon">⏸</span><div class="user-stat-info"><h3>{{ $stats['inactive'] }}</h3><span>Inactive</span></div></div>
+        </div>
       @elseif($sectionType === \App\Support\ProjectSection::ECOMMERCE)
         <div class="user-stat-row" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px">
           <div class="user-stat-card green"><span class="user-stat-icon">🛍️</span><div class="user-stat-info"><h3>{{ $stats['total'] }}</h3><span>Total Products</span></div></div>
@@ -40,11 +47,14 @@
               <th>#</th>
               <th>Title</th>
               <th>Type</th>
-              @if($sectionType === \App\Support\ProjectSection::REAL_ESTATE || $sectionType === \App\Support\ProjectSection::ECOMMERCE)
+              @if(\App\Support\ProjectSection::usesGalleryMedia($sectionType) || $sectionType === \App\Support\ProjectSection::ECOMMERCE)
                 <th>Price</th>
               @endif
-              @if($sectionType === \App\Support\ProjectSection::REAL_ESTATE)
+              @if(\App\Support\ProjectSection::usesGalleryMedia($sectionType))
                 <th>Location</th>
+              @endif
+              @if($sectionType === \App\Support\ProjectSection::ENGINEERING)
+                <th>Service Type</th>
               @endif
               <th>Status</th>
               <th>Description</th>
@@ -58,15 +68,18 @@
               <td>{{ $loop->iteration + ($projects->currentPage() - 1) * $projects->perPage() }}</td>
               <td><strong>{{ $project->title }}</strong></td>
               <td>
-                <span class="user-badge {{ $project->isRealEstate() ? 'user-badge-success' : ($project->isEcommerce() ? 'user-badge-warning' : ($project->type === 'document' ? 'user-badge-success' : ($project->type === 'video' ? 'user-badge-warning' : 'user-badge-info'))) }}">
+                <span class="user-badge {{ $project->isRealEstate() || $project->isEngineering() ? 'user-badge-success' : ($project->isEcommerce() ? 'user-badge-warning' : ($project->type === 'document' ? 'user-badge-success' : ($project->type === 'video' ? 'user-badge-warning' : 'user-badge-info'))) }}">
                   {{ $project->typeLabel() }}
                 </span>
               </td>
-              @if($sectionType === \App\Support\ProjectSection::REAL_ESTATE || $sectionType === \App\Support\ProjectSection::ECOMMERCE)
+              @if(\App\Support\ProjectSection::usesGalleryMedia($sectionType) || $sectionType === \App\Support\ProjectSection::ECOMMERCE)
                 <td>{{ $project->formattedPrice() ?: '—' }}</td>
               @endif
-              @if($sectionType === \App\Support\ProjectSection::REAL_ESTATE)
+              @if(\App\Support\ProjectSection::usesGalleryMedia($sectionType))
                 <td>{{ $project->metaValue('location') ?: '—' }}</td>
+              @endif
+              @if($sectionType === \App\Support\ProjectSection::ENGINEERING)
+                <td>{{ $project->metaValue('service_type') ?: '—' }}</td>
               @endif
               <td>
                 @include('front.partials.users.status-toggle', [

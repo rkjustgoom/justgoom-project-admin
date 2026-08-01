@@ -102,7 +102,7 @@
         }
       }
 
-      if (sectionType === 'real_estate' || sectionType === 'ecommerce') {
+      if (sectionType === 'real_estate' || sectionType === 'engineering' || sectionType === 'ecommerce') {
         var price = form.querySelector('[name="price"]');
         if (!price || !price.value.trim()) {
           setError(form.querySelector('[data-field="price"]'), 'Price is required.');
@@ -111,7 +111,7 @@
           clearError(form.querySelector('[data-field="price"]'));
         }
 
-        if (sectionType === 'real_estate') {
+        if (sectionType === 'real_estate' || sectionType === 'engineering') {
           var location = form.querySelector('[name="location"]');
           if (!location || !location.value.trim()) {
             setError(form.querySelector('[data-field="location"]'), 'Location is required.');
@@ -122,7 +122,7 @@
         }
 
         if (!isEdit) {
-          if (sectionType === 'real_estate') {
+          if (sectionType === 'real_estate' || sectionType === 'engineering') {
             var mediaInput = form.querySelector('[name="media[]"]');
             if (!mediaInput || !mediaInput.files || !mediaInput.files.length) {
               setError(form.querySelector('[data-field="media"]'), 'Please upload at least one listing image.');

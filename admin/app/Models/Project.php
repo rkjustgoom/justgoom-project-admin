@@ -61,6 +61,11 @@ class Project extends Model
         return $this->section_type === ProjectSection::REAL_ESTATE;
     }
 
+    public function isEngineering(): bool
+    {
+        return $this->section_type === ProjectSection::ENGINEERING;
+    }
+
     public function isEcommerce(): bool
     {
         return $this->section_type === ProjectSection::ECOMMERCE;
@@ -69,6 +74,11 @@ class Project extends Model
     public function isNormal(): bool
     {
         return $this->section_type === ProjectSection::NORMAL || empty($this->section_type);
+    }
+
+    public function usesGalleryMedia(): bool
+    {
+        return ProjectSection::usesGalleryMedia($this->section_type ?: ProjectSection::NORMAL);
     }
 
     public function metaValue(string $key, mixed $default = null): mixed
@@ -88,6 +98,9 @@ class Project extends Model
         if ($this->isRealEstate()) {
             return 'Listing';
         }
+        if ($this->isEngineering()) {
+            return 'Engineering';
+        }
         if ($this->isEcommerce()) {
             return 'Product';
         }
@@ -97,6 +110,7 @@ class Project extends Model
             'video' => 'Video',
             'link' => 'External Link',
             'listing' => 'Listing',
+            'engineering' => 'Engineering',
             'product' => 'Product',
             default => ucfirst((string) $this->type),
         };
@@ -126,7 +140,25 @@ class Project extends Model
      */
     public function amenitiesList(): array
     {
-        $raw = $this->metaValue('amenities', '');
+        return $this->metaTagList('amenities');
+    }
+
+    /**
+     * Engineering capabilities / feature tags (same storage shape as amenities).
+     *
+     * @return list<string>
+     */
+    public function featuresList(): array
+    {
+        return $this->metaTagList('features');
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function metaTagList(string $key): array
+    {
+        $raw = $this->metaValue($key, '');
         if (is_array($raw)) {
             return array_values(array_filter(array_map('trim', $raw)));
         }
