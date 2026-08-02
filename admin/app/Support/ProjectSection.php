@@ -18,7 +18,7 @@ class ProjectSection
     public const REAL_ESTATE_CATEGORY_ID = 3;
 
     /** Category slugs that use real-estate listing UI */
-    public const REAL_ESTATE_SLUGS = ['real-estate'];
+    public const REAL_ESTATE_SLUGS = ['real-estate', 'construction-infrastructure'];
 
     /** Category slugs that use engineering / industrial listing UI */
     public const ENGINEERING_SLUGS = ['industrial-machinery', 'manufacturing'];

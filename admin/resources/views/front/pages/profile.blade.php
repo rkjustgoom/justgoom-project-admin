@@ -329,21 +329,29 @@
         <div class="profile-card">
           <h3>Services <span class="profile-section-count">({{ $services->count() }})</span></h3>
           @if($services->isNotEmpty())
-            <div class="profile-items-scroll profile-items-scroll--cards {{ $services->count() > 16 ? 'is-scrollable' : '' }}">
-              <div class="profile-services-grid profile-services-cards">
+            <div class="profile-items-scroll profile-items-scroll--list {{ $services->count() > 10 ? 'is-scrollable' : '' }}">
+              <div class="profile-services-list">
                 @foreach($services as $service)
-                  <article class="profile-service-card">
-                    @if($service->product_image)
-                      <img src="{{ asset($service->product_image) }}" alt="{{ $service->product_name }}">
-                    @else
-                      <div class="profile-service-card-placeholder" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" width="36" height="36"><path fill="currentColor" d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg>
+                  <article class="profile-service-row">
+                    <div class="profile-service-row-media">
+                      @if($service->product_image)
+                        <img src="{{ asset($service->product_image) }}" alt="{{ $service->product_name }}">
+                      @else
+                        <div class="profile-service-row-placeholder" aria-hidden="true">
+                          <svg viewBox="0 0 24 24" width="28" height="28"><path fill="currentColor" d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg>
+                        </div>
+                      @endif
+                    </div>
+                    <div class="profile-service-row-body">
+                      <div class="profile-service-row-top">
+                        <span class="profile-item-badge profile-item-badge--service">Service</span>
+                        @if($service->formattedPrice())
+                          <span class="profile-service-row-price">{{ $service->formattedPrice() }}</span>
+                        @endif
                       </div>
-                    @endif
-                    <div class="profile-service-card-body">
                       <h4>{{ $service->product_name }}</h4>
                       @if($service->product_desc)
-                        <p>{{ Str::limit($service->product_desc, 90) }}</p>
+                        <p>{{ Str::limit($service->product_desc, 140) }}</p>
                       @endif
                     </div>
                   </article>
@@ -360,21 +368,27 @@
         <div class="profile-card">
           <h3>Products <span class="profile-section-count">({{ $products->count() }})</span></h3>
           @if($products->isNotEmpty())
-            <div class="profile-items-scroll profile-items-scroll--cards {{ $products->count() > 16 ? 'is-scrollable' : '' }}">
-              <div class="profile-services-grid profile-services-cards">
+            <div class="profile-items-scroll profile-items-scroll--cards {{ $products->count() > 12 ? 'is-scrollable' : '' }}">
+              <div class="profile-products-grid">
                 @foreach($products as $product)
-                  <article class="profile-service-card">
-                    @if($product->product_image)
-                      <img src="{{ asset($product->product_image) }}" alt="{{ $product->product_name }}">
-                    @else
-                      <div class="profile-service-card-placeholder" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" width="36" height="36"><path fill="currentColor" d="M20 6H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 13H4V8h16v11zM8 10h2v2H8v-2zm0 4h2v2H8v-2zm4-4h2v2h-2v-2zm0 4h2v2h-2v-2zm4-4h2v2h-2v-2zm0 4h2v2h-2v-2z"/></svg>
-                      </div>
-                    @endif
-                    <div class="profile-service-card-body">
+                  <article class="profile-product-card">
+                    <div class="profile-product-card-media">
+                      @if($product->product_image)
+                        <img src="{{ asset($product->product_image) }}" alt="{{ $product->product_name }}">
+                      @else
+                        <div class="profile-product-card-placeholder" aria-hidden="true">
+                          <svg viewBox="0 0 24 24" width="40" height="40"><path fill="currentColor" d="M20 6H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 13H4V8h16v11zM8 10h2v2H8v-2zm0 4h2v2H8v-2zm4-4h2v2h-2v-2zm0 4h2v2h-2v-2zm4-4h2v2h-2v-2zm0 4h2v2h-2v-2z"/></svg>
+                        </div>
+                      @endif
+                      <span class="profile-item-badge profile-item-badge--product">Product</span>
+                    </div>
+                    <div class="profile-product-card-body">
                       <h4>{{ $product->product_name }}</h4>
+                      @if($product->formattedPrice())
+                        <div class="profile-product-price">{{ $product->formattedPrice() }}</div>
+                      @endif
                       @if($product->product_desc)
-                        <p>{{ Str::limit($product->product_desc, 90) }}</p>
+                        <p>{{ Str::limit($product->product_desc, 80) }}</p>
                       @endif
                     </div>
                   </article>
@@ -415,7 +429,7 @@
                     $actionLabel = $actionUrl ? 'View Details' : null;
                     $postedLabel = trim(($profile->company_name ?: 'Owner').' · '.($project->created_at?->format('M j, Y') ?? ''));
                   @endphp
-                  <article class="listing-card profile-project-listing">
+                  <article class="listing-card listing-card--v2 profile-project-listing {{ $isEngineeringCategory ? 'listing-card--engineering' : 'listing-card--property' }}">
                     <div class="listing-card-img">
                       @if($coverImage)
                         <button
@@ -432,6 +446,14 @@
                           <svg viewBox="0 0 24 24" width="48" height="48"><path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
                         </div>
                       @endif
+                      <div class="listing-card-img-overlay" aria-hidden="true"></div>
+                      @if($isEngineeringCategory)
+                        <span class="listing-type-badge">Engineering</span>
+                      @elseif($project->metaValue('sale_type'))
+                        <span class="listing-type-badge">{{ $project->metaValue('sale_type') }}</span>
+                      @else
+                        <span class="listing-type-badge">Property</span>
+                      @endif
                       @if($photoCount > 0 && count($listingImages) > 0)
                         <button
                           type="button"
@@ -439,15 +461,21 @@
                           data-title="{{ e($project->title) }}"
                           data-images='@json(collect($listingImages)->map(fn ($img) => asset($img))->values())'
                           aria-label="View {{ $photoCount }} photos"
-                        >📷 {{ $photoCount }} Photos</button>
+                        >
+                          <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                          {{ $photoCount }} Photos
+                        </button>
                       @endif
                     </div>
                     <div class="listing-card-body">
                       <div class="listing-card-top">
-                        <div>
+                        <div class="listing-card-heading">
                           <h2>{{ $project->title }}</h2>
                           @if($listingLocation)
-                            <p class="listing-location">📍 {{ $listingLocation }}</p>
+                            <p class="listing-location">
+                              <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                              {{ $listingLocation }}
+                            </p>
                           @endif
                         </div>
                         <div class="listing-price">
@@ -457,35 +485,61 @@
                           @endif
                         </div>
                       </div>
-                      <div class="listing-specs">
+
+                      <div class="listing-specs listing-specs--tiles">
                         @if($isEngineeringCategory)
                           @if($project->metaValue('service_type'))
-                            <span class="spec-item">Service <strong>{{ $project->metaValue('service_type') }}</strong></span>
+                            <div class="spec-tile">
+                              <span class="spec-tile-label">Service</span>
+                              <strong>{{ $project->metaValue('service_type') }}</strong>
+                            </div>
                           @endif
                           @if($project->metaValue('domain'))
-                            <span class="spec-item">Domain <strong>{{ $project->metaValue('domain') }}</strong></span>
+                            <div class="spec-tile">
+                              <span class="spec-tile-label">Domain</span>
+                              <strong>{{ $project->metaValue('domain') }}</strong>
+                            </div>
                           @endif
                           @if($project->metaValue('lead_time'))
-                            <span class="spec-item">Lead Time <strong>{{ $project->metaValue('lead_time') }}</strong></span>
+                            <div class="spec-tile">
+                              <span class="spec-tile-label">Lead Time</span>
+                              <strong>{{ $project->metaValue('lead_time') }}</strong>
+                            </div>
                           @endif
                           @if($project->metaValue('capacity'))
-                            <span class="spec-item">Capacity <strong>{{ $project->metaValue('capacity') }}</strong></span>
+                            <div class="spec-tile">
+                              <span class="spec-tile-label">Capacity</span>
+                              <strong>{{ $project->metaValue('capacity') }}</strong>
+                            </div>
                           @endif
                         @else
                           @if($project->metaValue('config'))
-                            <span class="spec-item">Config <strong>{{ $project->metaValue('config') }}</strong></span>
+                            <div class="spec-tile">
+                              <span class="spec-tile-label">Config</span>
+                              <strong>{{ $project->metaValue('config') }}</strong>
+                            </div>
                           @endif
                           @if($project->metaValue('sale_type'))
-                            <span class="spec-item">Sale Type <strong>{{ $project->metaValue('sale_type') }}</strong></span>
+                            <div class="spec-tile">
+                              <span class="spec-tile-label">Sale Type</span>
+                              <strong>{{ $project->metaValue('sale_type') }}</strong>
+                            </div>
                           @endif
                           @if($project->metaValue('possession'))
-                            <span class="spec-item">Possession <strong>{{ $project->metaValue('possession') }}</strong></span>
+                            <div class="spec-tile">
+                              <span class="spec-tile-label">Possession</span>
+                              <strong>{{ $project->metaValue('possession') }}</strong>
+                            </div>
                           @endif
                           @if($project->metaValue('parking'))
-                            <span class="spec-item">Parking <strong>{{ $project->metaValue('parking') }}</strong></span>
+                            <div class="spec-tile">
+                              <span class="spec-tile-label">Parking</span>
+                              <strong>{{ $project->metaValue('parking') }}</strong>
+                            </div>
                           @endif
                         @endif
                       </div>
+
                       @if($project->description)
                         <p class="listing-desc">{{ Str::limit(strip_tags($project->description), 160) }}</p>
                       @endif
@@ -495,7 +549,7 @@
                             <span class="amenity-tag">{{ $tag }}</span>
                           @endforeach
                           @if(count($tagList) > 3)
-                            <span class="amenity-tag">+more</span>
+                            <span class="amenity-tag amenity-tag--more">+{{ count($tagList) - 3 }} more</span>
                           @endif
                         </div>
                       @endif
