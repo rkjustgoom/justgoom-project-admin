@@ -12,7 +12,10 @@ const COMPANY_BANNER_FILES = [
   'cat-food.jpg', 'cat-business.jpg', 'hero-banner.jpg'
 ];
 
-function getCompanyBanner(index) {
+function getCompanyBanner(company, index) {
+  if (company && company.bannerUrl) {
+    return company.bannerUrl;
+  }
   var base = window.FRONT_ASSETS || 'front/assets/images';
   return base + '/' + COMPANY_BANNER_FILES[index % COMPANY_BANNER_FILES.length];
 }
@@ -97,62 +100,658 @@ function initFilterChipsLocal(container) {
 }
 
 function renderCompanyCard(company, index) {
-  const banner = getCompanyBanner(index);
+  const banner = getCompanyBanner(company, index);
   const logoColor = COMPANY_LOGO_COLORS[index % COMPANY_LOGO_COLORS.length];
-  const initials = getCompanyInitials(company.name);
+  const name = company.name || 'Business';
+  const category = company.category || 'Uncategorized';
+  const city = company.city || 'N/A';
+  const country = company.country || 'N/A';
+  const initials = getCompanyInitials(name);
   const starClass = company.featured ? ' is-starred' : '';
   const addedDays = company.addedDaysAgo ?? 0;
   const logoHtml = company.logoUrl
-    ? `<div class="company-logo company-logo-image"><img src="${company.logoUrl}" alt="${company.name}"></div>`
+    ? `<div class="company-logo company-logo-image"><img src="${company.logoUrl}" alt="${name}"></div>`
     : `<div class="company-logo" style="background:${logoColor}">${initials}</div>`;
 
+  const profileUrl = company.profileUrl || '#';
+  const esc = function(value) {
+    return String(value || '').toLowerCase().replace(/"/g, '&quot;');
+  };
+  const escAttr = function(value) {
+    return String(value || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  };
+
   return `
-    <article class="company-card"
-      data-name="${company.name.toLowerCase()}"
-      data-category="${company.category.toLowerCase()}"
-      data-category-slug="${(company.categorySlug || '').toLowerCase()}"
-      data-subcategory="${(company.subCategory || '').toLowerCase()}"
-      data-subcategory-slug="${(company.subCategorySlug || '').toLowerCase()}"
-      data-locality="${company.city.toLowerCase()}"
-      data-country="${(company.country || '').toLowerCase()}"
+    <article class="company-card company-card-clickable"
+      role="link"
+      tabindex="0"
+      data-profile-url="${escAttr(profileUrl)}"
+      data-company-name="${escAttr(name)}"
+      data-company-category="${escAttr(category)}"
+      data-company-city="${escAttr(city)}"
+      data-company-country="${escAttr(country)}"
+      data-company-logo="${escAttr(company.logoUrl || '')}"
+      data-company-banner="${escAttr(banner)}"
+      data-company-projects="${company.projects ?? 0}"
+      data-company-services="${company.services ?? company.tasks ?? 0}"
+      data-name="${esc(name)}"
+      data-category="${esc(category)}"
+      data-category-slug="${esc(company.categorySlug)}"
+      data-subcategory="${esc(company.subCategory)}"
+      data-subcategory-slug="${esc(company.subCategorySlug)}"
+      data-locality="${esc(city)}"
+      data-country="${esc(country)}"
       data-verified="${company.verified ? 'yes' : 'no'}"
       data-added-days="${addedDays}">
       <div class="company-card-banner">
-        <img src="${banner}" alt="${company.name}">
+        <img src="${banner}" alt="${escAttr(name)}">
         <button type="button" class="company-star${starClass}" aria-label="Favorite">★</button>
         <div class="company-menu-wrap">
           <button type="button" class="company-menu-btn" aria-label="More options">⋯</button>
           <div class="company-menu-dropdown">
-            <button type="button">Download Profile PDF</button>
-            <button type="button">Share Profile Link</button>
+            <button type="button" class="js-download-profile-pdf">Download Profile PDF</button>
+            <button type="button" class="js-share-profile-link">Share Profile Link</button>
           </div>
         </div>
       </div>
       <div class="company-card-body">
         ${logoHtml}
-        <h3 class="company-name">${company.name}</h3>
-        <p class="company-category">${company.category}</p>
-        <p class="company-location">📍 ${company.city}</p>
+        <h3 class="company-name">${name}</h3>
+        <p class="company-category">${category}</p>
+        <p class="company-location">📍 ${city}</p>
         ${company.verified ? '<span class="company-verified-badge">✓ Verified</span>' : ''}
         <span class="company-added-time">🕐 ${formatAddedTime(addedDays)}</span>
         <div class="company-stats">
           <div class="company-stat">
-            <span class="company-stat-num">${company.projects}</span>
+            <span class="company-stat-num">${company.projects ?? 0}</span>
             <span class="company-stat-label">Projects</span>
           </div>
           <div class="company-stat-divider"></div>
           <div class="company-stat">
-            <span class="company-stat-num">${company.tasks}</span>
-            <span class="company-stat-label">Tasks</span>
+            <span class="company-stat-num">${company.services ?? company.tasks ?? 0}</span>
+            <span class="company-stat-label">Services</span>
           </div>
         </div>
-        <a href="${company.profileUrl || '#'}" class="btn btn-view-profile">View Profile</a>
+        <a href="${profileUrl}" class="btn btn-view-profile">View Profile</a>
       </div>
     </article>
   `;
 }
 
+function openCompanyProfile(card) {
+  const url = card?.dataset?.profileUrl;
+  if (url && url !== '#') {
+    window.location.href = url;
+  }
+}
+
+function getCardProfileData(card) {
+  return {
+    url: card?.dataset?.profileUrl || '',
+    name: card?.dataset?.companyName || card?.dataset?.name || 'Business Profile',
+    category: card?.dataset?.companyCategory || '',
+    city: card?.dataset?.companyCity || '',
+    country: card?.dataset?.companyCountry || '',
+    logo: card?.dataset?.companyLogo || '',
+    banner: card?.dataset?.companyBanner || '',
+    projects: Number(card?.dataset?.companyProjects || 0),
+    services: Number(card?.dataset?.companyServices || 0),
+    verified: card?.dataset?.verified === 'yes'
+  };
+}
+
+function shareCompanyProfileLink(card, btn) {
+  const data = getCardProfileData(card);
+  if (!data.url || data.url === '#') return;
+
+  const markCopied = function() {
+    if (!btn) return;
+    const prev = btn.textContent;
+    btn.textContent = 'Link Copied';
+    setTimeout(function() { btn.textContent = prev; }, 1800);
+  };
+
+  const shareData = {
+    title: data.name + ' — JustGoom',
+    text: 'Check out ' + data.name + ' on JustGoom',
+    url: data.url
+  };
+
+  if (navigator.share) {
+    navigator.share(shareData).catch(function() {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(data.url).then(markCopied);
+      }
+    });
+    return;
+  }
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(data.url).then(markCopied);
+    return;
+  }
+
+  window.prompt('Copy profile link:', data.url);
+}
+
+function slugifyFilename(name) {
+  return String(name || 'profile')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 60) || 'profile';
+}
+
+function getProfileInitials(name) {
+  return String(name || 'JG')
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(function(part) { return part.charAt(0).toUpperCase(); })
+    .join('') || 'JG';
+}
+
+function loadPdfImage(src) {
+  if (!src) return Promise.resolve(null);
+  return new Promise(function(resolve) {
+    var settled = false;
+    var finish = function(img) {
+      if (settled) return;
+      settled = true;
+      resolve(img);
+    };
+    var img = new Image();
+    try {
+      var abs = new URL(src, window.location.href);
+      if (abs.origin !== window.location.origin) {
+        img.crossOrigin = 'anonymous';
+      }
+    } catch (err) { /* ignore */ }
+    img.onload = function() { finish(img); };
+    img.onerror = function() { finish(null); };
+    img.src = src;
+    setTimeout(function() { finish(null); }, 2500);
+  });
+}
+
+function roundRectPath(ctx, x, y, w, h, r) {
+  var radius = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.arcTo(x + w, y, x + w, y + h, radius);
+  ctx.arcTo(x + w, y + h, x, y + h, radius);
+  ctx.arcTo(x, y + h, x, y, radius);
+  ctx.arcTo(x, y, x + w, y, radius);
+  ctx.closePath();
+}
+
+function wrapCanvasText(ctx, text, maxWidth) {
+  var words = String(text || '').split(/\s+/).filter(Boolean);
+  var lines = [];
+  var current = '';
+  words.forEach(function(word) {
+    var next = current ? current + ' ' + word : word;
+    if (ctx.measureText(next).width > maxWidth && current) {
+      lines.push(current);
+      current = word;
+    } else {
+      current = next;
+    }
+  });
+  if (current) lines.push(current);
+  return lines.length ? lines : [''];
+}
+
+function strToPdfBytes(str) {
+  var bytes = new Uint8Array(str.length);
+  for (var i = 0; i < str.length; i++) bytes[i] = str.charCodeAt(i) & 0xff;
+  return bytes;
+}
+
+function concatPdfBytes(chunks) {
+  var total = 0;
+  chunks.forEach(function(chunk) { total += chunk.length; });
+  var out = new Uint8Array(total);
+  var offset = 0;
+  chunks.forEach(function(chunk) {
+    out.set(chunk, offset);
+    offset += chunk.length;
+  });
+  return out;
+}
+
+function canvasToJpegBytes(canvas) {
+  return new Promise(function(resolve, reject) {
+    if (canvas.toBlob) {
+      canvas.toBlob(function(blob) {
+        if (!blob) {
+          reject(new Error('JPEG export failed'));
+          return;
+        }
+        blob.arrayBuffer().then(function(buf) {
+          resolve(new Uint8Array(buf));
+        }).catch(reject);
+      }, 'image/jpeg', 0.95);
+      return;
+    }
+    try {
+      var dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+      var base64 = dataUrl.split(',')[1] || '';
+      var binary = atob(base64);
+      var bytes = new Uint8Array(binary.length);
+      for (var i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      resolve(bytes);
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
+/** Build a real A4 PDF with the designed canvas JPEG (no CDN / jsPDF). */
+function buildA4PdfFromJpeg(jpegBytes, pixelW, pixelH) {
+  var pageW = 595.28;
+  var pageH = 841.89;
+  var content = 'q\n' + pageW + ' 0 0 ' + pageH + ' 0 0 cm\n/Im0 Do\nQ\n';
+
+  var chunks = [];
+  var offsets = [0];
+  var pos = 0;
+
+  function pushBytes(bytes) {
+    chunks.push(bytes);
+    pos += bytes.length;
+  }
+
+  function pushStr(str) {
+    pushBytes(strToPdfBytes(str));
+  }
+
+  function startObj() {
+    offsets.push(pos);
+  }
+
+  pushStr('%PDF-1.4\n');
+
+  startObj();
+  pushStr('1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n');
+
+  startObj();
+  pushStr('2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n');
+
+  startObj();
+  pushStr(
+    '3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ' + pageW + ' ' + pageH + ']'
+    + ' /Contents 4 0 R /Resources << /XObject << /Im0 5 0 R >> >> >>\nendobj\n'
+  );
+
+  startObj();
+  pushStr('4 0 obj\n<< /Length ' + content.length + ' >>\nstream\n' + content + '\nendstream\nendobj\n');
+
+  startObj();
+  pushStr(
+    '5 0 obj\n<< /Type /XObject /Subtype /Image /Width ' + pixelW
+    + ' /Height ' + pixelH
+    + ' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length '
+    + jpegBytes.length + ' >>\nstream\n'
+  );
+  pushBytes(jpegBytes);
+  pushStr('\nendstream\nendobj\n');
+
+  var xrefStart = pos;
+  pushStr('xref\n0 ' + offsets.length + '\n');
+  pushStr('0000000000 65535 f \n');
+  for (var i = 1; i < offsets.length; i++) {
+    pushStr(String(offsets[i]).padStart(10, '0') + ' 00000 n \n');
+  }
+  pushStr('trailer\n<< /Size ' + offsets.length + ' /Root 1 0 R >>\n');
+  pushStr('startxref\n' + xrefStart + '\n%%EOF');
+
+  return new Blob([concatPdfBytes(chunks)], { type: 'application/pdf' });
+}
+
+function triggerBlobDownload(blob, filename) {
+  var objectUrl = URL.createObjectURL(blob);
+  var link = document.createElement('a');
+  link.href = objectUrl;
+  link.download = filename;
+  link.rel = 'noopener';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(function() { URL.revokeObjectURL(objectUrl); }, 1500);
+}
+
+function drawProfilePdfCanvas(data, logoImg, bannerImg) {
+  // A4 @ 96dpi — modern digital business profile sheet
+  var W = 794;
+  var H = 1123;
+  var pad = 44;
+  var contentW = W - pad * 2;
+  var NAVY = '#0B2A5B';
+  var BLUE = '#1A428A';
+  var ACCENT = '#F7941D';
+  var SOFT = '#F4F7FB';
+  var MUTED = '#64748b';
+  var INK = '#0f172a';
+
+  var canvas = document.createElement('canvas');
+  canvas.width = W * 2;
+  canvas.height = H * 2;
+  var ctx = canvas.getContext('2d');
+  ctx.scale(2, 2);
+
+  function drawLogo(x, y, size) {
+    ctx.fillStyle = '#ffffff';
+    roundRectPath(ctx, x - 5, y - 5, size + 10, size + 10, size * 0.28);
+    ctx.fill();
+    if (logoImg) {
+      ctx.save();
+      roundRectPath(ctx, x, y, size, size, size * 0.22);
+      ctx.clip();
+      ctx.drawImage(logoImg, x, y, size, size);
+      ctx.restore();
+    } else {
+      var g = ctx.createLinearGradient(x, y, x + size, y + size);
+      g.addColorStop(0, BLUE);
+      g.addColorStop(1, NAVY);
+      ctx.fillStyle = g;
+      roundRectPath(ctx, x, y, size, size, size * 0.22);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '800 ' + Math.round(size * 0.34) + 'px Arial,sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(getProfileInitials(data.name), x + size / 2, y + size / 2);
+      ctx.textAlign = 'left';
+    }
+  }
+
+  // Page base
+  ctx.fillStyle = SOFT;
+  ctx.fillRect(0, 0, W, H);
+
+  // ===== HERO =====
+  var heroH = 340;
+  if (bannerImg) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, 0, W, heroH);
+    ctx.clip();
+    var bw = bannerImg.naturalWidth || bannerImg.width || 1;
+    var bh = bannerImg.naturalHeight || bannerImg.height || 1;
+    var scale = Math.max(W / bw, heroH / bh);
+    var dw = bw * scale;
+    var dh = bh * scale;
+    ctx.drawImage(bannerImg, (W - dw) / 2, (heroH - dh) / 2, dw, dh);
+    ctx.restore();
+  } else {
+    var heroGrad = ctx.createLinearGradient(0, 0, W, heroH);
+    heroGrad.addColorStop(0, '#072047');
+    heroGrad.addColorStop(0.55, BLUE);
+    heroGrad.addColorStop(1, '#2457b0');
+    ctx.fillStyle = heroGrad;
+    ctx.fillRect(0, 0, W, heroH);
+  }
+
+  // Dark cinematic overlay
+  var overlay = ctx.createLinearGradient(0, 0, 0, heroH);
+  overlay.addColorStop(0, 'rgba(7,32,71,0.55)');
+  overlay.addColorStop(0.45, 'rgba(7,32,71,0.35)');
+  overlay.addColorStop(1, 'rgba(7,32,71,0.88)');
+  ctx.fillStyle = overlay;
+  ctx.fillRect(0, 0, W, heroH);
+
+  // Soft accent glow
+  ctx.fillStyle = 'rgba(247,148,29,0.16)';
+  ctx.beginPath();
+  ctx.arc(W - 40, 40, 140, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Top brand row
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '800 22px Arial,sans-serif';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('Just', pad, 36);
+  var justW = ctx.measureText('Just').width;
+  ctx.fillStyle = ACCENT;
+  ctx.fillText('Goom', pad + justW, 36);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.18)';
+  roundRectPath(ctx, W - pad - 168, 22, 168, 28, 14);
+  ctx.fill();
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '700 11px Arial,sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(data.verified ? '★  VERIFIED PROFILE' : '●  BUSINESS PROFILE', W - pad - 84, 36);
+  ctx.textAlign = 'left';
+
+  // Hero company identity
+  var logoSize = 88;
+  var logoX = pad;
+  var logoY = heroH - 148;
+  drawLogo(logoX, logoY, logoSize);
+
+  var titleX = logoX + logoSize + 20;
+  var titleMax = W - titleX - pad;
+  ctx.fillStyle = 'rgba(255,255,255,0.72)';
+  ctx.font = '700 11px Arial,sans-serif';
+  ctx.textBaseline = 'top';
+  ctx.fillText((data.category || 'BUSINESS').toUpperCase(), titleX, logoY + 4);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '800 36px Arial,sans-serif';
+  var nameLines = wrapCanvasText(ctx, data.name || 'Business Profile', titleMax).slice(0, 2);
+  nameLines.forEach(function(line, i) {
+    ctx.fillText(line, titleX, logoY + 24 + i * 40);
+  });
+  var nameH = nameLines.length * 40;
+
+  ctx.fillStyle = ACCENT;
+  ctx.fillRect(titleX, logoY + 24 + nameH + 4, 52, 4);
+
+  var metaY = logoY + 24 + nameH + 18;
+  ctx.font = '600 13px Arial,sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.9)';
+  var locationLabel = [data.city, data.country].filter(Boolean).join(' · ') || 'India';
+  ctx.fillText(locationLabel, titleX, metaY);
+
+  // Orange accent strip under hero
+  ctx.fillStyle = ACCENT;
+  ctx.fillRect(0, heroH, W, 6);
+
+  // ===== BODY CARD =====
+  var cardY = heroH + 22;
+  var cardH = H - cardY - 64;
+  ctx.fillStyle = '#ffffff';
+  roundRectPath(ctx, pad, cardY, contentW, cardH, 20);
+  ctx.fill();
+  ctx.strokeStyle = '#e8eef6';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  var innerX = pad + 24;
+  var innerW = contentW - 48;
+  var y = cardY + 22;
+
+  ctx.fillStyle = ACCENT;
+  ctx.font = '800 10px Arial,sans-serif';
+  ctx.textBaseline = 'top';
+  ctx.fillText('SNAPSHOT', innerX, y);
+  ctx.fillStyle = NAVY;
+  ctx.font = '800 20px Arial,sans-serif';
+  ctx.fillText('Business at a glance', innerX, y + 16);
+  y += 48;
+
+  var metrics = [
+    { num: String(data.projects || 0), label: 'Projects', tone: BLUE },
+    { num: String(data.services || 0), label: 'Services', tone: ACCENT },
+    { num: data.verified ? 'Verified' : 'Public', label: 'Status', tone: data.verified ? '#059669' : BLUE },
+    { num: data.city || '—', label: 'Location', tone: NAVY }
+  ];
+  var gap = 10;
+  var tileW = (innerW - gap * 3) / 4;
+  var tileH = 78;
+  metrics.forEach(function(m, i) {
+    var tx = innerX + i * (tileW + gap);
+    roundRectPath(ctx, tx, y, tileW, tileH, 14);
+    ctx.fillStyle = SOFT;
+    ctx.fill();
+    ctx.fillStyle = m.tone;
+    ctx.fillRect(tx, y, 4, tileH);
+    ctx.fillStyle = NAVY;
+    ctx.font = '800 22px Arial,sans-serif';
+    ctx.textBaseline = 'top';
+    ctx.fillText(wrapCanvasText(ctx, m.num, tileW - 20)[0], tx + 14, y + 16);
+    ctx.fillStyle = MUTED;
+    ctx.font = '700 10px Arial,sans-serif';
+    ctx.fillText(m.label.toUpperCase(), tx + 14, y + 48);
+  });
+  y += tileH + 26;
+
+  ctx.fillStyle = ACCENT;
+  ctx.font = '800 10px Arial,sans-serif';
+  ctx.fillText('DETAILS', innerX, y);
+  ctx.fillStyle = NAVY;
+  ctx.font = '800 20px Arial,sans-serif';
+  ctx.fillText('Company information', innerX, y + 16);
+  y += 48;
+
+  var details = [
+    { label: 'Company', value: data.name || '—' },
+    { label: 'Category', value: data.category || '—' },
+    { label: 'City', value: data.city || '—' },
+    { label: 'Country', value: data.country || '—' },
+    { label: 'Listing', value: data.verified ? 'Verified on JustGoom' : 'Public JustGoom listing' },
+    { label: 'Network', value: 'JustGoom Business Directory' }
+  ];
+  var colW = (innerW - 14) / 2;
+  var rowH = 54;
+  details.forEach(function(item, i) {
+    var col = i % 2;
+    var row = Math.floor(i / 2);
+    var dx = innerX + col * (colW + 14);
+    var dy = y + row * (rowH + 10);
+    roundRectPath(ctx, dx, dy, colW, rowH, 12);
+    ctx.fillStyle = SOFT;
+    ctx.fill();
+    ctx.fillStyle = MUTED;
+    ctx.font = '700 9px Arial,sans-serif';
+    ctx.textBaseline = 'top';
+    ctx.fillText(item.label.toUpperCase(), dx + 14, dy + 10);
+    ctx.fillStyle = INK;
+    ctx.font = '700 14px Arial,sans-serif';
+    ctx.fillText(wrapCanvasText(ctx, item.value, colW - 28)[0], dx + 14, dy + 28);
+  });
+  y += 3 * (rowH + 10) + 4;
+
+  var ctaH = 100;
+  roundRectPath(ctx, innerX, y, innerW, ctaH, 16);
+  var ctaGrad = ctx.createLinearGradient(innerX, y, innerX + innerW, y + ctaH);
+  ctaGrad.addColorStop(0, NAVY);
+  ctaGrad.addColorStop(1, BLUE);
+  ctx.fillStyle = ctaGrad;
+  ctx.fill();
+
+  ctx.fillStyle = ACCENT;
+  ctx.beginPath();
+  ctx.moveTo(innerX + innerW - 64, y);
+  ctx.lineTo(innerX + innerW, y);
+  ctx.lineTo(innerX + innerW, y + 64);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.fillStyle = 'rgba(255,255,255,0.7)';
+  ctx.font = '800 10px Arial,sans-serif';
+  ctx.textBaseline = 'top';
+  ctx.fillText('OPEN FULL PROFILE', innerX + 22, y + 18);
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '700 15px Arial,sans-serif';
+  wrapCanvasText(ctx, data.url || '', innerW - 90).slice(0, 2).forEach(function(line, i) {
+    ctx.fillText(line, innerX + 22, y + 38 + i * 20);
+  });
+  ctx.fillStyle = 'rgba(255,255,255,0.65)';
+  ctx.font = '11px Arial,sans-serif';
+  ctx.fillText('Share with clients, partners & teams', innerX + 22, y + 78);
+  // ===== FOOTER =====
+  var footerY = H - 52;
+  ctx.fillStyle = NAVY;
+  ctx.fillRect(0, footerY, W, 52);
+  ctx.fillStyle = ACCENT;
+  ctx.fillRect(0, footerY, W, 3);
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '700 13px Arial,sans-serif';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('Just Goom LLP', pad, footerY + 26);
+  ctx.fillStyle = 'rgba(255,255,255,0.7)';
+  ctx.font = '12px Arial,sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText('Business directory profile · A4', W - pad, footerY + 26);
+  ctx.textAlign = 'left';
+
+  return canvas;
+}
+
+function downloadCompanyProfilePdf(card, btn) {
+  const data = getCardProfileData(card);
+  if (!data.url || data.url === '#') return;
+
+  const prev = btn ? btn.textContent : '';
+  const filename = slugifyFilename(data.name) + '-profile.pdf';
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Downloading…';
+  }
+
+  Promise.all([
+    loadPdfImage(data.logo),
+    loadPdfImage(data.banner)
+  ])
+    .then(function(images) {
+      var logoImg = images[0];
+      var bannerImg = images[1];
+      var canvas;
+      try {
+        canvas = drawProfilePdfCanvas(data, logoImg, bannerImg);
+        // If canvas is tainted, toBlob/toDataURL will fail — rebuild without images
+        canvas.toDataURL('image/jpeg', 0.5);
+      } catch (err) {
+        canvas = drawProfilePdfCanvas(data, null, null);
+      }
+
+      return canvasToJpegBytes(canvas).then(function(jpegBytes) {
+        var pdfBlob = buildA4PdfFromJpeg(jpegBytes, canvas.width, canvas.height);
+        triggerBlobDownload(pdfBlob, filename);
+      });
+    })
+    .catch(function(err) {
+      console.warn('Profile PDF failed', err);
+      alert('Unable to download designed PDF. Please try again.');
+    })
+    .finally(function() {
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = prev || 'Download Profile PDF';
+      }
+    });
+}
+
 function bindCardInteractions(grid) {
+  grid.querySelectorAll('.company-card-clickable').forEach(card => {
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.company-star, .company-menu-wrap, .company-menu-dropdown, .btn-view-profile')) {
+        return;
+      }
+      openCompanyProfile(card);
+    });
+
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openCompanyProfile(card);
+      }
+    });
+  });
+
   grid.querySelectorAll('.company-menu-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -161,6 +760,24 @@ function bindCardInteractions(grid) {
         if (d !== dropdown) d.classList.remove('open');
       });
       dropdown?.classList.toggle('open');
+    });
+  });
+
+  grid.querySelectorAll('.js-share-profile-link').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const card = btn.closest('.company-card');
+      shareCompanyProfileLink(card, btn);
+      btn.closest('.company-menu-dropdown')?.classList.remove('open');
+    });
+  });
+
+  grid.querySelectorAll('.js-download-profile-pdf').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const card = btn.closest('.company-card');
+      downloadCompanyProfilePdf(card, btn);
+      btn.closest('.company-menu-dropdown')?.classList.remove('open');
     });
   });
 

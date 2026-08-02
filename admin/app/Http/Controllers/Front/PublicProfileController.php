@@ -49,6 +49,7 @@ class PublicProfileController extends Controller
         $products = $this->serviceService->listForPublicProfile($user, 'product');
         $documents = $this->documentService->listForPublicProfile($user);
         $projects = $user->projects()->where('status', 1)->latest()->get();
+        $user->setRelation('projects', $projects);
         $articles = $user->articles()->where('status', 'published')->latest('published_at')->get();
         $offers = $user->offers()->active()->orderByDesc('is_featured')->orderByDesc('created_at')->get();
         $videos = collect(DB::table('videos')
@@ -95,6 +96,7 @@ class PublicProfileController extends Controller
             'offers' => $offers,
             'videos' => $videos,
             'activities' => $activities,
+            'bannerUrl' => \App\Support\ProfileBanner::url($profile, $user),
             'completionPercent' => $this->profileService->completionPercent($user),
             'planName' => $this->profileService->planName($user),
             'isOwner' => auth()->check() && auth()->id() === $user->id,

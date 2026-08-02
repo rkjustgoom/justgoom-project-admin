@@ -15,6 +15,7 @@
     ? 'https://www.google.com/maps/search/?api=1&query='.rawurlencode($mapQuery)
     : null;
   $logoUrl = $profile->logo ? asset($profile->logo) : null;
+  $bannerUrl = $bannerUrl ?? \App\Support\ProfileBanner::url($profile, $user);
   $initials = collect(explode(' ', $profile->company_name))
     ->filter()
     ->take(2)
@@ -31,7 +32,7 @@
 
 @section('content')
   <section class="profile-hero">
-    <div class="profile-hero-bg" style="background-image:url('{{ asset('front/assets/images/hero-banner.jpg') }}')"></div>
+    <div class="profile-hero-bg" style="background-image:url('{{ $bannerUrl }}')"></div>
     <div class="container profile-hero-inner">
       <div class="profile-hero-top">
         <div class="profile-hero-brand">

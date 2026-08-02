@@ -131,14 +131,30 @@
         </div>
 
         <div class="profiles-results-bar">
-          <p class="company-count" id="categoryCompanyCount">Showing 1–12 of 28 profiles</p>
-          <span class="profiles-page-info" id="profilesPageInfo">Page 1 of 3 · 12 per page · 3 per row</span>
+          @php
+            $totalListedProfiles = count($companyProfiles ?? []);
+            $profilesPerPage = 12;
+            $profilesTotalPages = max(1, (int) ceil(max($totalListedProfiles, 1) / $profilesPerPage));
+            $profilesShowingEnd = min($profilesPerPage, $totalListedProfiles);
+          @endphp
+          <p class="company-count" id="categoryCompanyCount">
+            @if($totalListedProfiles === 0)
+              No profiles found
+            @else
+              Showing 1–{{ $profilesShowingEnd }} of {{ $totalListedProfiles }} profiles
+            @endif
+          </p>
+          <span class="profiles-page-info" id="profilesPageInfo">
+            @if($totalListedProfiles > 0)
+              Page 1 of {{ $profilesTotalPages }} · {{ $profilesPerPage }} per page · 3 per row
+            @endif
+          </span>
           <a href="{{ route('front.register') }}" class="profiles-add-link">+ Add Your Profile</a>
         </div>
 
         <div class="company-grid profiles-grid profiles-grid-3" id="categoryCompanyGrid"></div>
 
-        <p class="profiles-empty" id="profilesEmpty" hidden>No profiles match your filters. Try adjusting your search or filters.</p>
+        <p class="profiles-empty" id="profilesEmpty" @if($totalListedProfiles > 0) hidden @endif>No profiles match your filters. Try adjusting your search or filters.</p>
 
         <nav class="pagination company-pagination profiles-pagination" id="profilesPagination" aria-label="Profile pages"></nav>
       </div>

@@ -3,6 +3,7 @@
 namespace App\Services\Front;
 
 use App\Models\CompanyProfile;
+use App\Support\ProfileBanner;
 use Illuminate\Support\Facades\DB;
 
 class PublicProfileListingService
@@ -10,7 +11,17 @@ class PublicProfileListingService
     public function listForFrontend(): array
     {
         return CompanyProfile::query()
-            ->with(['user.category'])
+            ->with([
+                'user' => fn ($q) => $q
+                    ->with([
+                        'category',
+                        'projects' => fn ($pq) => $pq->where('status', 1)->latest()->limit(1),
+                    ])
+                    ->withCount([
+                        'projects as projects_count' => fn ($q) => $q->where('status', 1),
+                        'services as services_count',
+                    ]),
+            ])
             ->whereHas('user', fn ($q) => $this->applyPublicUserConstraints($q))
             ->latest()
             ->get()
@@ -84,8 +95,8 @@ class PublicProfileListingService
             'subCategorySlug' => $user
                 ? $user->subCategories()->pluck('slug')->filter()->implode(',')
                 : '',
-            'projects' => 0,
-            'tasks' => 0,
+            'projects' => (int) ($user->projects_count ?? 0),
+            'services' => (int) ($user->services_count ?? 0),
             'city' => $profile->city ?: ($user->city ?: 'N/A'),
             'country' => $profile->country ?: 'N/A',
             'verified' => $user->hasVerifiedEmail(),
@@ -96,6 +107,7 @@ class PublicProfileListingService
             'profileUrl' => route('front.profile.show', $profile->slug),
             'tagline' => $profile->tagline,
             'logoUrl' => $profile->logo ? asset($profile->logo) : null,
+            'bannerUrl' => ProfileBanner::url($profile, $user),
         ];
     }
 

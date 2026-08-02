@@ -3988,6 +3988,9 @@ select.form-input:disabled {
   box-shadow: var(--shadow-sm);
   transition: box-shadow var(--transition), transform var(--transition);
 }
+.company-card-clickable {
+  cursor: pointer;
+}
 .company-card:hover {
   box-shadow: var(--shadow);
   transform: translateY(-2px);
