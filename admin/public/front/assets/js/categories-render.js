@@ -13,27 +13,37 @@ function renderSectorCard(sector) {
   var maxVisible = 6;
   var visibleSubs = sector.subs.slice(0, maxVisible);
   var remaining = sector.subs.length - visibleSubs.length;
+  var sectorUrl = (typeof getCategoryDetailsUrl === 'function')
+    ? getCategoryDetailsUrl(sector.slug)
+    : getCategoryProfileUrl(sector.slug);
+  var isEcommerce = sector.section === 'ecommerce';
 
   var subsHtml = visibleSubs.map(function(sub) {
-    return '<a href="' + getCategoryProfileUrl(sub.slug) + '" class="globy-sub-chip" title="' + sub.name + '">' +
+    var subUrl = (typeof getCategoryDetailsUrl === 'function')
+      ? getCategoryDetailsUrl(sector.slug, sub.slug)
+      : getCategoryProfileUrl(sub.slug);
+    return '<a href="' + subUrl + '" class="globy-sub-chip" title="' + sub.name + '">' +
       sub.name + '</a>';
   }).join('');
 
   if (remaining > 0) {
-    subsHtml += '<a href="' + getCategoryProfileUrl(sector.slug) + '" class="globy-sub-chip globy-sub-chip-more">+' +
+    subsHtml += '<a href="' + sectorUrl + '" class="globy-sub-chip globy-sub-chip-more">+' +
       remaining + ' more</a>';
   }
 
-  return '<article class="globy-sector-card" data-sector-slug="' + sector.slug + '">' +
+  return '<article class="globy-sector-card" data-sector-slug="' + sector.slug + '"' +
+      (isEcommerce ? ' data-section="ecommerce"' : '') + '>' +
     '<div class="globy-sector-card-top">' +
       '<h3 class="globy-sector-title">' +
         renderCategoryIcon(sector) +
-        '<a href="' + getCategoryProfileUrl(sector.slug) + '">' + sector.name + '</a>' +
+        '<a href="' + sectorUrl + '">' + sector.name + '</a>' +
       '</h3>' +
       '<span class="globy-sector-count">' + sector.subs.length + ' subs</span>' +
     '</div>' +
     '<div class="globy-sector-subs">' + subsHtml + '</div>' +
-    '<a href="' + getCategoryProfileUrl(sector.slug) + '" class="globy-sector-view">Browse sector profiles →</a>' +
+    '<a href="' + sectorUrl + '" class="globy-sector-view">' +
+      (isEcommerce ? 'Shop category →' : 'Browse category →') +
+    '</a>' +
   '</article>';
 }
 
@@ -124,7 +134,10 @@ function renderPopularStrip() {
 
   var popular = CATEGORY_SECTORS.slice(0, 10);
   strip.innerHTML = popular.map(function(sector) {
-    return '<a href="' + getCategoryProfileUrl(sector.slug) + '" class="categories-popular-item">' +
+    var url = (typeof getCategoryDetailsUrl === 'function')
+      ? getCategoryDetailsUrl(sector.slug)
+      : getCategoryProfileUrl(sector.slug);
+    return '<a href="' + url + '" class="categories-popular-item">' +
       '<span class="categories-popular-icon">' + (sector.iconUrl ? '<img src="' + sector.iconUrl + '" alt="" class="globy-sector-icon-img">' : (sector.icon || '📂')) + '</span>' +
       '<span class="categories-popular-label">' + sector.name + '</span>' +
     '</a>';

@@ -339,6 +339,16 @@ function getCategoryProfileUrl(slug) {
   return base + (base.indexOf('?') >= 0 ? '&' : '?') + 'category=' + encodeURIComponent(slug);
 }
 
+/** Category ecommerce / details page: /category/{sectorSlug}?sub={subSlug} */
+function getCategoryDetailsUrl(sectorSlug, subSlug) {
+  var base = (window.FRONT_ROUTES && window.FRONT_ROUTES.categoryBase) || '/category';
+  var url = String(base).replace(/\/$/, '') + '/' + encodeURIComponent(sectorSlug);
+  if (subSlug) {
+    url += (url.indexOf('?') >= 0 ? '&' : '?') + 'sub=' + encodeURIComponent(subSlug);
+  }
+  return url;
+}
+
 function getTotalSubcategoryCount() {
   return CATEGORY_SECTORS.reduce(function(sum, s) { return sum + s.subs.length; }, 0);
 }

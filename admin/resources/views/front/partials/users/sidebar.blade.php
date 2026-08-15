@@ -14,6 +14,7 @@
     ?? \App\Models\Plan::where('name', 'Free')->value('name')
     ?? 'Free';
   $sidebarProjectSection = \App\Support\ProjectSection::forUser($sidebarUser);
+  $sidebarIsEcommerce = $sidebarProjectSection === \App\Support\ProjectSection::ECOMMERCE;
   $sidebarProjectLabel = match ($sidebarProjectSection) {
       \App\Support\ProjectSection::REAL_ESTATE => 'My Listings',
       \App\Support\ProjectSection::ENGINEERING => 'My Listings',
@@ -26,6 +27,10 @@
       \App\Support\ProjectSection::ECOMMERCE => '🛍️',
       default => '📁',
   };
+  $sidebarServicesActive = request()->routeIs('front.users.services', 'front.users.service-*')
+    && request('type') !== 'product';
+  $sidebarCatalogProductsActive = request()->routeIs('front.users.services', 'front.users.service-*')
+    && request('type') === 'product';
 @endphp
 <button type="button" class="user-sidebar-close" aria-label="Close menu">✕</button>
 <div class="user-sidebar-brand">
@@ -45,12 +50,18 @@
     <a href="{{ route('front.users.business-activity') }}" class="user-nav-link{{ request()->routeIs('front.users.business-activity') ? ' active' : '' }}" data-nav="business-activity"><span class="nav-icon">📈</span>Business Activity</a>
   </div>
   <div class="user-nav-section">
-    <div class="user-nav-heading">My Business</div>
+    <div class="user-nav-heading">{{ $sidebarIsEcommerce ? 'Store' : 'My Business' }}</div>
     <a href="{{ route('front.users.profile') }}" class="user-nav-link{{ request()->routeIs('front.users.profile*') ? ' active' : '' }}" data-nav="profile"><span class="nav-icon">👤</span>My Profile</a>
     <a href="{{ route('front.users.team') }}" class="user-nav-link{{ request()->routeIs('front.users.team', 'front.users.team-*') ? ' active' : '' }}" data-nav="team"><span class="nav-icon">👥</span>My Team</a>
-    <a href="{{ route('front.users.services') }}" class="user-nav-link{{ request()->routeIs('front.users.services', 'front.users.service-*') ? ' active' : '' }}" data-nav="services"><span class="nav-icon">💼</span>Services & Products</a>
+    @if($sidebarIsEcommerce)
+      <a href="{{ route('front.users.services', ['type' => 'service']) }}" class="user-nav-link{{ $sidebarServicesActive ? ' active' : '' }}" data-nav="services"><span class="nav-icon">🔧</span>Services</a>
+      <a href="{{ route('front.users.services', ['type' => 'product']) }}" class="user-nav-link{{ $sidebarCatalogProductsActive ? ' active' : '' }}" data-nav="catalog-products"><span class="nav-icon">📦</span>Catalog Products</a>
+      <a href="{{ route('front.users.projects') }}" class="user-nav-link{{ request()->routeIs('front.users.projects', 'front.users.project-*') ? ' active' : '' }}" data-nav="projects"><span class="nav-icon">{{ $sidebarProjectIcon }}</span>{{ $sidebarProjectLabel }}</a>
+    @else
+      <a href="{{ route('front.users.services') }}" class="user-nav-link{{ request()->routeIs('front.users.services', 'front.users.service-*') ? ' active' : '' }}" data-nav="services"><span class="nav-icon">💼</span>Services & Products</a>
+      <a href="{{ route('front.users.projects') }}" class="user-nav-link{{ request()->routeIs('front.users.projects', 'front.users.project-*') ? ' active' : '' }}" data-nav="projects"><span class="nav-icon">{{ $sidebarProjectIcon }}</span>{{ $sidebarProjectLabel }}</a>
+    @endif
     <a href="{{ route('front.users.documents') }}" class="user-nav-link{{ request()->routeIs('front.users.documents', 'front.users.document-*') ? ' active' : '' }}" data-nav="documents"><span class="nav-icon">📄</span>My Documents</a>
-    <a href="{{ route('front.users.projects') }}" class="user-nav-link{{ request()->routeIs('front.users.projects', 'front.users.project-*') ? ' active' : '' }}" data-nav="projects"><span class="nav-icon">{{ $sidebarProjectIcon }}</span>{{ $sidebarProjectLabel }}</a>
   </div>
   <div class="user-nav-section">
     <div class="user-nav-heading">Content & Marketing</div>
@@ -71,6 +82,9 @@
 </nav>
 <div class="user-sidebar-footer">
   <a href="{{ route('front.home') }}">🌐 View Public Site</a>
+  @if($sidebarIsEcommerce && $sidebarUser?->category)
+    <a href="{{ route('front.category-details', $sidebarUser->category->slug) }}">🛒 View Category Shop</a>
+  @endif
   <form method="POST" action="{{ route('front.logout') }}" id="frontLogoutForm" style="display:block;">
     @csrf
     <button type="submit" class="user-logout-btn" style="color: #fff;">🚪 Logout</button>

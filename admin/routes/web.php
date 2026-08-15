@@ -58,7 +58,12 @@ Route::get('/articles/{slug}', [ArticleController::class, 'show'])
     ->name('front.articles.show');
 Route::get('/calculators', fn () => app(PageController::class)->publicPage('calculators'))->name('front.calculators');
 Route::get('/categories', [FrontCategoryController::class, 'index'])->name('front.categories');
-Route::get('/category-details', fn () => app(PageController::class)->publicPage('category-details'))->name('front.category-details');
+Route::get('/category/{slug}', [FrontCategoryController::class, 'show'])
+    ->where('slug', '[a-z0-9\-]+')
+    ->name('front.category-details');
+Route::get('/category-details', function () {
+    return redirect()->route('front.category-details', ['slug' => 'electronics-electrical']);
+})->name('front.category-details.legacy');
 Route::get('/contact', fn () => app(PageController::class)->publicPage('contact'))->name('front.contact');
 Route::get('/all-profiles', [PublicProfileController::class, 'index'])->name('front.all-profiles');
 Route::get('/profile', [PublicProfileController::class, 'redirectLegacy'])->name('front.profile');

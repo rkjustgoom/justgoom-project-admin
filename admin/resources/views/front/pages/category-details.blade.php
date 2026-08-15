@@ -1,282 +1,402 @@
 @extends('front.layouts.app')
 
-@section('title', 'Just Goom | Company Profile | JustGoom')
-@section('meta_description', 'Just Goom company profile — IT services, team, projects, and contact information on JustGoom.')
-@section('body_attrs', 'class="profile-page" data-page="all-profiles"')
+@php
+  $heroTitle = $subCategory?->name ?? $category->name;
+  $heroIcon = $categoryIcon['emoji'] ?? '🔌';
+  $heroIconUrl = $categoryIcon['url'] ?? null;
+  $allProfilesUrl = route('front.all-profiles', array_filter([
+    'category' => $category->slug,
+    'sub' => $subCategory?->slug,
+  ]));
+  $projectsTabLabel = $isEcommerce ? 'Store Products' : 'Projects';
+@endphp
+
+@section('title', $heroTitle.' — Shop & Suppliers | JustGoom')
+@section('meta_description', 'Browse products, services, and sellers in '.$heroTitle.' on JustGoom — '.$catalogStats['subs'].' subcategories, '.$catalogStats['sellers'].'+ verified businesses.')
+@section('body_attrs', 'class="category-details-page'.($isEcommerce ? ' is-ecommerce' : '').'" data-page="category-details"')
 
 @section('content')
-<!-- Profile Hero -->
-  <section class="profile-hero">
-    <div class="profile-hero-bg" style="background-image:url('assets/images/hero-banner.jpg')"></div>
-    <div class="container profile-hero-inner">
-      <div class="profile-hero-top">
-        <div class="profile-hero-brand">
-          <div class="profile-hero-logo">JG</div>
-          <div>
-            <h1>Just Goom</h1>
-            <p class="profile-category">IT Company</p>
-            <div class="profile-meta">
-              <span>📍 California, United States</span>
-              <a href="https://justgoom.com" target="_blank" rel="noopener">🌐 justgoom.com</a>
-            </div>
-          </div>
-        </div>
-        <div class="profile-hero-stats">
-          <div class="profile-stat">
-            <strong>24.3K</strong>
-            <span>Followers</span>
-          </div>
-          <div class="profile-stat">
-            <strong>1.3K</strong>
-            <span>Following</span>
-          </div>
+<section class="page-hero category-details-hero">
+  <div class="container">
+    <nav class="breadcrumb">
+      <a href="{{ route('front.home') }}">Home</a>
+      <span class="breadcrumb-sep">›</span>
+      <a href="{{ route('front.categories') }}">Categories</a>
+      <span class="breadcrumb-sep">›</span>
+      @if($subCategory)
+        <a href="{{ route('front.category-details', $category->slug) }}">{{ $category->name }}</a>
+        <span class="breadcrumb-sep">›</span>
+        <span>{{ $subCategory->name }}</span>
+      @else
+        <span>{{ $category->name }}</span>
+      @endif
+    </nav>
+
+    <div class="category-details-hero-row">
+      <div class="category-details-hero-copy">
+        <div class="category-details-badge">{{ $isEcommerce ? 'Ecommerce Category' : 'Business Category' }}</div>
+        <h1>
+          @if($heroIconUrl)
+            <img src="{{ $heroIconUrl }}" alt="" class="category-details-hero-icon-img">
+          @else
+            <span class="category-details-hero-icon" aria-hidden="true">{{ $heroIcon }}</span>
+          @endif
+          {{ $heroTitle }}
+        </h1>
+        <p>
+          Discover products, services, and verified sellers in {{ $category->name }}
+          @if($subCategory) — focused on {{ $subCategory->name }}@endif.
+          Shop catalogs and connect with suppliers across India.
+        </p>
+        <div class="category-details-hero-actions">
+          <a href="#categoryCatalog" class="btn btn-primary">Browse Catalog</a>
+          <a href="{{ $allProfilesUrl }}" class="btn btn-outline">View All Sellers</a>
+          @guest
+            <a href="{{ route('front.register') }}" class="btn btn-outline">List Your Business</a>
+          @endguest
         </div>
       </div>
-
-      <div class="profile-hero-nav">
-        <nav class="profile-tabs" id="profileTabs">
-          <button type="button" class="active" data-tab="overview">Overview</button>
-          <button type="button" data-tab="activities">Activities</button>
-          <button type="button" data-tab="projects">Projects</button>
-          <button type="button" data-tab="documents">Documents</button>
-          <button type="button" data-tab="services">Services</button>
-          <button type="button" data-tab="product">Product</button>
-          <button type="button" data-tab="blog">My Blog</button>
-          <button type="button" data-tab="location">My Location</button>
-        </nav>
-        <button type="button" class="btn-share-profile">↗ Share Profile</button>
+      <div class="category-details-hero-stats">
+        <div class="category-details-stat-card">
+          <strong>{{ $catalogStats['products'] }}</strong>
+          <span>Products</span>
+        </div>
+        <div class="category-details-stat-card">
+          <strong>{{ $catalogStats['services'] }}</strong>
+          <span>Services</span>
+        </div>
+        <div class="category-details-stat-card">
+          <strong>{{ $catalogStats['projects'] }}</strong>
+          <span>{{ $isEcommerce ? 'Listings' : 'Projects' }}</span>
+        </div>
+        <div class="category-details-stat-card">
+          <strong>{{ $catalogStats['sellers'] }}</strong>
+          <span>Sellers</span>
+        </div>
       </div>
     </div>
-  </section>
-
-  <!-- Profile Body -->
-  <div class="container profile-body">
-
-    <aside class="profile-sidebar">
-      <div class="profile-card profile-progress-card">
-        <h3>Complete Your Profile</h3>
-        <div class="profile-progress-bar">
-          <div class="profile-progress-fill" style="width:30%"></div>
-        </div>
-        <span class="profile-progress-label">30%</span>
-      </div>
-
-      <div class="profile-card">
-        <h3>Info</h3>
-        <ul class="profile-info-list">
-          <li><span>Full Name :</span><strong>Just Goom</strong></li>
-          <li><span>Mobile :</span><strong>+91 7201838383</strong></li>
-          <li><span>E-mail :</span><strong>info@justgoom.com</strong></li>
-          <li><span>Location :</span><strong>California, United States</strong></li>
-          <li><span>Joining Date :</span><strong>24 Nov 2021</strong></li>
-        </ul>
-      </div>
-
-      <div class="profile-card">
-        <h3>Portfolio</h3>
-        <div class="profile-portfolio">
-          <a href="#" class="portfolio-icon github" title="GitHub">GH</a>
-          <a href="#" class="portfolio-icon web" title="Website">🌐</a>
-          <a href="#" class="portfolio-icon dribbble" title="Dribbble">Dr</a>
-          <a href="#" class="portfolio-icon behance" title="Behance">Be</a>
-        </div>
-      </div>
-    </aside>
-
-    <main class="profile-content">
-
-      <!-- Overview -->
-      <div class="profile-tab-pane active" data-pane="overview">
-        <div class="profile-card profile-about-card">
-          <h3>About</h3>
-          <div class="profile-about-text">
-            <p>Hi I'm Just Goom, It will be as simple as Occidental in fact, it will be Occidental. To an English person, it will seem like simplified English, as a skeptical Cambridge friend of mine told me what Occidental is. The European languages are members of the same family.</p>
-            <p>You always want to make sure that your fonts work well together and try to limit the number of fonts you use to three or fewer. Experiment and play around with the fonts that you already have in the software you're working with, or you can always revert to the defaults.</p>
-          </div>
-          <div class="profile-quick-info">
-            <div class="quick-info-item">
-              <span class="quick-info-icon">💼</span>
-              <div>
-                <span class="quick-info-label">Designation</span>
-                <strong>Lead Designer / Developer</strong>
-              </div>
-            </div>
-            <div class="quick-info-item">
-              <span class="quick-info-icon">🌐</span>
-              <div>
-                <span class="quick-info-label">Website</span>
-                <strong>www.justgoom.com</strong>
-              </div>
-            </div>
-            <div class="quick-info-item">
-              <span class="quick-info-icon">🔗</span>
-              <div>
-                <span class="quick-info-label">Sub Website</span>
-                <strong>blog.justgoom.com</strong>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="profile-card profile-team-card">
-          <div class="profile-team-header">
-            <h3>Team</h3>
-            <div class="team-time-filter">
-              <button type="button" class="active">Today</button>
-              <button type="button">Weekly</button>
-              <button type="button">Monthly</button>
-            </div>
-          </div>
-          <div class="profile-team-grid">
-            <article class="team-member-card">
-              <div class="team-avatar" style="background:#6366f1">GM</div>
-              <h4>Glen Matney</h4>
-              <p class="team-role">Marketing Director</p>
-              <p class="team-location">📍 California, United States</p>
-              <a href="{{ route('front.category-details') }}" class="btn btn-primary btn-block btn-sm">View Profile</a>
-            </article>
-            <article class="team-member-card">
-              <div class="team-avatar" style="background:#ec4899">JD</div>
-              <h4>James Dave</h4>
-              <p class="team-role">Project Manager</p>
-              <p class="team-location">📍 California, United States</p>
-              <a href="{{ route('front.category-details') }}" class="btn btn-primary btn-block btn-sm">View Profile</a>
-            </article>
-            <article class="team-member-card">
-              <div class="team-avatar" style="background:#14b8a6">LH</div>
-              <h4>Laura Hansen</h4>
-              <p class="team-role">UI/UX Designer</p>
-              <p class="team-location">📍 California, United States</p>
-              <a href="{{ route('front.category-details') }}" class="btn btn-primary btn-block btn-sm">View Profile</a>
-            </article>
-            <article class="team-member-card">
-              <div class="team-avatar" style="background:#f59e0b">RK</div>
-              <h4>Ronald Keith</h4>
-              <p class="team-role">Backend Developer</p>
-              <p class="team-location">📍 California, United States</p>
-              <a href="{{ route('front.category-details') }}" class="btn btn-primary btn-block btn-sm">View Profile</a>
-            </article>
-          </div>
-        </div>
-      </div>
-
-      <!-- Activities -->
-      <div class="profile-tab-pane" data-pane="activities">
-        <div class="profile-card">
-          <h3>Recent Activities</h3>
-          <ul class="profile-activity-list">
-            <li><span class="activity-dot"></span> Updated company portfolio — <time>2 hours ago</time></li>
-            <li><span class="activity-dot"></span> Added 3 new team members — <time>Yesterday</time></li>
-            <li><span class="activity-dot"></span> Published blog post on digital trends — <time>3 days ago</time></li>
-            <li><span class="activity-dot"></span> Completed project milestone for client — <time>1 week ago</time></li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- Projects -->
-      <div class="profile-tab-pane" data-pane="projects">
-        <div class="profile-card">
-          <h3>Projects</h3>
-          <div class="profile-projects-grid">
-            <div class="profile-project-item">
-              <strong>JustGoom Platform</strong>
-              <span>Web Development · 225 Tasks</span>
-            </div>
-            <div class="profile-project-item">
-              <strong>Health Calculator App</strong>
-              <span>Mobile · 197 Tasks</span>
-            </div>
-            <div class="profile-project-item">
-              <strong>Category Discovery Portal</strong>
-              <span>UI/UX · 164 Tasks</span>
-            </div>
-            <div class="profile-project-item">
-              <strong>Business Listing Module</strong>
-              <span>Backend · 182 Tasks</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Documents -->
-      <div class="profile-tab-pane" data-pane="documents">
-        <div class="profile-card">
-          <h3>Documents</h3>
-          <ul class="profile-doc-list">
-            <li><span>📄</span> Company Profile.pdf <a href="#">Download</a></li>
-            <li><span>📄</span> Service Agreement.docx <a href="#">Download</a></li>
-            <li><span>📄</span> Portfolio Brochure.pdf <a href="#">Download</a></li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- Services -->
-      <div class="profile-tab-pane" data-pane="services">
-        <div class="profile-card">
-          <h3>Services</h3>
-          <div class="profile-services-grid">
-            <div class="profile-service-tag">Web Development</div>
-            <div class="profile-service-tag">Mobile Apps</div>
-            <div class="profile-service-tag">UI/UX Design</div>
-            <div class="profile-service-tag">Digital Marketing</div>
-            <div class="profile-service-tag">Cloud Solutions</div>
-            <div class="profile-service-tag">IT Consulting</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Product -->
-      <div class="profile-tab-pane" data-pane="product">
-        <div class="profile-card">
-          <h3>Products</h3>
-          <div class="profile-projects-grid">
-            <div class="profile-project-item">
-              <strong>JustGoom Admin Panel</strong>
-              <span>Business management software</span>
-            </div>
-            <div class="profile-project-item">
-              <strong>Health Tracker Pro</strong>
-              <span>Wellness & BMI tools</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Blog -->
-      <div class="profile-tab-pane" data-pane="blog">
-        <div class="profile-card">
-          <h3>My Blog</h3>
-          <div class="profile-blog-list">
-            <a href="{{ route('front.articles') }}" class="profile-blog-item">
-              <strong>How to grow your local business online</strong>
-              <span>May 28, 2026</span>
-            </a>
-            <a href="{{ route('front.articles') }}" class="profile-blog-item">
-              <strong>Top 10 categories trending in 2026</strong>
-              <span>May 15, 2026</span>
-            </a>
-            <a href="{{ route('front.articles') }}" class="profile-blog-item">
-              <strong>Building trust with verified profiles</strong>
-              <span>Apr 30, 2026</span>
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Location -->
-      <div class="profile-tab-pane" data-pane="location">
-        <div class="profile-card">
-          <h3>My Location</h3>
-          <p class="profile-location-text">📍 California, United States</p>
-          <div class="profile-map-placeholder">
-            <img src="{{ asset('front/assets/images/hero-banner.jpg') }}" alt="Location map preview">
-            <span>Map preview — California, United States</span>
-          </div>
-        </div>
-      </div>
-
-    </main>
   </div>
+  <div class="pixel-deco orange"><span></span><span></span><span></span><span></span></div>
+</section>
 
-  <button type="button" class="profile-fab" aria-label="Settings">⚙</button>
+@if($category->subCategories->isNotEmpty())
+<section class="category-details-subs">
+  <div class="container">
+    <div class="category-details-subs-head">
+      <h2>Subcategories</h2>
+      <span>{{ $catalogStats['subs'] }} specialties</span>
+    </div>
+    <div class="category-details-sub-chips">
+      <a href="{{ route('front.category-details', $category->slug) }}"
+         class="category-sub-chip{{ ! $subCategory ? ' active' : '' }}">All</a>
+      @foreach($category->subCategories as $sub)
+        <a href="{{ route('front.category-details', ['slug' => $category->slug, 'sub' => $sub->slug]) }}"
+           class="category-sub-chip{{ $subCategory && $subCategory->id === $sub->id ? ' active' : '' }}">
+          {{ $sub->name }}
+        </a>
+      @endforeach
+    </div>
+  </div>
+</section>
+@endif
+
+<section class="category-details-main" id="categoryCatalog">
+  <div class="container">
+    <nav class="category-details-tabs" id="categoryDetailsTabs" aria-label="Category catalog sections">
+      <button type="button" class="active" data-tab="products">
+        Products <span>{{ $products->count() + ($isEcommerce ? $projects->count() : 0) }}</span>
+      </button>
+      <button type="button" data-tab="services">
+        Services <span>{{ $services->count() }}</span>
+      </button>
+      <button type="button" data-tab="projects">
+        {{ $projectsTabLabel }} <span>{{ $projects->count() }}</span>
+      </button>
+      <button type="button" data-tab="sellers">
+        Sellers <span>{{ $sellers->count() }}</span>
+      </button>
+    </nav>
+
+    {{-- Products --}}
+    <div class="category-details-pane active" data-pane="products">
+      <div class="category-details-pane-head">
+        <h2>Products</h2>
+        <p>Shop product catalogs from businesses in {{ $heroTitle }}.</p>
+      </div>
+
+      @php
+        $hasCatalogProducts = $products->isNotEmpty();
+        $hasProjectProducts = $isEcommerce && $projects->isNotEmpty();
+      @endphp
+
+      @if($hasCatalogProducts || $hasProjectProducts)
+        <div class="profile-products-grid category-catalog-grid">
+          @foreach($products as $product)
+            @php
+              $sellerProfile = $product->user?->companyProfile;
+              $sellerUrl = $sellerProfile?->slug ? route('front.profile.show', $sellerProfile->slug) : null;
+            @endphp
+            <article class="profile-product-card">
+              <div class="profile-product-card-media">
+                @if($product->product_image)
+                  <img src="{{ asset($product->product_image) }}" alt="{{ $product->product_name }}">
+                @else
+                  <div class="profile-product-card-placeholder" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="40" height="40"><path fill="currentColor" d="M20 6H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 13H4V8h16v11z"/></svg>
+                  </div>
+                @endif
+                <span class="profile-item-badge profile-item-badge--product">Product</span>
+              </div>
+              <div class="profile-product-card-body">
+                <h4>{{ $product->product_name }}</h4>
+                @if($product->formattedPrice())
+                  <div class="profile-product-price">{{ $product->formattedPrice() }}</div>
+                @endif
+                @if($product->product_desc)
+                  <p>{{ \Illuminate\Support\Str::limit($product->product_desc, 80) }}</p>
+                @endif
+                @if($sellerProfile)
+                  <a href="{{ $sellerUrl }}" class="category-card-seller">{{ $sellerProfile->company_name }}</a>
+                @endif
+              </div>
+            </article>
+          @endforeach
+
+          @if($isEcommerce)
+            @foreach($projects as $project)
+              @php
+                $cover = $project->coverImage();
+                $sellerProfile = $project->user?->companyProfile;
+                $sellerUrl = $sellerProfile?->slug ? route('front.profile.show', $sellerProfile->slug) : null;
+              @endphp
+              <article class="profile-product-card">
+                <div class="profile-product-card-media">
+                  @if($cover)
+                    <img src="{{ asset($cover) }}" alt="{{ $project->title }}">
+                  @else
+                    <div class="profile-product-card-placeholder" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" width="40" height="40"><path fill="currentColor" d="M20 6H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 13H4V8h16v11z"/></svg>
+                    </div>
+                  @endif
+                  <span class="profile-item-badge profile-item-badge--product">Listing</span>
+                </div>
+                <div class="profile-product-card-body">
+                  <h4>{{ $project->title }}</h4>
+                  @if($project->formattedPrice())
+                    <div class="profile-product-price">{{ $project->formattedPrice() }}</div>
+                  @endif
+                  @if($project->description)
+                    <p>{{ \Illuminate\Support\Str::limit($project->description, 80) }}</p>
+                  @endif
+                  @if($sellerProfile)
+                    <a href="{{ $sellerUrl }}" class="category-card-seller">{{ $sellerProfile->company_name }}</a>
+                  @endif
+                </div>
+              </article>
+            @endforeach
+          @endif
+        </div>
+      @else
+        <div class="category-details-empty">
+          <p>No products listed yet in this category.</p>
+          <a href="{{ route('front.register') }}" class="btn btn-primary btn-sm">Become a Seller</a>
+        </div>
+      @endif
+    </div>
+
+    {{-- Services --}}
+    <div class="category-details-pane" data-pane="services">
+      <div class="category-details-pane-head">
+        <h2>Services</h2>
+        <p>Installation, contracting, repair, and support services.</p>
+      </div>
+
+      @if($services->isNotEmpty())
+        <div class="profile-services-list category-services-list">
+          @foreach($services as $service)
+            @php
+              $sellerProfile = $service->user?->companyProfile;
+              $sellerUrl = $sellerProfile?->slug ? route('front.profile.show', $sellerProfile->slug) : null;
+            @endphp
+            <article class="profile-service-row">
+              <div class="profile-service-row-media">
+                @if($service->product_image)
+                  <img src="{{ asset($service->product_image) }}" alt="{{ $service->product_name }}">
+                @else
+                  <div class="profile-service-row-placeholder" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="28" height="28"><path fill="currentColor" d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg>
+                  </div>
+                @endif
+              </div>
+              <div class="profile-service-row-body">
+                <div class="profile-service-row-top">
+                  <span class="profile-item-badge profile-item-badge--service">Service</span>
+                  @if($service->formattedPrice())
+                    <span class="profile-service-row-price">{{ $service->formattedPrice() }}</span>
+                  @endif
+                </div>
+                <h4>{{ $service->product_name }}</h4>
+                @if($service->product_desc)
+                  <p>{{ \Illuminate\Support\Str::limit($service->product_desc, 140) }}</p>
+                @endif
+                @if($sellerProfile)
+                  <a href="{{ $sellerUrl }}" class="category-card-seller">{{ $sellerProfile->company_name }}</a>
+                @endif
+              </div>
+            </article>
+          @endforeach
+        </div>
+      @else
+        <div class="category-details-empty">
+          <p>No services listed yet in this category.</p>
+        </div>
+      @endif
+    </div>
+
+    {{-- Projects / Store listings --}}
+    <div class="category-details-pane" data-pane="projects">
+      <div class="category-details-pane-head">
+        <h2>{{ $projectsTabLabel }}</h2>
+        <p>
+          @if($isEcommerce)
+            Featured product listings from Electronics &amp; Electrical sellers.
+          @else
+            Projects and showcase work from businesses in this category.
+          @endif
+        </p>
+      </div>
+
+      @if($projects->isNotEmpty())
+        <div class="profile-products-grid category-catalog-grid">
+          @foreach($projects as $project)
+            @php
+              $cover = $project->coverImage();
+              $sellerProfile = $project->user?->companyProfile;
+              $sellerUrl = $sellerProfile?->slug ? route('front.profile.show', $sellerProfile->slug) : null;
+            @endphp
+            <article class="profile-product-card">
+              <div class="profile-product-card-media">
+                @if($cover)
+                  <img src="{{ asset($cover) }}" alt="{{ $project->title }}">
+                @else
+                  <div class="profile-product-card-placeholder" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="40" height="40"><path fill="currentColor" d="M20 6H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 13H4V8h16v11z"/></svg>
+                  </div>
+                @endif
+                <span class="profile-item-badge profile-item-badge--product">{{ $isEcommerce ? 'Product' : 'Project' }}</span>
+              </div>
+              <div class="profile-product-card-body">
+                <h4>{{ $project->title }}</h4>
+                @if($project->formattedPrice())
+                  <div class="profile-product-price">{{ $project->formattedPrice() }}</div>
+                @endif
+                @if($project->description)
+                  <p>{{ \Illuminate\Support\Str::limit($project->description, 90) }}</p>
+                @endif
+                @if($sellerProfile)
+                  <a href="{{ $sellerUrl }}" class="category-card-seller">{{ $sellerProfile->company_name }}</a>
+                @endif
+              </div>
+            </article>
+          @endforeach
+        </div>
+      @else
+        <div class="category-details-empty">
+          <p>No {{ strtolower($projectsTabLabel) }} yet.</p>
+        </div>
+      @endif
+    </div>
+
+    {{-- Sellers --}}
+    <div class="category-details-pane" data-pane="sellers">
+      <div class="category-details-pane-head">
+        <h2>Verified Sellers</h2>
+        <p>Businesses registered under {{ $heroTitle }}.</p>
+      </div>
+
+      @if($sellers->isNotEmpty())
+        <div class="category-sellers-grid">
+          @foreach($sellers as $seller)
+            <a href="{{ $seller['profileUrl'] }}" class="category-seller-card">
+              <div class="category-seller-banner" @if(!empty($seller['bannerUrl'])) style="background-image:url('{{ $seller['bannerUrl'] }}')" @endif></div>
+              <div class="category-seller-body">
+                <div class="category-seller-logo">
+                  @if(!empty($seller['logoUrl']))
+                    <img src="{{ $seller['logoUrl'] }}" alt="">
+                  @else
+                    <span>{{ strtoupper(substr($seller['name'], 0, 2)) }}</span>
+                  @endif
+                </div>
+                <div>
+                  <h3>
+                    {{ $seller['name'] }}
+                    @if($seller['verified'])
+                      <span class="category-seller-verified" title="Verified">✓</span>
+                    @endif
+                  </h3>
+                  <p>{{ $seller['tagline'] ?: $seller['category'] }}</p>
+                  <span class="category-seller-meta">📍 {{ $seller['city'] }}</span>
+                </div>
+              </div>
+            </a>
+          @endforeach
+        </div>
+        <div class="category-details-more">
+          <a href="{{ $allProfilesUrl }}" class="btn btn-outline">View all sellers →</a>
+        </div>
+      @else
+        <div class="category-details-empty">
+          <p>No sellers registered in this category yet.</p>
+          <a href="{{ route('front.register') }}" class="btn btn-primary btn-sm">Register your business</a>
+        </div>
+      @endif
+    </div>
+  </div>
+</section>
+
+<section class="category-details-cta">
+  <div class="container category-details-cta-inner">
+    <div>
+      <h2>Sell in {{ $category->name }}</h2>
+      <p>
+        Register with the <strong>{{ $category->name }}</strong> category to unlock
+        @if($isEcommerce)
+          Products, Services &amp; store listings in your seller dashboard.
+        @else
+          Services, Products &amp; Projects in your business dashboard.
+        @endif
+      </p>
+    </div>
+    <div class="category-details-cta-actions">
+      @guest
+        <a href="{{ route('front.register') }}" class="btn btn-primary">Create Seller Account</a>
+        <a href="{{ route('front.login') }}" class="btn btn-outline">Login</a>
+      @else
+        <a href="{{ route('front.users.services') }}" class="btn btn-primary">Manage Services &amp; Products</a>
+        <a href="{{ route('front.users.projects') }}" class="btn btn-outline">{{ $isEcommerce ? 'My Products' : 'My Projects' }}</a>
+      @endguest
+    </div>
+  </div>
+</section>
 @endsection
+
+@push('scripts')
+<script>
+(function () {
+  var tabs = document.getElementById('categoryDetailsTabs');
+  if (!tabs) return;
+  var buttons = tabs.querySelectorAll('[data-tab]');
+  var panes = document.querySelectorAll('.category-details-pane');
+
+  buttons.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var tab = btn.getAttribute('data-tab');
+      buttons.forEach(function (b) { b.classList.toggle('active', b === btn); });
+      panes.forEach(function (pane) {
+        pane.classList.toggle('active', pane.getAttribute('data-pane') === tab);
+      });
+    });
+  });
+})();
+</script>
+@endpush
