@@ -23,9 +23,6 @@ class ProjectSection
     /** Category slugs that use engineering / industrial listing UI */
     public const ENGINEERING_SLUGS = ['industrial-machinery', 'manufacturing'];
 
-    /** Category slugs that use ecommerce product UI (My Products + catalog details) */
-    public const ECOMMERCE_SLUGS = ['electronics-electrical'];
-
     public static function forUser(?User $user): string
     {
         if (! $user) {
@@ -43,40 +40,12 @@ class ProjectSection
             return self::ENGINEERING;
         }
 
-        if ($slug !== '' && in_array($slug, self::ECOMMERCE_SLUGS, true)) {
-            return self::ECOMMERCE;
-        }
-
         // Legacy fallback if category relation / slug missing
         if ((int) ($user->category_id ?? 0) === self::REAL_ESTATE_CATEGORY_ID) {
             return self::REAL_ESTATE;
         }
 
         return self::NORMAL;
-    }
-
-    public static function forCategorySlug(?string $slug): string
-    {
-        $slug = strtolower(trim((string) $slug));
-        if ($slug === '') {
-            return self::NORMAL;
-        }
-        if (in_array($slug, self::REAL_ESTATE_SLUGS, true)) {
-            return self::REAL_ESTATE;
-        }
-        if (in_array($slug, self::ENGINEERING_SLUGS, true)) {
-            return self::ENGINEERING;
-        }
-        if (in_array($slug, self::ECOMMERCE_SLUGS, true)) {
-            return self::ECOMMERCE;
-        }
-
-        return self::NORMAL;
-    }
-
-    public static function isEcommerceSlug(?string $slug): bool
-    {
-        return self::forCategorySlug($slug) === self::ECOMMERCE;
     }
 
     public static function isValid(string $section): bool
