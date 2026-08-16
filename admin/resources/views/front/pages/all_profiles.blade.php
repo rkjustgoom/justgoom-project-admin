@@ -33,11 +33,11 @@
         <div class="stat-label">Verified</div>
       </div>
       <div class="stat-item">
-        <div class="stat-num">{{ max($profileStats['cities'], 1) }}</div>
+        <div class="stat-num">{{ $profileStats['cities'] }}</div>
         <div class="stat-label">Cities</div>
       </div>
       <div class="stat-item">
-        <div class="stat-num">{{ max($profileStats['categories'], 1) }}+</div>
+        <div class="stat-num">{{ $profileStats['categories'] }}</div>
         <div class="stat-label">Categories</div>
       </div>
     </div>

@@ -35,7 +35,7 @@
         <div class="stat-label">Verified Profiles</div>
       </div>
       <div class="stat-item">
-        <div class="stat-num">{{ max($catalogStats['cities'], 1) }}+</div>
+        <div class="stat-num">{{ $catalogStats['cities'] }}</div>
         <div class="stat-label">Cities Covered</div>
       </div>
     </div>
