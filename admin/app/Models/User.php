@@ -126,6 +126,32 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(UserPlan::class);
     }
 
+    public function auditLogs(): HasMany
+    {
+        return $this->hasMany(AuditLog::class);
+    }
+
+    public function paymentLogs(): HasMany
+    {
+        return $this->hasMany(PaymentLog::class);
+    }
+
+    public function activeUserPlan(): ?UserPlan
+    {
+        return once(function () {
+            return $this->userPlans()
+                ->with('plan')
+                ->where('next_purchase_date', '>=', now()->toDateString())
+                ->orderByDesc('next_purchase_date')
+                ->first();
+        });
+    }
+
+    public function hasActivePlan(): bool
+    {
+        return $this->activeUserPlan() !== null;
+    }
+
     public function teams(): HasMany
     {
         return $this->hasMany(Team::class);

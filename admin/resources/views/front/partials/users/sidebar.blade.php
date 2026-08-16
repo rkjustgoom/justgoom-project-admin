@@ -3,16 +3,17 @@
   if ($sidebarUser) {
       $sidebarUser->loadMissing('category');
   }
-  $sidebarUserPlan = $sidebarUser
+  $hasActivePlan = $hasActivePlan ?? false;
+  $sidebarUserPlan = $activeUserPlan ?? ($sidebarUser
     ? \App\Models\UserPlan::with('plan')
         ->where('user_id', auth()->id())
         ->where('next_purchase_date', '>=', now()->toDateString())
         ->orderByDesc('next_purchase_date')
         ->first()
-    : null;
-  $sidebarPlanName = $sidebarUserPlan?->plan?->name
-    ?? \App\Models\Plan::where('name', 'Free')->value('name')
-    ?? 'Free';
+    : null);
+  $sidebarPlanName = $hasActivePlan
+    ? ($sidebarUserPlan?->plan?->name ?? 'Active')
+    : 'No Plan';
   $sidebarProjectSection = \App\Support\ProjectSection::forUser($sidebarUser);
   $sidebarProjectLabel = match ($sidebarProjectSection) {
       \App\Support\ProjectSection::REAL_ESTATE => 'My Listings',
@@ -26,47 +27,57 @@
       \App\Support\ProjectSection::ECOMMERCE => '🛍️',
       default => '📁',
   };
+  $sidebarPlanIcon = match ($sidebarPlanName) {
+      'Platinum' => '💎',
+      'Gold' => '🥇',
+      'Silver' => '🥈',
+      'No Plan' => '🔒',
+      default => '🆓',
+  };
+  $lockHref = route('front.users.subscription');
 @endphp
 <button type="button" class="user-sidebar-close" aria-label="Close menu">✕</button>
 <div class="user-sidebar-brand">
-  <a href="{{ route('front.users.dashboard') }}"><img src="{{ asset('front/assets/images/justgoom-logo.png') }}" alt="JustGoom"></a>
+  <a href="{{ $hasActivePlan ? route('front.users.dashboard') : route('front.users.profile') }}"><img src="{{ asset('front/assets/images/justgoom-logo.png') }}" alt="JustGoom"></a>
 </div>
 <div class="user-sidebar-plan">
-  <span class="user-sidebar-plan-icon">{{ $sidebarPlanName === 'Platinum' ? '💎' : ($sidebarPlanName === 'Gold' ? '🥇' : '🆓') }}</span>
+  <span class="user-sidebar-plan-icon">{{ $sidebarPlanIcon }}</span>
   <div>
-    <strong>{{ $sidebarPlanName }} Plan</strong>
-    <span><a href="{{ route('front.users.subscription') }}" style="color:inherit;text-decoration:underline;">Manage subscription</a></span>
+    <strong>{{ $sidebarPlanName }}{{ $sidebarPlanName === 'No Plan' ? '' : ' Plan' }}</strong>
+    <span><a href="{{ route('front.users.subscription') }}" style="color:inherit;text-decoration:underline;">{{ $hasActivePlan ? 'Manage subscription' : 'Purchase a plan' }}</a></span>
   </div>
 </div>
 <nav>
   <div class="user-nav-section">
+    <div class="user-nav-heading">Account</div>
+    <a href="{{ route('front.users.profile') }}" class="user-nav-link{{ request()->routeIs('front.users.profile*') ? ' active' : '' }}" data-nav="profile"><span class="nav-icon">👤</span>My Profile</a>
+    <a href="{{ route('front.users.subscription') }}" class="user-nav-link{{ request()->routeIs('front.users.subscription') ? ' active' : '' }}" data-nav="subscription"><span class="nav-icon">💳</span>Subscription</a>
+    <a href="{{ route('front.users.payments') }}" class="user-nav-link{{ request()->routeIs('front.users.payments*') ? ' active' : '' }}" data-nav="payments"><span class="nav-icon">🧾</span>Payment History</a>
+    <a href="{{ route('front.users.audit-logs') }}" class="user-nav-link{{ request()->routeIs('front.users.audit-logs') ? ' active' : '' }}" data-nav="audit-logs"><span class="nav-icon">📋</span>Audit Logs</a>
+    <a href="{{ route('front.users.change-password') }}" class="user-nav-link{{ request()->routeIs('front.users.change-password') ? ' active' : '' }}" data-nav="change-password"><span class="nav-icon">🔑</span>Change Password</a>
+  </div>
+  <div class="user-nav-section">
     <div class="user-nav-heading">Overview</div>
-    <a href="{{ route('front.users.dashboard') }}" class="user-nav-link{{ request()->routeIs('front.users.dashboard') ? ' active' : '' }}" data-nav="dashboard"><span class="nav-icon">📊</span>Dashboard</a>
-    <a href="{{ route('front.users.business-activity') }}" class="user-nav-link{{ request()->routeIs('front.users.business-activity') ? ' active' : '' }}" data-nav="business-activity"><span class="nav-icon">📈</span>Business Activity</a>
+    <a href="{{ $hasActivePlan ? route('front.users.dashboard') : $lockHref }}" class="user-nav-link{{ request()->routeIs('front.users.dashboard') ? ' active' : '' }}{{ $hasActivePlan ? '' : ' is-locked' }}" data-nav="dashboard"@if(! $hasActivePlan) data-requires-plan="1"@endif><span class="nav-icon">📊</span>Dashboard</a>
+    <a href="{{ $hasActivePlan ? route('front.users.business-activity') : $lockHref }}" class="user-nav-link{{ request()->routeIs('front.users.business-activity') ? ' active' : '' }}{{ $hasActivePlan ? '' : ' is-locked' }}" data-nav="business-activity"@if(! $hasActivePlan) data-requires-plan="1"@endif><span class="nav-icon">📈</span>Business Activity</a>
   </div>
   <div class="user-nav-section">
     <div class="user-nav-heading">My Business</div>
-    <a href="{{ route('front.users.profile') }}" class="user-nav-link{{ request()->routeIs('front.users.profile*') ? ' active' : '' }}" data-nav="profile"><span class="nav-icon">👤</span>My Profile</a>
-    <a href="{{ route('front.users.team') }}" class="user-nav-link{{ request()->routeIs('front.users.team', 'front.users.team-*') ? ' active' : '' }}" data-nav="team"><span class="nav-icon">👥</span>My Team</a>
-    <a href="{{ route('front.users.services') }}" class="user-nav-link{{ request()->routeIs('front.users.services', 'front.users.service-*') ? ' active' : '' }}" data-nav="services"><span class="nav-icon">💼</span>Services & Products</a>
-    <a href="{{ route('front.users.documents') }}" class="user-nav-link{{ request()->routeIs('front.users.documents', 'front.users.document-*') ? ' active' : '' }}" data-nav="documents"><span class="nav-icon">📄</span>My Documents</a>
-    <a href="{{ route('front.users.projects') }}" class="user-nav-link{{ request()->routeIs('front.users.projects', 'front.users.project-*') ? ' active' : '' }}" data-nav="projects"><span class="nav-icon">{{ $sidebarProjectIcon }}</span>{{ $sidebarProjectLabel }}</a>
+    <a href="{{ $hasActivePlan ? route('front.users.team') : $lockHref }}" class="user-nav-link{{ request()->routeIs('front.users.team', 'front.users.team-*') ? ' active' : '' }}{{ $hasActivePlan ? '' : ' is-locked' }}" data-nav="team"@if(! $hasActivePlan) data-requires-plan="1"@endif><span class="nav-icon">👥</span>My Team</a>
+    <a href="{{ $hasActivePlan ? route('front.users.services') : $lockHref }}" class="user-nav-link{{ request()->routeIs('front.users.services', 'front.users.service-*') ? ' active' : '' }}{{ $hasActivePlan ? '' : ' is-locked' }}" data-nav="services"@if(! $hasActivePlan) data-requires-plan="1"@endif><span class="nav-icon">💼</span>Services & Products</a>
+    <a href="{{ $hasActivePlan ? route('front.users.documents') : $lockHref }}" class="user-nav-link{{ request()->routeIs('front.users.documents', 'front.users.document-*') ? ' active' : '' }}{{ $hasActivePlan ? '' : ' is-locked' }}" data-nav="documents"@if(! $hasActivePlan) data-requires-plan="1"@endif><span class="nav-icon">📄</span>My Documents</a>
+    <a href="{{ $hasActivePlan ? route('front.users.projects') : $lockHref }}" class="user-nav-link{{ request()->routeIs('front.users.projects', 'front.users.project-*') ? ' active' : '' }}{{ $hasActivePlan ? '' : ' is-locked' }}" data-nav="projects"@if(! $hasActivePlan) data-requires-plan="1"@endif><span class="nav-icon">{{ $sidebarProjectIcon }}</span>{{ $sidebarProjectLabel }}</a>
   </div>
   <div class="user-nav-section">
     <div class="user-nav-heading">Content & Marketing</div>
-    <a href="{{ route('front.users.articles') }}" class="user-nav-link{{ request()->routeIs('front.users.articles', 'front.users.article-*') ? ' active' : '' }}" data-nav="articles"><span class="nav-icon">📝</span>My Articles</a>
-    <a href="{{ route('front.users.videos') }}" class="user-nav-link{{ request()->routeIs('front.users.videos', 'front.users.video-*') ? ' active' : '' }}" data-nav="videos"><span class="nav-icon">🎬</span>My Videos</a>
-    <a href="{{ route('front.users.offers') }}" class="user-nav-link{{ request()->routeIs('front.users.offers', 'front.users.offer-*') ? ' active' : '' }}" data-nav="offers"><span class="nav-icon">🏷️</span>My Offers</a>
+    <a href="{{ $hasActivePlan ? route('front.users.articles') : $lockHref }}" class="user-nav-link{{ request()->routeIs('front.users.articles', 'front.users.article-*') ? ' active' : '' }}{{ $hasActivePlan ? '' : ' is-locked' }}" data-nav="articles"@if(! $hasActivePlan) data-requires-plan="1"@endif><span class="nav-icon">📝</span>My Articles</a>
+    <a href="{{ $hasActivePlan ? route('front.users.videos') : $lockHref }}" class="user-nav-link{{ request()->routeIs('front.users.videos', 'front.users.video-*') ? ' active' : '' }}{{ $hasActivePlan ? '' : ' is-locked' }}" data-nav="videos"@if(! $hasActivePlan) data-requires-plan="1"@endif><span class="nav-icon">🎬</span>My Videos</a>
+    <a href="{{ $hasActivePlan ? route('front.users.offers') : $lockHref }}" class="user-nav-link{{ request()->routeIs('front.users.offers', 'front.users.offer-*') ? ' active' : '' }}{{ $hasActivePlan ? '' : ' is-locked' }}" data-nav="offers"@if(! $hasActivePlan) data-requires-plan="1"@endif><span class="nav-icon">🏷️</span>My Offers</a>
   </div>
   <div class="user-nav-section">
     <div class="user-nav-heading">Engagement</div>
-    <a href="{{ route('front.users.inquiries') }}" class="user-nav-link{{ request()->routeIs('front.users.inquiries', 'front.users.inquiries.*') ? ' active' : '' }}" data-nav="inquiries"><span class="nav-icon">💬</span>My Inquiries</a>
-    <a href="{{ route('front.users.notifications') }}" class="user-nav-link{{ request()->routeIs('front.users.notifications', 'front.users.notifications.*') ? ' active' : '' }}" data-nav="notifications"><span class="nav-icon">✉</span>Notifications</a>
-  </div>
-  <div class="user-nav-section">
-    <div class="user-nav-heading">Account</div>
-    <a href="{{ route('front.users.subscription') }}" class="user-nav-link{{ request()->routeIs('front.users.subscription') ? ' active' : '' }}" data-nav="subscription"><span class="nav-icon">💳</span>Subscription</a>
-    <a href="{{ route('front.users.change-password') }}" class="user-nav-link{{ request()->routeIs('front.users.change-password') ? ' active' : '' }}" data-nav="change-password"><span class="nav-icon">🔑</span>Change Password</a>
+    <a href="{{ $hasActivePlan ? route('front.users.inquiries') : $lockHref }}" class="user-nav-link{{ request()->routeIs('front.users.inquiries', 'front.users.inquiries.*') ? ' active' : '' }}{{ $hasActivePlan ? '' : ' is-locked' }}" data-nav="inquiries"@if(! $hasActivePlan) data-requires-plan="1"@endif><span class="nav-icon">💬</span>My Inquiries</a>
+    <a href="{{ $hasActivePlan ? route('front.users.notifications') : $lockHref }}" class="user-nav-link{{ request()->routeIs('front.users.notifications', 'front.users.notifications.*') ? ' active' : '' }}{{ $hasActivePlan ? '' : ' is-locked' }}" data-nav="notifications"@if(! $hasActivePlan) data-requires-plan="1"@endif><span class="nav-icon">✉</span>Notifications</a>
   </div>
 </nav>
 <div class="user-sidebar-footer">

@@ -18,6 +18,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'auth' => Authenticate::class,
             'guest' => RedirectIfAuthenticated::class,
             'front.user' => \App\Http\Middleware\EnsureFrontUser::class,
+            'front.plan' => \App\Http\Middleware\EnsureActiveSubscription::class,
+        ]);
+
+        $middleware->validateCsrfTokens(except: [
+            'razorpay/webhook',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

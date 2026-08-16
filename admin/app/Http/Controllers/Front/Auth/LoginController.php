@@ -13,7 +13,7 @@ class LoginController extends Controller
         if (Auth::check()) {
             return Auth::user()->isAdmin()
                 ? redirect()->route('admin.dashboard')
-                : redirect()->route('front.users.dashboard');
+                : redirect()->route(Auth::user()->hasActivePlan() ? 'front.users.dashboard' : 'front.users.profile');
         }
 
         return view('front.auth.login');
@@ -67,6 +67,12 @@ class LoginController extends Controller
         }
 
         $request->session()->regenerate();
+
+        if (! $user->hasActivePlan()) {
+            return redirect()
+                ->route('front.users.profile')
+                ->with('show_plan_popup', true);
+        }
 
         return redirect()->intended(route('front.users.dashboard'));
     }

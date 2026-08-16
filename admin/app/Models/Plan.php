@@ -34,4 +34,9 @@ class Plan extends Model
     {
         return $this->hasMany(UserPlan::class);
     }
+
+    public function paymentLogs(): HasMany
+    {
+        return $this->hasMany(PaymentLog::class);
+    }
 }

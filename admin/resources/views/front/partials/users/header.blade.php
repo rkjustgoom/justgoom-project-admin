@@ -14,7 +14,7 @@
   <div class="user-page-header-end">
     <div class="user-page-header-actions">
       <button type="button" class="user-theme-btn" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
-      <span class="user-plan-chip">Free</span>
+      <span class="user-plan-chip">{{ !empty($hasActivePlan) ? ($activeUserPlan?->plan?->name ?? 'Active') : 'No Plan' }}</span>
       <div class="user-header-dropdown">
         <button type="button" class="user-header-dropdown-toggle" aria-label="Account menu" aria-expanded="false" aria-haspopup="true">
           <span class="user-topbar-avatar">{{ $initials }}</span>

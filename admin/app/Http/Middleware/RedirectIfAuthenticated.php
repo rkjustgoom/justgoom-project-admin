@@ -28,7 +28,9 @@ class RedirectIfAuthenticated
                 return redirect()->route('admin.dashboard');
             }
 
-            return redirect()->route('front.users.dashboard');
+            return redirect()->route(
+                $user->hasActivePlan() ? 'front.users.dashboard' : 'front.users.profile'
+            );
         }
 
         return $next($request);

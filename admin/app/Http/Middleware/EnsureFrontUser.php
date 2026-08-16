@@ -38,6 +38,10 @@ class EnsureFrontUser
                 ->withErrors(['email' => 'Please verify your email address before accessing your dashboard.']);
         }
 
+        $activeUserPlan = $user->activeUserPlan();
+        view()->share('activeUserPlan', $activeUserPlan);
+        view()->share('hasActivePlan', $activeUserPlan !== null);
+
         return $next($request);
     }
 }

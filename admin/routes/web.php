@@ -4,6 +4,7 @@ use App\Http\Controllers\AdvertisementController;
 use App\Http\Controllers\Auth\LoginController as AdminLoginController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\Front\ArticleController;
+use App\Http\Controllers\Front\AuditLogController;
 use App\Http\Controllers\Front\Auth\LoginController as FrontLoginController;
 use App\Http\Controllers\Front\Auth\RegisterController;
 use App\Http\Controllers\Front\Auth\ResendVerificationController;
@@ -17,10 +18,12 @@ use App\Http\Controllers\Front\LocationController;
 use App\Http\Controllers\Front\OfferController;
 use App\Http\Controllers\Front\PageController;
 use App\Http\Controllers\Front\PasswordController;
+use App\Http\Controllers\Front\PaymentHistoryController;
 use App\Http\Controllers\Front\ProfileController;
 use App\Http\Controllers\Front\ProjectController;
 use App\Http\Controllers\Front\PublicProfileController;
 use App\Http\Controllers\Front\ServiceController;
+use App\Http\Controllers\Front\RazorpayWebhookController;
 use App\Http\Controllers\Front\SubscriptionController;
 use App\Http\Controllers\Front\TeamController;
 use App\Http\Controllers\Front\UserNotificationController;
@@ -51,6 +54,8 @@ Route::get('/email/verify/{id}/{hash}', VerifyEmailController::class)
 
 Route::post('/logout', [FrontLoginController::class, 'logout'])->name('front.logout');
 
+Route::post('/razorpay/webhook', RazorpayWebhookController::class)->name('front.razorpay.webhook');
+
 Route::get('/about', fn () => app(PageController::class)->publicPage('about'))->name('front.about');
 Route::get('/articles', [ArticleController::class, 'listing'])->name('front.articles');
 Route::get('/articles/{slug}', [ArticleController::class, 'show'])
@@ -60,13 +65,14 @@ Route::get('/calculators', fn () => app(PageController::class)->publicPage('calc
 Route::get('/categories', [FrontCategoryController::class, 'index'])->name('front.categories');
 Route::get('/category-details', fn () => app(PageController::class)->publicPage('category-details'))->name('front.category-details');
 Route::get('/contact', fn () => app(PageController::class)->publicPage('contact'))->name('front.contact');
+Route::get('/pricing', fn () => app(PageController::class)->publicPage('pricing'))->name('front.pricing');
 Route::get('/all-profiles', [PublicProfileController::class, 'index'])->name('front.all-profiles');
 Route::get('/profile', [PublicProfileController::class, 'redirectLegacy'])->name('front.profile');
 Route::get('/profile/{slug}', function (string $slug) {
     return redirect('/'.$slug, 301);
 })->where('slug', '[a-z0-9\-]+');
 
-Route::prefix('users')->name('front.users.')->middleware(['auth', 'front.user'])->group(function () {
+Route::prefix('users')->name('front.users.')->middleware(['auth', 'front.user', 'front.plan'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/business-activity', [BusinessActivityController::class, 'index'])->name('business-activity');
     Route::get('/analytics', fn () => app(PageController::class)->userPage('analytics'))->name('analytics');
@@ -158,7 +164,12 @@ Route::prefix('users')->name('front.users.')->middleware(['auth', 'front.user'])
 
     // Subscription
     Route::get('/subscription', [SubscriptionController::class, 'index'])->name('subscription');
-    Route::post('/subscription/{plan}', [SubscriptionController::class, 'subscribe'])->name('subscription.subscribe');
+    Route::post('/subscription/{plan}/order', [SubscriptionController::class, 'createOrder'])->name('subscription.order');
+    Route::post('/subscription/payment/verify', [SubscriptionController::class, 'verify'])->name('subscription.verify');
+    Route::post('/subscription/payment/failed', [SubscriptionController::class, 'failed'])->name('subscription.failed');
+    Route::get('/payments', [PaymentHistoryController::class, 'index'])->name('payments');
+    Route::get('/payments/{paymentLog}/invoice', [PaymentHistoryController::class, 'invoice'])->name('payments.invoice');
+    Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit-logs');
 
     // Team
     Route::get('/team', [TeamController::class, 'index'])->name('team');

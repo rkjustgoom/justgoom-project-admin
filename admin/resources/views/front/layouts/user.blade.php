@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>@yield('title', 'Dashboard — Just Goom')</title>
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   @include('partials.favicon')
   <link rel="stylesheet" href="{{ asset('front/assets/css/users.css') }}">
   @stack('styles')
@@ -21,6 +22,10 @@
       @include('front.partials.users.footer')
     </div>
   </div>
+
+  @if(empty($hasActivePlan))
+    @include('front.partials.users.plan-required-modal')
+  @endif
 
   @stack('scripts')
   @if(session('success') || session('error') || session('info'))

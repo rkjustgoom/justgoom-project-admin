@@ -48,7 +48,7 @@
       '<button type="button" class="user-theme-btn" aria-label="Toggle dark mode" title="Toggle dark mode">' +
         (isDark ? '☀️' : '🌙') +
       '</button>' +
-      '<span class="user-plan-chip">Free</span>' +
+      '<span class="user-plan-chip">No Plan</span>' +
       '<a href="/users/profile" class="user-topbar-avatar" title="My Profile">SG</a>';
 
     end.appendChild(actions);

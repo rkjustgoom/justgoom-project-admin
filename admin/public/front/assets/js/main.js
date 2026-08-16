@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     initActiveNav, initMobileNav, initTabs, initProfileTabs,
     initTeamFilter, initGallery, initHealthCalculator,
     initContactForm, initAuthRegister, initAuthForms, initFlashToast,
-    initProfileDropdown
+    initProfileDropdown, initPricingRegion
   ];
   inits.forEach(function(fn) {
     try { fn(); } catch (e) { console.error(e); }
@@ -631,6 +631,35 @@ function initFlashToast() {
   }
 
   window.JG_FLASH = null;
+}
+
+function initPricingRegion() {
+  var page = document.querySelector('.pricing-page-content');
+  if (!page) return;
+
+  var buttons = page.querySelectorAll('[data-region]');
+  var prices = page.querySelectorAll('.js-region-price');
+  var rateNote = page.querySelector('.pricing-rate-note');
+
+  function setRegion(region) {
+    page.setAttribute('data-active-region', region);
+    buttons.forEach(function(btn) {
+      var isActive = btn.getAttribute('data-region') === region;
+      btn.classList.toggle('active', isActive);
+      btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    });
+    prices.forEach(function(el) {
+      var value = el.getAttribute('data-' + region);
+      if (value) el.textContent = value;
+    });
+    if (rateNote) rateNote.hidden = region !== 'global';
+  }
+
+  buttons.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      setRegion(btn.getAttribute('data-region'));
+    });
+  });
 }
 
 function initProfileDropdown() {

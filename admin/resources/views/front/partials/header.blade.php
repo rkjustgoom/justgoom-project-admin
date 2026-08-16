@@ -21,6 +21,7 @@
       <a href="{{ route('front.categories') }}" data-nav="categories" @class(['active' => request()->routeIs('front.categories', 'front.category-details')])>Categories</a>
       <a href="{{ route('front.all-profiles') }}" data-nav="all-profiles" @class(['active' => request()->routeIs('front.all-profiles', 'front.profile.show', 'front.profile')])>All Profiles</a>
       <a href="{{ route('front.articles') }}" data-nav="articles" @class(['active' => request()->routeIs('front.articles', 'front.articles.show')])>Articles</a>
+      <a href="{{ route('front.pricing') }}" data-nav="pricing" @class(['active' => request()->routeIs('front.pricing')])>Pricing</a>
       <a href="{{ route('front.contact') }}" data-nav="contact" @class(['active' => request()->routeIs('front.contact')])>Contact Us</a>
     </nav>
     <div class="header-actions">
@@ -41,8 +42,8 @@
             </button>
             <div class="hdr-profile-menu">
               <div class="hdr-profile-links">
-                <a href="{{ route('front.users.dashboard') }}" class="hdr-profile-link">
-                  <span class="hdr-profile-link-icon">👤</span> My Dashboard
+                <a href="{{ $authUser->hasActivePlan() ? route('front.users.dashboard') : route('front.users.profile') }}" class="hdr-profile-link">
+                  <span class="hdr-profile-link-icon">👤</span> {{ $authUser->hasActivePlan() ? 'My Dashboard' : 'My Profile' }}
                 </a>
                 <form method="POST" action="{{ route('front.logout') }}">
                   @csrf
@@ -75,6 +76,7 @@
       <a href="{{ route('front.categories') }}" data-nav="categories" @class(['active' => request()->routeIs('front.categories', 'front.category-details')])>Categories</a>
       <a href="{{ route('front.all-profiles') }}" data-nav="all-profiles" @class(['active' => request()->routeIs('front.all-profiles', 'front.profile.show', 'front.profile')])>All Profiles</a>
       <a href="{{ route('front.articles') }}" data-nav="articles" @class(['active' => request()->routeIs('front.articles', 'front.articles.show')])>Articles</a>
+      <a href="{{ route('front.pricing') }}" data-nav="pricing" @class(['active' => request()->routeIs('front.pricing')])>Pricing</a>
       <a href="{{ route('front.contact') }}" data-nav="contact" @class(['active' => request()->routeIs('front.contact')])>Contact Us</a>
     </nav>
     <div class="mobile-nav-actions">
