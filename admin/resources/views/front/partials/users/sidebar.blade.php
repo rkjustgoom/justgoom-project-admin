@@ -53,7 +53,7 @@
     <a href="{{ route('front.users.profile') }}" class="user-nav-link{{ request()->routeIs('front.users.profile*') ? ' active' : '' }}" data-nav="profile"><span class="nav-icon">👤</span>My Profile</a>
     <a href="{{ route('front.users.subscription') }}" class="user-nav-link{{ request()->routeIs('front.users.subscription') ? ' active' : '' }}" data-nav="subscription"><span class="nav-icon">💳</span>Subscription</a>
     <a href="{{ route('front.users.payments') }}" class="user-nav-link{{ request()->routeIs('front.users.payments*') ? ' active' : '' }}" data-nav="payments"><span class="nav-icon">🧾</span>Payment History</a>
-    <a href="{{ route('front.users.audit-logs') }}" class="user-nav-link{{ request()->routeIs('front.users.audit-logs') ? ' active' : '' }}" data-nav="audit-logs"><span class="nav-icon">📋</span>Audit Logs</a>
+    <a href="{{ route('front.users.audit-logs') }}" class="user-nav-link{{ request()->routeIs('front.users.audit-logs') ? ' active' : '' }}" data-nav="audit-logs"><span class="nav-icon">📋</span>Activity Log</a>
     <a href="{{ route('front.users.change-password') }}" class="user-nav-link{{ request()->routeIs('front.users.change-password') ? ' active' : '' }}" data-nav="change-password"><span class="nav-icon">🔑</span>Change Password</a>
   </div>
   <div class="user-nav-section">

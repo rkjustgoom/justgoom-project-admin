@@ -1,8 +1,8 @@
 @extends('front.layouts.user')
 
-@section('title', 'Audit Logs — Just Goom')
-@section('page_title', 'Audit Logs')
-@section('body_attrs', 'class="user-panel-body" data-page="audit-logs" data-title="Audit Logs"')
+@section('title', 'Activity Log — Just Goom')
+@section('page_title', 'Activity Log')
+@section('body_attrs', 'class="user-panel-body" data-page="audit-logs" data-title="Activity Log"')
 
 @section('content')
 @php
@@ -47,7 +47,7 @@
               </tr>
             @empty
               <tr>
-                <td colspan="6" class="user-text-muted" style="text-align:center;padding:24px;">No audit logs yet. Purchase or upgrade a plan to see activity here.</td>
+                <td colspan="6" class="user-text-muted" style="text-align:center;padding:24px;">No activity yet. Purchase or upgrade a plan to see activity here.</td>
               </tr>
             @endforelse
           </tbody>

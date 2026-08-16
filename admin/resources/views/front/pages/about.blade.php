@@ -222,6 +222,61 @@
             <a href="tel:+917201838383">+91 72018 38383</a>
           </div>
         </div>
+        <div class="team-card team-card-lg">
+          <div class="team-avatar">K</div>
+          <div class="team-card-body">
+            <strong>Kumar</strong>
+            <span class="team-role">Co-Founder</span>
+            <p class="team-bio">Building operations and growth so MSMEs get discovered and connect with you.</p>
+            <a href="tel:+917894561236">+91 78945 61236</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Corporate Team -->
+  <section class="about-team about-corporate-team">
+    <div class="container">
+      <div class="section-header text-center about-section-head">
+        <div>
+          <h2 class="section-title">Corporate Team</h2>
+          <p class="section-subtitle">The specialists who design, build, and deliver Just Goom</p>
+        </div>
+      </div>
+      <div class="team-grid team-grid-4">
+        <div class="team-card team-card-lg">
+          <div class="team-avatar team-avatar-lead">TL</div>
+          <div class="team-card-body">
+            <strong>Team Lead</strong>
+            <span class="team-role">Engineering</span>
+            <p class="team-bio">Guides platform delivery, code quality, and day-to-day execution of the Just Goom product.</p>
+          </div>
+        </div>
+        <div class="team-card team-card-lg">
+          <div class="team-avatar team-avatar-dev">DV</div>
+          <div class="team-card-body">
+            <strong>Developer</strong>
+            <span class="team-role">Technology</span>
+            <p class="team-bio">Builds and maintains listings, search, and the B2B discovery experience across web and admin.</p>
+          </div>
+        </div>
+        <div class="team-card team-card-lg">
+          <div class="team-avatar team-avatar-design">DS</div>
+          <div class="team-card-body">
+            <strong>Designer</strong>
+            <span class="team-role">Product Design</span>
+            <p class="team-bio">Crafts the brand, UI, and user journeys so buyers and businesses can discover each other easily.</p>
+          </div>
+        </div>
+        <div class="team-card team-card-lg">
+          <div class="team-avatar team-avatar-ba">BA</div>
+          <div class="team-card-body">
+            <strong>Business Analyst</strong>
+            <span class="team-role">BA Team</span>
+            <p class="team-bio">Turns business needs into clear requirements and keeps product, ops, and stakeholders aligned.</p>
+          </div>
+        </div>
       </div>
     </div>
   </section>

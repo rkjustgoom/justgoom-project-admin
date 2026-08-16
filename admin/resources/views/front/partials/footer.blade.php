@@ -48,6 +48,7 @@
     </div>
     <div class="footer-bottom">
       <span>© {{ date('Y') }} Just Goom LLP. All rights reserved.</span>
+      <span class="footer-partner">Partnered By <strong>NeatifyDocs LLP</strong></span>
       <div class="footer-bottom-links">
         <a href="#">Privacy</a>
         <a href="#">Terms</a>

@@ -18,19 +18,9 @@ class ArticleController extends Controller
             ->with(['user.companyProfile', 'user.category'])
             ->latest('published_at')
             ->latest('created_at')
-            ->paginate(9);
+            ->paginate(12);
 
-        $featured = $articles->getCollection();
-        $featuredMain = $featured->first();
-        $featuredSide = $featured->slice(1, 3)->values();
-        $gridArticles = $articles->getCollection();
-
-        return view('front.pages.articles', compact(
-            'articles',
-            'featuredMain',
-            'featuredSide',
-            'gridArticles'
-        ));
+        return view('front.pages.articles', compact('articles'));
     }
 
     public function index(Request $request)

@@ -41,8 +41,43 @@
     </div>
   </div>
 
-  <!-- Contact Section -->
-  <section class="section contact-page-section">
+  <!-- Reach Us — 4 column base -->
+  <section class="section contact-reach-section">
+    <div class="container">
+      <div class="section-header text-center about-section-head">
+        <div>
+          <h2 class="section-title">Get In Touch</h2>
+          <p class="section-subtitle">Four ways to reach the Just Goom team</p>
+        </div>
+      </div>
+      <div class="contact-reach-grid">
+        <div class="contact-info-card">
+          <div class="ci-icon">📧</div>
+          <h4>Email</h4>
+          <p><a href="mailto:info@justgoom.com">info@justgoom.com</a></p>
+        </div>
+        <div class="contact-info-card">
+          <div class="ci-icon">📞</div>
+          <h4>Phone</h4>
+          <p><a href="tel:+919624898242">+91 96248 98242</a></p>
+          <p><a href="tel:+917201838383">+91 72018 38383</a></p>
+        </div>
+        <div class="contact-info-card">
+          <div class="ci-icon">🌐</div>
+          <h4>Website</h4>
+          <p><a href="https://www.justgoom.com" target="_blank" rel="noopener">www.justgoom.com</a></p>
+        </div>
+        <div class="contact-info-card">
+          <div class="ci-icon">📍</div>
+          <h4>Office Address</h4>
+          <p>A/201, Oxford Avenue, Opp. C.U. Shah College, Ashram Road, Ahmedabad — 380014</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Form -->
+  <section class="section section-alt contact-page-section">
     <div class="container contact-page-layout">
 
       <div class="contact-form-card">
@@ -92,30 +127,6 @@
       </div>
 
       <aside class="contact-sidebar">
-        <div class="contact-info-grid contact-info-stack">
-          <div class="contact-info-card">
-            <div class="ci-icon">📧</div>
-            <h4>Email</h4>
-            <p><a href="mailto:info@justgoom.com">info@justgoom.com</a></p>
-          </div>
-          <div class="contact-info-card">
-            <div class="ci-icon">📞</div>
-            <h4>Phone</h4>
-            <p><a href="tel:+919624898242">+91 96248 98242</a></p>
-            <p><a href="tel:+917201838383">+91 72018 38383</a></p>
-          </div>
-          <div class="contact-info-card">
-            <div class="ci-icon">🌐</div>
-            <h4>Website</h4>
-            <p><a href="https://www.justgoom.com" target="_blank" rel="noopener">www.justgoom.com</a></p>
-          </div>
-          <div class="contact-info-card">
-            <div class="ci-icon">📍</div>
-            <h4>Office Address</h4>
-            <p>A/201, Oxford Avenue, Opp. C.U. Shah College, Ashram Road, Ahmedabad — 380014, Gujarat, India</p>
-          </div>
-        </div>
-
         <div class="contact-hours-card">
           <h4>Business Hours</h4>
           <ul class="contact-hours-list">
@@ -131,6 +142,14 @@
             <a href="{{ route('front.register') }}" class="btn btn-accent btn-block">List Your Business</a>
             <a href="{{ route('front.all-profiles') }}" class="btn btn-outline-primary btn-block">Browse Profiles</a>
             <a href="{{ route('front.calculators') }}" class="btn btn-outline btn-block">Free Calculators</a>
+          </div>
+        </div>
+
+        <div class="contact-partner-card">
+          <div class="contact-partner-avatar" aria-hidden="true">ND</div>
+          <div class="contact-partner-copy">
+            <span class="contact-partner-label">Partnered By</span>
+            <strong>NeatifyDocs LLP</strong>
           </div>
         </div>
       </aside>
