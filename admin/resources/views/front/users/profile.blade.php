@@ -92,6 +92,10 @@
 @endpush
 
 @section('content')
+@php
+  $hasProfileCountry = filled(old('country', $profile->country ?? $user->country));
+  $hasProfileState = filled(old('state', $profile->state ?? $user->state));
+@endphp
 <div class="user-content">
       <div class="user-toolbar">
         <p class="user-text-muted">Profile completion required for Free Plan onboarding — <strong class="user-text-accent">{{ $completionPercent }}%</strong> complete</p>
@@ -106,27 +110,11 @@
         </div>
       @endif
 
-      <div class="user-form-card">
+      <div class="user-form-card user-form-card-full">
         <form method="POST" action="{{ route('front.users.profile.update') }}" id="profileForm" enctype="multipart/form-data" novalidate>
           @csrf
           @method('PUT')
-          <div class="user-form-group" data-field="logo">
-            <label>Company Logo</label>
-            <img
-              src="{{ $profile->logo ? asset($profile->logo) : '' }}"
-              alt="{{ $profile->company_name }} logo"
-              class="company-logo-box"
-              id="profileLogoPreview"
-              @if(!$profile->logo) style="display:none" @endif
-            >
-            <div class="user-upload-zone">
-              <input type="file" name="logo" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
-              <p>@if($profile->logo)Replace logo (optional)@else Drag &amp; drop or <strong>click to upload</strong> logo (optional)@endif</p>
-            </div>
-            <p class="user-form-hint">JPG, PNG, WebP or GIF · max 2 MB · displays at 120×120 px on your public profile</p>
-            <small class="user-field-error">@error('logo'){{ $message }}@enderror</small>
-          </div>
-          <div class="user-form-row">
+          <div class="profile-form-grid">
             <div class="user-form-group" data-field="company_name">
               <label>Business Name *</label>
               <input type="text" name="company_name" class="user-form-control @error('company_name') is-invalid @enderror" value="{{ old('company_name', $profile->company_name) }}" maxlength="200">
@@ -142,8 +130,6 @@
               </select>
               <small class="user-field-error">@error('category_id'){{ $message }}@enderror</small>
             </div>
-          </div>
-          <div class="user-form-row">
             <div class="user-form-group" data-field="sub_category_id">
               <label>Sub Category *</label>
               <div class="ms-wrap @error('sub_category_id') is-invalid @enderror @error('sub_category_id.*') is-invalid @enderror" id="profileSubCategoryWrap">
@@ -161,52 +147,85 @@
                 @error('sub_category_id.*'){{ $message }}@enderror
               </small>
             </div>
-            <div class="user-form-group" data-field="city">
-              <label>City *</label>
-              <input type="text" name="city" class="user-form-control @error('city') is-invalid @enderror" value="{{ old('city', $profile->city ?? $user->city) }}" maxlength="100">
-              <small class="user-field-error">@error('city'){{ $message }}@enderror</small>
-            </div>
-          </div>
-          <div class="user-form-group" data-field="tagline">
-            <label>Tagline</label>
-            <input type="text" name="tagline" class="user-form-control @error('tagline') is-invalid @enderror" value="{{ old('tagline', $profile->tagline) }}" placeholder="Short business tagline" maxlength="255">
-            <small class="user-field-error">@error('tagline'){{ $message }}@enderror</small>
-          </div>
-          <div class="user-form-group" data-field="business_desc">
-            <label>About Business *</label>
-            <textarea name="business_desc" class="user-form-control @error('business_desc') is-invalid @enderror" rows="4" maxlength="5000">{{ old('business_desc', $profile->business_desc) }}</textarea>
-            <small class="user-field-error">@error('business_desc'){{ $message }}@enderror</small>
-          </div>
-          <div class="user-form-row">
-            <div class="user-form-group" data-field="phone">
-              <label>Phone *</label>
-              <input type="tel" name="phone" class="user-form-control @error('phone') is-invalid @enderror" value="{{ old('phone', $profile->phone ?? $user->phone) }}" maxlength="10" inputmode="numeric" placeholder="Enter Phone Number">
-              <small class="user-field-error">@error('phone'){{ $message }}@enderror</small>
-            </div>
+
             <div class="user-form-group" data-field="email">
               <label>Email *</label>
               <input type="email" name="email" class="user-form-control @error('email') is-invalid @enderror" value="{{ old('email', $profile->email ?? $user->email) }}" maxlength="191">
               <small class="user-field-error">@error('email'){{ $message }}@enderror</small>
             </div>
-          </div>
-          <div class="user-form-group" data-field="address">
-            <label>Address</label>
-            <input type="text" name="address" class="user-form-control @error('address') is-invalid @enderror" value="{{ old('address', $profile->address) }}" maxlength="500">
-            <small class="user-field-error">@error('address'){{ $message }}@enderror</small>
-          </div>
-          <div class="user-form-row">
+            <div class="user-form-group" data-field="phone">
+              <label>Phone *</label>
+              <input type="tel" name="phone" class="user-form-control @error('phone') is-invalid @enderror" value="{{ old('phone', $profile->phone ?? $user->phone) }}" maxlength="10" inputmode="numeric" placeholder="Enter Phone Number">
+              <small class="user-field-error">@error('phone'){{ $message }}@enderror</small>
+            </div>
+            <div class="user-form-group" data-field="tagline">
+              <label>Tagline</label>
+              <input type="text" name="tagline" class="user-form-control @error('tagline') is-invalid @enderror" value="{{ old('tagline', $profile->tagline) }}" placeholder="Short business tagline" maxlength="255">
+              <small class="user-field-error">@error('tagline'){{ $message }}@enderror</small>
+            </div>
+
+            <div class="user-form-group profile-form-span-2" data-field="business_desc">
+              <label>About Business *</label>
+              <textarea name="business_desc" class="user-form-control @error('business_desc') is-invalid @enderror" rows="6" maxlength="5000">{{ old('business_desc', $profile->business_desc) }}</textarea>
+              <small class="user-field-error">@error('business_desc'){{ $message }}@enderror</small>
+            </div>
+            <div class="user-form-group profile-logo-field" data-field="logo">
+              <label>Company Logo</label>
+              <img
+                src="{{ $profile->logo ? asset($profile->logo) : '' }}"
+                alt="{{ $profile->company_name }} logo"
+                class="company-logo-box"
+                id="profileLogoPreview"
+                @if(!$profile->logo) style="display:none" @endif
+              >
+              <div class="user-upload-zone">
+                <input type="file" name="logo" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
+                <p>@if($profile->logo)Replace logo (optional)@else Drag &amp; drop or <strong>click to upload</strong> logo (optional)@endif</p>
+              </div>
+              <p class="user-form-hint">JPG, PNG, WebP or GIF · max 2 MB</p>
+              <small class="user-field-error">@error('logo'){{ $message }}@enderror</small>
+            </div>
+
+            <div class="user-form-group profile-form-span-all" data-field="address">
+              <label>Address *</label>
+              <input type="text" name="address" class="user-form-control @error('address') is-invalid @enderror" value="{{ old('address', $profile->address) }}" maxlength="500" placeholder="Enter full address">
+              <small class="user-field-error">@error('address'){{ $message }}@enderror</small>
+            </div>
+            <div class="user-form-group" data-field="country">
+              <label>Country *</label>
+              <select name="country" id="profileCountry" class="user-form-control @error('country') is-invalid @enderror">
+                <option value="">Select country</option>
+                @foreach($countries as $country)
+                  <option value="{{ $country->name }}" data-id="{{ $country->id }}" @selected(old('country', $profile->country ?? $user->country) === $country->name)>{{ $country->name }}</option>
+                @endforeach
+              </select>
+              <small class="user-field-error">@error('country'){{ $message }}@enderror</small>
+            </div>
+            <div class="user-form-group" data-field="state">
+              <label>State *</label>
+              <select name="state" id="profileState" class="user-form-control @error('state') is-invalid @enderror" @disabled(! $hasProfileCountry)>
+                <option value="">Select state</option>
+              </select>
+              <small class="user-field-error">@error('state'){{ $message }}@enderror</small>
+            </div>
+            <div class="user-form-group" data-field="city">
+              <label>City *</label>
+              <select name="city" id="profileCity" class="user-form-control @error('city') is-invalid @enderror" @disabled(! $hasProfileState)>
+                <option value="">Select city</option>
+              </select>
+              <small class="user-field-error">@error('city'){{ $message }}@enderror</small>
+            </div>
+            <div class="user-form-group" data-field="zipcode">
+              <label>Zipcode *</label>
+              <input type="text" name="zipcode" class="user-form-control @error('zipcode') is-invalid @enderror" value="{{ old('zipcode', $profile->zipcode) }}" maxlength="6" inputmode="numeric" placeholder="Enter 6-digit zipcode">
+              <small class="user-field-error">@error('zipcode'){{ $message }}@enderror</small>
+            </div>
+
             <div class="user-form-group" data-field="social_website">
               <label>Website</label>
               <input type="url" name="social_website" class="user-form-control @error('social_website') is-invalid @enderror" value="{{ old('social_website', $profile->social_website) }}" placeholder="https://www.example.com" maxlength="255">
               <small class="user-field-error">@error('social_website'){{ $message }}@enderror</small>
             </div>
-            <div class="user-form-group" data-field="social_subwebsite">
-              <label>Sub Website</label>
-              <input type="url" name="social_subwebsite" class="user-form-control @error('social_subwebsite') is-invalid @enderror" value="{{ old('social_subwebsite', $profile->social_subwebsite) }}" placeholder="https://shop.example.com" maxlength="255">
-              <small class="user-field-error">@error('social_subwebsite'){{ $message }}@enderror</small>
-            </div>
-          </div>
-          <div class="user-form-row">
             <div class="user-form-group" data-field="social_facebook">
               <label>Facebook</label>
               <input type="url" name="social_facebook" class="user-form-control @error('social_facebook') is-invalid @enderror" value="{{ old('social_facebook', $profile->social_facebook) }}" placeholder="https://facebook.com/yourpage" maxlength="255">
@@ -217,29 +236,18 @@
               <input type="url" name="social_twitter" class="user-form-control @error('social_twitter') is-invalid @enderror" value="{{ old('social_twitter', $profile->social_twitter) }}" placeholder="https://x.com/yourhandle" maxlength="255">
               <small class="user-field-error">@error('social_twitter'){{ $message }}@enderror</small>
             </div>
-          </div>
-          <div class="user-form-group" data-field="social_linkedin">
-            <label>LinkedIn</label>
-            <input type="url" name="social_linkedin" class="user-form-control @error('social_linkedin') is-invalid @enderror" value="{{ old('social_linkedin', $profile->social_linkedin) }}" placeholder="https://linkedin.com/company/yourcompany" maxlength="255">
-            <small class="user-field-error">@error('social_linkedin'){{ $message }}@enderror</small>
-          </div>
-          <div class="user-form-row">
-            <div class="user-form-group">
-              <label>Plan</label>
-              <input type="text" class="user-form-control" value="{{ $planName }}" readonly>
+            <div class="user-form-group" data-field="social_linkedin">
+              <label>LinkedIn</label>
+              <input type="url" name="social_linkedin" class="user-form-control @error('social_linkedin') is-invalid @enderror" value="{{ old('social_linkedin', $profile->social_linkedin) }}" placeholder="https://linkedin.com/company/yourcompany" maxlength="255">
+              <small class="user-field-error">@error('social_linkedin'){{ $message }}@enderror</small>
             </div>
-            <div class="user-form-group">
-              <label>Public Profile Slug</label>
-              <input type="text" class="user-form-control" value="{{ $profile->slug }}" readonly>
-            </div>
-          </div>
 
           @php
             $days = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
             $dayLabels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
             $savedHours = old('business_hours', $profile->business_hours ?? []);
           @endphp
-          <div class="user-form-group" data-field="business_hours">
+            <div class="user-form-group profile-form-span-all" data-field="business_hours">
             <label>Business Hours</label>
             <div class="business-hours-grid">
               @foreach($days as $i => $day)
@@ -254,28 +262,91 @@
                     <span class="bh-day-label">{{ $dayLabels[$i] }}</span>
                   </label>
                   <div class="bh-times">
-                    <select name="business_hours[{{ $day }}][open]" class="user-form-control bh-select" {{ !$isOpen ? 'disabled' : '' }}>
-                      @foreach(getTimeOptions() as $time)
-                        <option value="{{ $time }}" @selected(($dayData['open'] ?? '10:00 AM') === $time)>{{ $time }}</option>
-                      @endforeach
-                    </select>
+                    <div class="bh-time-field">
+                      <span class="bh-time-label">Start</span>
+                      <select name="business_hours[{{ $day }}][open]" class="user-form-control bh-select" {{ !$isOpen ? 'disabled' : '' }}>
+                        @foreach(getTimeOptions() as $time)
+                          <option value="{{ $time }}" @selected(($dayData['open'] ?? '10:00 AM') === $time)>{{ $time }}</option>
+                        @endforeach
+                      </select>
+                    </div>
                     <span class="bh-separator">to</span>
-                    <select name="business_hours[{{ $day }}][close]" class="user-form-control bh-select" {{ !$isOpen ? 'disabled' : '' }}>
-                      @foreach(getTimeOptions() as $time)
-                        <option value="{{ $time }}" @selected(($dayData['close'] ?? '07:00 PM') === $time)>{{ $time }}</option>
-                      @endforeach
-                    </select>
+                    <div class="bh-time-field">
+                      <span class="bh-time-label">End</span>
+                      <select name="business_hours[{{ $day }}][close]" class="user-form-control bh-select" {{ !$isOpen ? 'disabled' : '' }}>
+                        @foreach(getTimeOptions() as $time)
+                          <option value="{{ $time }}" @selected(($dayData['close'] ?? '07:00 PM') === $time)>{{ $time }}</option>
+                        @endforeach
+                      </select>
+                    </div>
                   </div>
                   <span class="bh-closed-label" style="{{ $isOpen ? 'display:none' : '' }}">Closed</span>
                 </div>
               @endforeach
             </div>
           </div>
+          </div>
 
-          <button type="submit" class="user-btn user-btn-primary">Save Profile</button>
+          <div class="profile-section" id="profileDocumentsSection">
+            <h3 class="profile-section-title">Documents</h3>
+            <p class="profile-section-desc">Add identity and business documents. You can save your profile without documents, or add several of each type.</p>
+
+            <div class="profile-subsection" id="profileIndividualSection">
+              <h4 class="profile-subsection-title">Individual</h4>
+              <p class="profile-section-desc">Aadhaar Number and PAN Number. Front and back images are required for each document.</p>
+              <div class="profile-doc-list" data-document-list="individual">
+                @foreach($individualDocuments as $index => $doc)
+                  @include('front.users.partials.profile-document-row', [
+                    'group' => 'individual',
+                    'index' => $index,
+                    'doc' => $doc,
+                    'options' => $individualDocumentTypes,
+                  ])
+                @endforeach
+              </div>
+              <button type="button" class="user-btn user-btn-default profile-doc-add" data-add-document="individual">+ Add another document</button>
+            </div>
+
+            <div class="profile-subsection" id="profileBusinessSection">
+              <h4 class="profile-subsection-title">Business / Organization</h4>
+              <p class="profile-section-desc">PAN Number, TAN Number, GST and Gumasta.</p>
+              <div class="profile-doc-list" data-document-list="business">
+                @foreach($businessDocuments as $index => $doc)
+                  @include('front.users.partials.profile-document-row', [
+                    'group' => 'business',
+                    'index' => $index,
+                    'doc' => $doc,
+                    'options' => $businessDocumentTypes,
+                  ])
+                @endforeach
+              </div>
+              <button type="button" class="user-btn user-btn-default profile-doc-add" data-add-document="business">+ Add another document</button>
+            </div>
+          </div>
+
+          <div class="user-form-actions">
+            <button type="submit" class="user-btn user-btn-primary">Save Profile</button>
+          </div>
         </form>
       </div>
     </div>
+
+<template id="profileDocumentRowTemplate-individual">
+  @include('front.users.partials.profile-document-row', [
+    'group' => 'individual',
+    'index' => '__INDEX__',
+    'doc' => \App\Models\CompanyProfileDocument::emptyFormRow(),
+    'options' => $individualDocumentTypes,
+  ])
+</template>
+<template id="profileDocumentRowTemplate-business">
+  @include('front.users.partials.profile-document-row', [
+    'group' => 'business',
+    'index' => '__INDEX__',
+    'doc' => \App\Models\CompanyProfileDocument::emptyFormRow(),
+    'options' => $businessDocumentTypes,
+  ])
+</template>
 @endsection
 
 @push('scripts')
@@ -284,11 +355,23 @@
   if (! is_array($oldSubIds)) {
       $oldSubIds = array_values(array_filter(array_map('trim', explode(',', (string) $oldSubIds))));
   }
+  $profileOld = ['sub_category_id' => array_values($oldSubIds)];
+  $profileSubCategories = $subCategories->map(fn ($s) => ['id' => $s->id, 'name' => $s->name])->values();
+  $profileLocation = [
+      'apiBase' => url('/api'),
+      'country' => old('country', $profile->country ?? $user->country),
+      'state' => old('state', $profile->state ?? $user->state),
+      'city' => old('city', $profile->city ?? $user->city),
+  ];
 @endphp
 <script>
   window.PROFILE_SUBCATEGORIES_URL = @json(url('/register/sub-categories'));
-  window.PROFILE_OLD = @json(['sub_category_id' => array_values($oldSubIds)]);
-  window.PROFILE_SUBCATEGORIES = @json($subCategories->map(fn ($s) => ['id' => $s->id, 'name' => $s->name])->values());
+  window.PROFILE_OLD = @json($profileOld);
+  window.PROFILE_SUBCATEGORIES = @json($profileSubCategories);
+  window.PROFILE_DOCUMENT_PLACEHOLDERS = @json($documentClientConfig['placeholders']);
+  window.PROFILE_DOCUMENT_PATTERNS = @json($documentClientConfig['patterns']);
+  window.PROFILE_DOCUMENT_ERRORS = @json($documentClientConfig['errors']);
+  window.PROFILE_LOCATION = @json($profileLocation);
 </script>
 <script src="{{ asset('front/assets/js/profile.js') }}"></script>
 @endpush

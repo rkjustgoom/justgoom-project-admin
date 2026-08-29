@@ -108,13 +108,6 @@
                 <strong>www.justgoom.com</strong>
               </div>
             </div>
-            <div class="quick-info-item">
-              <span class="quick-info-icon">🔗</span>
-              <div>
-                <span class="quick-info-label">Sub Website</span>
-                <strong>blog.justgoom.com</strong>
-              </div>
-            </div>
           </div>
         </div>
 

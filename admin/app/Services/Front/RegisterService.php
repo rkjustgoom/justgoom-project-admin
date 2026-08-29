@@ -49,10 +49,11 @@ class RegisterService
 
     private function createUserUploadFolders(string $email): void
     {
-        $basePath = public_path('uploads/' . $email);
+        $basePath = public_path('uploads/'.$email);
 
         $subFolders = [
             'company-logos',
+            'company-documents',
             'documents',
             'services',
             'team-members',
@@ -68,7 +69,7 @@ class RegisterService
         }
 
         foreach ($subFolders as $folder) {
-            $folderPath = $basePath . '/' . $folder;
+            $folderPath = $basePath.'/'.$folder;
             if (! File::isDirectory($folderPath)) {
                 File::makeDirectory($folderPath, 0777, true);
             }

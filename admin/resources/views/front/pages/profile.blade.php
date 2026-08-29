@@ -24,10 +24,20 @@
   $websiteUrl = $profile->social_website
     ? (Str::startsWith($profile->social_website, ['http://', 'https://']) ? $profile->social_website : 'https://'.$profile->social_website)
     : null;
-  $subWebsiteUrl = $profile->social_subwebsite
-    ? (Str::startsWith($profile->social_subwebsite, ['http://', 'https://']) ? $profile->social_subwebsite : 'https://'.$profile->social_subwebsite)
-    : null;
   $avatarColors = ['#6366f1', '#ec4899', '#14b8a6', '#f59e0b', '#0ea5e9', '#8b5cf6'];
+  $hourDayLabels = [
+    'monday' => 'Mon',
+    'tuesday' => 'Tue',
+    'wednesday' => 'Wed',
+    'thursday' => 'Thu',
+    'friday' => 'Fri',
+    'saturday' => 'Sat',
+    'sunday' => 'Sun',
+  ];
+  $savedHours = is_array($profile->business_hours) ? $profile->business_hours : [];
+  $todayKey = strtolower(now()->englishDayOfWeek);
+  $todayHours = is_array($savedHours[$todayKey] ?? null) ? $savedHours[$todayKey] : null;
+  $todayIsOpen = (bool) ($todayHours['is_open'] ?? false);
 @endphp
 
 @section('content')
@@ -45,7 +55,10 @@
           </div>
           <div>
             <h1>{{ $profile->company_name }}</h1>
-            <p class="profile-category">{{ $user->category->name ?? ($profile->tagline ?: 'Company') }}</p>
+            @if($profile->tagline)
+              <p class="profile-tagline">{{ $profile->tagline }}</p>
+            @endif
+            <p class="profile-category">{{ $user->category->name ?? 'Company' }}</p>
             <div class="profile-meta">
               @if($location)
                 <span class="profile-meta-item">
@@ -137,27 +150,6 @@
           <a href="{{ $mapOpenUrl }}" class="btn btn-outline btn-sm btn-block" target="_blank" rel="noopener">Open in Maps</a>
         </div>
       @endif
-      @if($profile->social_website || $profile->social_facebook || $profile->social_twitter || $profile->social_linkedin)
-        <div class="profile-card">
-          <h3>Portfolio</h3>
-          <div class="profile-portfolio">
-            @if($profile->social_facebook)
-              <a href="{{ Str::startsWith($profile->social_facebook, ['http://', 'https://']) ? $profile->social_facebook : 'https://'.$profile->social_facebook }}" class="portfolio-icon github" title="Facebook" target="_blank" rel="noopener">f</a>
-            @endif
-            @if($websiteUrl)
-              <a href="{{ $websiteUrl }}" class="portfolio-icon web" title="Website" target="_blank" rel="noopener">
-                <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
-              </a>
-            @endif
-            @if($profile->social_twitter)
-              <a href="{{ Str::startsWith($profile->social_twitter, ['http://', 'https://']) ? $profile->social_twitter : 'https://'.$profile->social_twitter }}" class="portfolio-icon dribbble" title="Twitter" target="_blank" rel="noopener">X</a>
-            @endif
-            @if($profile->social_linkedin)
-              <a href="{{ Str::startsWith($profile->social_linkedin, ['http://', 'https://']) ? $profile->social_linkedin : 'https://'.$profile->social_linkedin }}" class="portfolio-icon behance" title="LinkedIn" target="_blank" rel="noopener">in</a>
-            @endif
-          </div>
-        </div>
-      @endif
       <div class="profile-card">
         <h3>Category</h3>
         <ul class="profile-info-list">
@@ -211,14 +203,19 @@
         <div class="profile-card profile-about-card">
           <h3>About</h3>
           <div class="profile-about-text">
+            @if($profile->tagline && $profile->business_desc)
+              <p class="profile-about-tagline">{{ $profile->tagline }}</p>
+            @endif
             @if($profile->business_desc)
               @foreach(preg_split("/\n\s*\n/", trim($profile->business_desc)) as $para)
                 @if(trim($para) !== '')
                   <p>{{ trim($para) }}</p>
                 @endif
               @endforeach
+            @elseif($profile->tagline)
+              <p>{{ $profile->tagline }}</p>
             @else
-              <p>{{ $profile->tagline ?: 'No business description added yet.' }}</p>
+              <p>No business description added yet.</p>
             @endif
           </div>
           <div class="profile-quick-info">
@@ -240,16 +237,97 @@
                 <strong>{{ $profile->social_website ?: '-' }}</strong>
               </div>
             </div>
-            <div class="quick-info-item">
-              <span class="quick-info-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
-              </span>
-              <div>
-                <span class="quick-info-label">Sub Website</span>
-                <strong>{{ $profile->social_subwebsite ?: '-' }}</strong>
-              </div>
-            </div>
           </div>
+
+          @php
+            $hasPortfolio = $profile->social_website || $profile->social_facebook || $profile->social_twitter || $profile->social_linkedin;
+            $facebookUrl = $profile->social_facebook
+              ? (Str::startsWith($profile->social_facebook, ['http://', 'https://']) ? $profile->social_facebook : 'https://'.$profile->social_facebook)
+              : null;
+            $twitterUrl = $profile->social_twitter
+              ? (Str::startsWith($profile->social_twitter, ['http://', 'https://']) ? $profile->social_twitter : 'https://'.$profile->social_twitter)
+              : null;
+            $linkedinUrl = $profile->social_linkedin
+              ? (Str::startsWith($profile->social_linkedin, ['http://', 'https://']) ? $profile->social_linkedin : 'https://'.$profile->social_linkedin)
+              : null;
+          @endphp
+          @if($savedHours !== [] || $hasPortfolio)
+            <div class="profile-about-extras">
+              @if($savedHours !== [])
+                <div class="profile-trade-card profile-about-hours">
+                  <div class="profile-trade-head">
+                    <h4 class="profile-about-extra-title">Business Hours</h4>
+                    <span class="profile-trade-status {{ $todayIsOpen ? 'is-open' : 'is-closed' }}">{{ $todayIsOpen ? 'Open today' : 'Closed today' }}</span>
+                  </div>
+                  <ul class="profile-hours-list business-hours-grid">
+                    @foreach($hourDayLabels as $dayKey => $dayLabel)
+                      @php
+                        $dayHours = is_array($savedHours[$dayKey] ?? null) ? $savedHours[$dayKey] : [];
+                        $isOpen = (bool) ($dayHours['is_open'] ?? false);
+                        $isToday = $dayKey === $todayKey;
+                      @endphp
+                      <li class="{{ $isToday ? 'hours-today' : '' }} {{ $isOpen ? 'is-open' : 'is-closed' }}">
+                        <span class="hours-pip" aria-hidden="true"></span>
+                        <span class="hours-day">{{ $dayLabel }}</span>
+                        @if($isOpen)
+                          <span class="hours-time">{{ $dayHours['open'] ?? '' }} – {{ $dayHours['close'] ?? '' }}</span>
+                        @else
+                          <span class="hours-closed">Closed</span>
+                        @endif
+                      </li>
+                    @endforeach
+                  </ul>
+                </div>
+              @endif
+              @if($hasPortfolio)
+                <div class="profile-trade-card profile-about-portfolio">
+                  <div class="profile-trade-head">
+                    <h4 class="profile-about-extra-title">Portfolio</h4>
+                  </div>
+                  <div class="profile-portfolio">
+                    @if($websiteUrl)
+                      <a href="{{ $websiteUrl }}" class="portfolio-link" target="_blank" rel="noopener">
+                        <span class="portfolio-icon web" aria-hidden="true">
+                          <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                        </span>
+                        <span class="portfolio-link-text">
+                          <strong>Website</strong>
+                          <span>{{ parse_url($websiteUrl, PHP_URL_HOST) ?: $profile->social_website }}</span>
+                        </span>
+                      </a>
+                    @endif
+                    @if($facebookUrl)
+                      <a href="{{ $facebookUrl }}" class="portfolio-link" target="_blank" rel="noopener">
+                        <span class="portfolio-icon github">f</span>
+                        <span class="portfolio-link-text">
+                          <strong>Facebook</strong>
+                          <span>View page</span>
+                        </span>
+                      </a>
+                    @endif
+                    @if($twitterUrl)
+                      <a href="{{ $twitterUrl }}" class="portfolio-link" target="_blank" rel="noopener">
+                        <span class="portfolio-icon dribbble">X</span>
+                        <span class="portfolio-link-text">
+                          <strong>Twitter / X</strong>
+                          <span>View profile</span>
+                        </span>
+                      </a>
+                    @endif
+                    @if($linkedinUrl)
+                      <a href="{{ $linkedinUrl }}" class="portfolio-link" target="_blank" rel="noopener">
+                        <span class="portfolio-icon behance">in</span>
+                        <span class="portfolio-link-text">
+                          <strong>LinkedIn</strong>
+                          <span>View company</span>
+                        </span>
+                      </a>
+                    @endif
+                  </div>
+                </div>
+              @endif
+            </div>
+          @endif
         </div>
 
         <div class="profile-card profile-team-card">
