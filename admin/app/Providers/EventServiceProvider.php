@@ -2,33 +2,19 @@
 
 namespace App\Providers;
 
-use App\Listeners\RecordLoginHistory;
-use App\Listeners\RecordLogoutHistory;
-use Illuminate\Auth\Events\Login;
-use Illuminate\Auth\Events\Logout;
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Event;
 
 class EventServiceProvider extends ServiceProvider
 {
     /**
      * The event listener mappings for the application.
      *
+     * Login/logout listeners are auto-discovered from App\Listeners.
+     * Verification email is registered once by Laravel itself.
+     *
      * @var array<class-string, array<int, class-string>>
      */
-    protected $listen = [
-        Registered::class => [
-            SendEmailVerificationNotification::class,
-        ],
-        Login::class => [
-            RecordLoginHistory::class,
-        ],
-        Logout::class => [
-            RecordLogoutHistory::class,
-        ],
-    ];
+    protected $listen = [];
 
     /**
      * Register any events for your application.
@@ -36,6 +22,15 @@ class EventServiceProvider extends ServiceProvider
      * @return void
      */
     public function boot()
+    {
+        //
+    }
+
+    /**
+     * Laravel already attaches SendEmailVerificationNotification.
+     * Registering it here as well would send two verification emails.
+     */
+    protected function configureEmailVerification(): void
     {
         //
     }
