@@ -25,6 +25,12 @@ class CompanyProfileDocument extends Model
 
     public const DOCUMENT_GUMASTA = 'Gumasta';
 
+    public const APPROVAL_PENDING = 0;
+
+    public const APPROVAL_APPROVED = 1;
+
+    public const APPROVAL_UNAPPROVED = 2;
+
     protected $fillable = [
         'company_profile_id',
         'user_id',
@@ -33,6 +39,11 @@ class CompanyProfileDocument extends Model
         'value',
         'front_image',
         'back_image',
+        'is_approved',
+    ];
+
+    protected $casts = [
+        'is_approved' => 'integer',
     ];
 
     public function companyProfile(): BelongsTo
@@ -175,6 +186,7 @@ class CompanyProfileDocument extends Model
                     'value' => (string) ($row['value'] ?? ''),
                     'front_image' => $model?->front_image,
                     'back_image' => $model?->back_image,
+                    'is_approved' => (int) ($model?->is_approved ?? self::APPROVAL_PENDING),
                     '_destroy' => $destroy,
                 ];
             }
@@ -194,6 +206,7 @@ class CompanyProfileDocument extends Model
             'value' => $document->value,
             'front_image' => $document->front_image,
             'back_image' => $document->back_image,
+            'is_approved' => (int) $document->is_approved,
             '_destroy' => false,
         ])->values()->all();
 
@@ -201,7 +214,7 @@ class CompanyProfileDocument extends Model
     }
 
     /**
-     * @return array{id: null, document_name: string, value: string, front_image: null, back_image: null}
+     * @return array{id: null, document_name: string, value: string, front_image: null, back_image: null, is_approved: int, _destroy: bool}
      */
     public static function emptyFormRow(): array
     {
@@ -211,7 +224,50 @@ class CompanyProfileDocument extends Model
             'value' => '',
             'front_image' => null,
             'back_image' => null,
+            'is_approved' => self::APPROVAL_PENDING,
             '_destroy' => false,
         ];
+    }
+
+    public function isApproved(): bool
+    {
+        return (int) $this->is_approved === self::APPROVAL_APPROVED;
+    }
+
+    public function isPending(): bool
+    {
+        return (int) $this->is_approved === self::APPROVAL_PENDING;
+    }
+
+    public function isUnapproved(): bool
+    {
+        return (int) $this->is_approved === self::APPROVAL_UNAPPROVED;
+    }
+
+    public function statusLabel(): string
+    {
+        return match ((int) $this->is_approved) {
+            self::APPROVAL_APPROVED => 'Verified',
+            self::APPROVAL_UNAPPROVED => 'Unapproved',
+            default => 'Pending',
+        };
+    }
+
+    public function statusClass(): string
+    {
+        return match ((int) $this->is_approved) {
+            self::APPROVAL_APPROVED => 'is-verified',
+            self::APPROVAL_UNAPPROVED => 'is-unapproved',
+            default => 'is-pending',
+        };
+    }
+
+    public static function approvalLabel(int $status): string
+    {
+        return match ($status) {
+            self::APPROVAL_APPROVED => 'Verified',
+            self::APPROVAL_UNAPPROVED => 'Unapproved',
+            default => 'Pending',
+        };
     }
 }

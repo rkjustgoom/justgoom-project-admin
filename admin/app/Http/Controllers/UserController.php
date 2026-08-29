@@ -41,6 +41,7 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
+        $user->load(['companyProfile.profileDocuments']);
         $categories = Category::where('status', 1)->orderBy('name')->get();
         $subCategories = SubCategory::where('status', 1)->orderBy('name')->get();
 

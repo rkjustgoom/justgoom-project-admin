@@ -53,7 +53,7 @@
   <div class="container profile-body">
 
     <aside class="profile-sidebar">
-      <div class="profile-card profile-progress-card">
+      <div class="profile-card profile-progress-card is-low">
         <h3>Complete Your Profile</h3>
         <div class="profile-progress-bar">
           <div class="profile-progress-fill" style="width:30%"></div>

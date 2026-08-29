@@ -84,6 +84,8 @@ class PublicProfileController extends Controller
             ->take(6)
             ->values();
 
+        $completion = $this->profileService->completion($user);
+
         return view('front.pages.profile', [
             'profile' => $profile,
             'user' => $user,
@@ -97,7 +99,8 @@ class PublicProfileController extends Controller
             'videos' => $videos,
             'activities' => $activities,
             'bannerUrl' => \App\Support\ProfileBanner::url($profile, $user),
-            'completionPercent' => $this->profileService->completionPercent($user),
+            'completionPercent' => $completion['percent'],
+            'completionLevel' => $completion['level'],
             'planName' => $this->profileService->planName($user),
             'isOwner' => auth()->check() && auth()->id() === $user->id,
             'profileUrl' => route('front.profile.show', $profile->slug),

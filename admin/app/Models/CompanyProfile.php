@@ -50,6 +50,32 @@ class CompanyProfile extends Model
         return $this->hasMany(CompanyProfileDocument::class)->orderBy('id');
     }
 
+    public function documentVerificationStatus(): string
+    {
+        $docs = $this->relationLoaded('profileDocuments')
+            ? $this->profileDocuments
+            : $this->profileDocuments()->get();
+
+        if ($docs->isEmpty()) {
+            return 'unverified';
+        }
+
+        if ($docs->contains(fn (CompanyProfileDocument $document) => $document->isApproved())) {
+            return 'verified';
+        }
+
+        if ($docs->contains(fn (CompanyProfileDocument $document) => $document->isPending())) {
+            return 'pending';
+        }
+
+        return 'unapproved';
+    }
+
+    public function isDocumentVerified(): bool
+    {
+        return $this->documentVerificationStatus() === 'verified';
+    }
+
     /**
      * Return a unique company slug. If $baseSlug is taken, append -01, -02, …
      */

@@ -7,6 +7,7 @@
   <meta name="csrf-token" content="{{ csrf_token() }}">
   @include('partials.favicon')
   <link rel="stylesheet" href="{{ asset('front/assets/css/users.css') }}">
+  <link rel="stylesheet" href="{{ asset('assets/vendors/font-awesome/css/font-awesome.min.css') }}">
   @stack('styles')
 </head>
 <body class="user-panel-body" @yield('body_attrs')>

@@ -80,28 +80,99 @@ class ProfileService
         });
     }
 
+    /**
+     * About-section completeness: Team, Services, Products, Projects,
+     * Documents, Videos, My Blog, My Advertisement.
+     *
+     * @return array{filled: int, total: int, percent: int, level: string}
+     */
+    public function completion(User $user): array
+    {
+        return $this->completionFromFilledCount($this->aboutSectionsFilledCount($user));
+    }
+
     public function completionPercent(User $user): int
     {
-        $profile = $user->companyProfile;
+        return $this->completion($user)['percent'];
+    }
 
-        $checks = [
-            filled($profile?->company_name),
-            filled($user->category_id),
-            filled($user->sub_category_id),
-            filled($profile?->logo),
-            filled($profile?->tagline),
-            filled($profile?->business_desc),
-            filled($profile?->phone),
-            filled($profile?->email),
-            filled($profile?->address),
-            filled($profile?->country),
-            filled($profile?->state),
-            filled($profile?->city),
+    public function completionLevel(User $user): string
+    {
+        return $this->completion($user)['level'];
+    }
+
+    /**
+     * Use withCount aliases from PublicProfileListingService (no extra queries).
+     *
+     * @return array{filled: int, total: int, percent: int, level: string}
+     */
+    public function completionFromLoadedCounts(User $user): array
+    {
+        $filled = count(array_filter([
+            (int) ($user->teams_count ?? 0) > 0,
+            (int) ($user->service_items_count ?? $user->services_count ?? 0) > 0,
+            (int) ($user->product_items_count ?? 0) > 0,
+            (int) ($user->profile_projects_count ?? 0) > 0,
+            (int) ($user->documents_count ?? 0) > 0,
+            (int) ($user->videos_count ?? 0) > 0,
+            (int) ($user->articles_count ?? 0) > 0,
+            (int) ($user->offers_count ?? 0) > 0,
+        ]));
+
+        return $this->completionFromFilledCount($filled);
+    }
+
+    public function aboutSectionsFilledCount(User $user): int
+    {
+        return count(array_filter([
+            $user->teams()->exists(),
+            $user->services()->where('type', 'service')->exists(),
+            $user->services()->where('type', 'product')->exists(),
+            $user->projects()->exists(),
+            $user->documents()->exists(),
+            $user->videos()->exists(),
+            $user->articles()->exists(),
+            $user->offers()->exists(),
+        ]));
+    }
+
+    /**
+     * 0–2 sections → 0–40% (red), 3–5 → 41–70% (yellow), 6–8 → 71–100% (green).
+     *
+     * @return array{filled: int, total: int, percent: int, level: string}
+     */
+    public function completionFromFilledCount(int $filled): array
+    {
+        $total = 8;
+        $filled = max(0, min($filled, $total));
+
+        if ($filled <= 2) {
+            $percent = (int) round(($filled / 2) * 40);
+        } elseif ($filled <= 5) {
+            $percent = (int) round(41 + (($filled - 3) / 2) * 29);
+        } else {
+            $percent = (int) round(71 + (($filled - 6) / 2) * 29);
+        }
+
+        return [
+            'filled' => $filled,
+            'total' => $total,
+            'percent' => $percent,
+            'level' => $this->levelFromPercent($percent),
         ];
+    }
 
-        $filled = count(array_filter($checks));
+    public function levelFromPercent(int $percent): string
+    {
+        if ($percent <= 40) {
+            return 'low';
+        }
 
-        return (int) round(($filled / count($checks)) * 100);
+        if ($percent <= 70) {
+            return 'medium';
+        }
+
+        return 'complete';
     }
 
     public function planName(User $user): string
@@ -175,19 +246,32 @@ class ProfileService
                 'value' => $value,
             ];
 
+            $contentChanged = false;
+
             if (($row['front_image'] ?? null) instanceof UploadedFile) {
                 $this->deleteStoredFile($existing?->front_image);
                 $payload['front_image'] = $this->uploadDocumentImage($row['front_image']);
+                $contentChanged = true;
             }
 
             if (($row['back_image'] ?? null) instanceof UploadedFile) {
                 $this->deleteStoredFile($existing?->back_image);
                 $payload['back_image'] = $this->uploadDocumentImage($row['back_image']);
+                $contentChanged = true;
             }
 
             if ($existing) {
+                $contentChanged = $contentChanged
+                    || $existing->document_name !== $documentName
+                    || $existing->value !== $value;
+
+                if ($contentChanged) {
+                    $payload['is_approved'] = CompanyProfileDocument::APPROVAL_PENDING;
+                }
+
                 $existing->update($payload);
             } else {
+                $payload['is_approved'] = CompanyProfileDocument::APPROVAL_PENDING;
                 $profile->profileDocuments()->create($payload);
             }
         }

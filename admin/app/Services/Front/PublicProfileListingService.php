@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\DB;
 
 class PublicProfileListingService
 {
+    public function __construct(private ProfileService $profileService)
+    {
+    }
+
     public function listForFrontend(): array
     {
         return CompanyProfile::query()
@@ -19,14 +23,22 @@ class PublicProfileListingService
                     ])
                     ->withCount([
                         'projects as projects_count' => fn ($q) => $q->where('status', 1),
-                        'services as services_count',
+                        'services as services_count' => fn ($q) => $q->where('type', 'service'),
+                        'services as product_items_count' => fn ($q) => $q->where('type', 'product'),
+                        'teams as teams_count',
+                        'documents as documents_count',
+                        'projects as profile_projects_count',
+                        'videos as videos_count',
+                        'articles as articles_count',
+                        'offers as offers_count',
                     ]),
+                'profileDocuments',
             ])
             ->whereHas('user', fn ($q) => $this->applyPublicUserConstraints($q))
             ->latest()
             ->get()
             ->values()
-            ->map(fn (CompanyProfile $profile, int $index) => $this->formatCard($profile, $index))
+            ->map(fn (CompanyProfile $profile) => $this->formatCard($profile))
             ->all();
     }
 
@@ -35,9 +47,8 @@ class PublicProfileListingService
         $query = CompanyProfile::query()->whereHas('user', fn ($q) => $this->applyPublicUserConstraints($q));
 
         $total = (clone $query)->count();
-        $verified = (clone $query)->whereHas('user', function ($q) {
-            $this->applyPublicUserConstraints($q);
-            $q->whereNotNull('email_verified_at');
+        $verified = (clone $query)->whereHas('profileDocuments', function ($q) {
+            $q->where('is_approved', 1);
         })->count();
 
         $cities = (clone $query)
@@ -64,7 +75,7 @@ class PublicProfileListingService
     public function findPublicProfile(string $slug): CompanyProfile
     {
         return CompanyProfile::query()
-            ->with(['user.category', 'user.userPlans.plan'])
+            ->with(['user.category', 'user.userPlans.plan', 'profileDocuments'])
             ->where('slug', $slug)
             ->whereHas('user', fn ($q) => $this->applyPublicUserConstraints($q))
             ->firstOrFail();
@@ -82,9 +93,12 @@ class PublicProfileListingService
             ->all();
     }
 
-    private function formatCard(CompanyProfile $profile, int $index): array
+    private function formatCard(CompanyProfile $profile): array
     {
         $user = $profile->user;
+        $completion = $user
+            ? $this->profileService->completionFromLoadedCounts($user)
+            : $this->profileService->completionFromFilledCount(0);
 
         return [
             'name' => $profile->company_name,
@@ -99,8 +113,11 @@ class PublicProfileListingService
             'services' => (int) ($user->services_count ?? 0),
             'city' => $profile->city ?: ($user->city ?: 'N/A'),
             'country' => $profile->country ?: 'N/A',
-            'verified' => $user->hasVerifiedEmail(),
-            'featured' => $index < 4,
+            'verified' => $profile->isDocumentVerified(),
+            'verificationStatus' => $profile->documentVerificationStatus(),
+            'featured' => $completion['level'] === 'complete',
+            'completionPercent' => $completion['percent'],
+            'completionLevel' => $completion['level'],
             'addedDaysAgo' => $profile->created_at
                 ? max(0, (int) $profile->created_at->diffInDays(now()))
                 : 0,

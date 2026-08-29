@@ -9,6 +9,7 @@
     <meta name="description" content="@yield('meta_description')">
   @endif
   <link rel="stylesheet" href="{{ asset('front/assets/css/style.css') }}">
+  <link rel="stylesheet" href="{{ asset('assets/vendors/font-awesome/css/font-awesome.min.css') }}">
   @stack('styles')
 </head>
 <body @yield('body_attrs')>

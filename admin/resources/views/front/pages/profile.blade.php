@@ -38,6 +38,7 @@
   $todayKey = strtolower(now()->englishDayOfWeek);
   $todayHours = is_array($savedHours[$todayKey] ?? null) ? $savedHours[$todayKey] : null;
   $todayIsOpen = (bool) ($todayHours['is_open'] ?? false);
+  $documentStatus = $profile->documentVerificationStatus();
 @endphp
 
 @section('content')
@@ -76,10 +77,18 @@
           </div>
         </div>
         <div class="profile-hero-badges">
-          <span class="profile-hero-badge profile-hero-badge-trusted" title="Trusted business listed on Just Goom">
-            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
-            Trusted Site
-          </span>
+          @if($documentStatus === 'verified')
+            <span class="profile-hero-badge profile-hero-badge-verified" title="Documents verified by Just Goom">
+              <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+              Verified
+            </span>
+          @elseif($documentStatus === 'pending')
+            <span class="profile-hero-badge profile-hero-badge-pending" title="Documents uploaded, waiting for admin verification">Pending</span>
+          @elseif($documentStatus === 'unapproved')
+            <span class="profile-hero-badge profile-hero-badge-unapproved" title="Documents were not approved">Unapproved</span>
+          @else
+            <span class="profile-hero-badge profile-hero-badge-unverified" title="No verified documents yet">Unverified</span>
+          @endif
           <span class="profile-hero-badge profile-hero-badge-trending" title="Trending business profile">
             <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6h-6z"/></svg>
             Trending
@@ -110,7 +119,7 @@
   <div class="container profile-body">
     <aside class="profile-sidebar">
       @if($isOwner)
-        <div class="profile-card profile-progress-card">
+        <div class="profile-card profile-progress-card is-{{ $completionLevel }}">
           <h3>Complete Your Profile</h3>
           <div class="profile-progress-bar">
             <div class="profile-progress-fill" style="width:{{ $completionPercent }}%"></div>

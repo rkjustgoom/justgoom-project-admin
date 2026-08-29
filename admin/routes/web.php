@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdvertisementController;
 use App\Http\Controllers\Auth\LoginController as AdminLoginController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CompanyProfileDocumentController;
 use App\Http\Controllers\Front\ArticleController;
 use App\Http\Controllers\Front\AuditLogController;
 use App\Http\Controllers\Front\Auth\LoginController as FrontLoginController;
@@ -216,6 +217,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('/users', [UserController::class, 'store'])->name('users.store');
     Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
     Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+    Route::patch('/users/{user}/documents/{document}/approval', [CompanyProfileDocumentController::class, 'updateApproval'])->name('users.documents.approval');
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 
     Route::get('/advertisements', [AdvertisementController::class, 'index'])->name('advertisements.index');

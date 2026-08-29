@@ -20,7 +20,20 @@
   <input type="hidden" name="{{ $prefix }}[{{ $index }}][_destroy]" value="{{ $isRemoved ? '1' : '0' }}" data-destroy-input>
   <div class="profile-doc-card-head">
     <span class="profile-doc-card-label">Document</span>
-    <button type="button" class="profile-doc-remove" data-remove-document>Remove</button>
+    <div class="profile-doc-card-head-actions">
+      @if(! empty($doc['id']))
+        @php
+          $docStatus = (int) ($doc['is_approved'] ?? \App\Models\CompanyProfileDocument::APPROVAL_PENDING);
+          $docStatusClass = match ($docStatus) {
+              \App\Models\CompanyProfileDocument::APPROVAL_APPROVED => 'is-verified',
+              \App\Models\CompanyProfileDocument::APPROVAL_UNAPPROVED => 'is-unapproved',
+              default => 'is-pending',
+          };
+        @endphp
+        <span class="profile-doc-status {{ $docStatusClass }}">{{ \App\Models\CompanyProfileDocument::approvalLabel($docStatus) }}</span>
+      @endif
+      <button type="button" class="profile-doc-remove" data-remove-document>Remove</button>
+    </div>
   </div>
   <div class="profile-doc-grid" data-document-fields>
     <div class="user-form-group" data-field="{{ $typeErrorKey }}">

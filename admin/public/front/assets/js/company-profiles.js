@@ -99,6 +99,28 @@ function initFilterChipsLocal(container) {
   });
 }
 
+function verificationBadge(status) {
+  const tips = {
+    verified: 'Documents approved by JustGoom. This profile is verified.',
+    pending: 'Documents uploaded. Waiting for admin review.',
+    unapproved: 'Documents were not approved. Please update and resubmit.',
+    unverified: 'No company documents uploaded yet.',
+  };
+  const tip = tips[status] || tips.unverified;
+  const escTip = String(tip).replace(/"/g, '&quot;');
+
+  if (status === 'verified') {
+    return '<span class="company-verified-badge" tabindex="0" data-tooltip="' + escTip + '"><i class="fa fa-check-circle" aria-hidden="true"></i> Verified</span>';
+  }
+  if (status === 'pending') {
+    return '<span class="company-verified-badge is-pending" tabindex="0" data-tooltip="' + escTip + '"><i class="fa fa-hourglass-half" aria-hidden="true"></i> Pending</span>';
+  }
+  if (status === 'unapproved') {
+    return '<span class="company-verified-badge is-unapproved" tabindex="0" data-tooltip="' + escTip + '"><i class="fa fa-times-circle" aria-hidden="true"></i> Unapproved</span>';
+  }
+  return '<span class="company-verified-badge is-unverified" tabindex="0" data-tooltip="' + escTip + '"><i class="fa fa-question-circle" aria-hidden="true"></i> Unverified</span>';
+}
+
 function renderCompanyCard(company, index) {
   const banner = getCompanyBanner(company, index);
   const logoColor = COMPANY_LOGO_COLORS[index % COMPANY_LOGO_COLORS.length];
@@ -107,7 +129,18 @@ function renderCompanyCard(company, index) {
   const city = company.city || 'N/A';
   const country = company.country || 'N/A';
   const initials = getCompanyInitials(name);
-  const starClass = company.featured ? ' is-starred' : '';
+  const completionLevel = company.completionLevel || (company.featured ? 'complete' : 'low');
+  const starClass = ' is-' + completionLevel;
+  const completionPercent = Number(company.completionPercent ?? 0);
+  const starTips = {
+    complete: completionPercent + '% complete. Green star: 6 or more About sections added (Team, Services, Products, Projects, Documents, Videos, Blog, Ads).',
+    medium: completionPercent + '% complete. Yellow star: 3 to 5 About sections added.',
+    low: completionPercent + '% complete. Red star: 0 to 2 About sections added. Add more to raise your rating.',
+  };
+  const starTip = String(starTips[completionLevel] || starTips.low).replace(/"/g, '&quot;');
+  const trendingTag = completionLevel === 'complete'
+    ? '<span class="company-star-tag" data-tooltip="Trending: this profile has 6 or more About sections filled."><i class="fa fa-fire" aria-hidden="true"></i> Trending</span>'
+    : '';
   const addedDays = company.addedDaysAgo ?? 0;
   const logoHtml = company.logoUrl
     ? `<div class="company-logo company-logo-image"><img src="${company.logoUrl}" alt="${name}"></div>`
@@ -142,12 +175,16 @@ function renderCompanyCard(company, index) {
       data-locality="${esc(city)}"
       data-country="${esc(country)}"
       data-verified="${company.verified ? 'yes' : 'no'}"
+      data-verification-status="${esc(company.verificationStatus || (company.verified ? 'verified' : 'unverified'))}"
       data-added-days="${addedDays}">
       <div class="company-card-banner">
         <img src="${banner}" alt="${escAttr(name)}">
-        <button type="button" class="company-star${starClass}" aria-label="Favorite">★</button>
+        <div class="company-star-wrap${starClass}">
+          <span class="company-star" tabindex="0" data-tooltip="${starTip}" aria-label="${starTip}"><i class="fa fa-star" aria-hidden="true"></i></span>
+          ${trendingTag}
+        </div>
         <div class="company-menu-wrap">
-          <button type="button" class="company-menu-btn" aria-label="More options">⋯</button>
+          <button type="button" class="company-menu-btn" aria-label="More options"><i class="fa fa-ellipsis-h"></i></button>
           <div class="company-menu-dropdown">
             <button type="button" class="js-download-profile-pdf">Download Profile PDF</button>
             <button type="button" class="js-share-profile-link">Share Profile Link</button>
@@ -158,18 +195,18 @@ function renderCompanyCard(company, index) {
         ${logoHtml}
         <h3 class="company-name">${name}</h3>
         <p class="company-category">${category}</p>
-        <p class="company-location">📍 ${city}</p>
-        ${company.verified ? '<span class="company-verified-badge">✓ Verified</span>' : ''}
-        <span class="company-added-time">🕐 ${formatAddedTime(addedDays)}</span>
+        <p class="company-location"><i class="fa fa-map-marker" aria-hidden="true"></i> ${city}</p>
+        ${verificationBadge(company.verificationStatus)}
+        <span class="company-added-time"><i class="fa fa-clock-o" aria-hidden="true"></i> ${formatAddedTime(addedDays)}</span>
         <div class="company-stats">
           <div class="company-stat">
             <span class="company-stat-num">${company.projects ?? 0}</span>
-            <span class="company-stat-label">Projects</span>
+            <span class="company-stat-label"><i class="fa fa-briefcase" aria-hidden="true"></i> Projects</span>
           </div>
           <div class="company-stat-divider"></div>
           <div class="company-stat">
             <span class="company-stat-num">${company.services ?? company.tasks ?? 0}</span>
-            <span class="company-stat-label">Services</span>
+            <span class="company-stat-label"><i class="fa fa-cogs" aria-hidden="true"></i> Services</span>
           </div>
         </div>
         <a href="${profileUrl}" class="btn btn-view-profile">View Profile</a>
@@ -738,7 +775,7 @@ function downloadCompanyProfilePdf(card, btn) {
 function bindCardInteractions(grid) {
   grid.querySelectorAll('.company-card-clickable').forEach(card => {
     card.addEventListener('click', (e) => {
-      if (e.target.closest('.company-star, .company-menu-wrap, .company-menu-dropdown, .btn-view-profile')) {
+      if (e.target.closest('.company-menu-wrap, .company-menu-dropdown, .btn-view-profile, .company-star, .company-star-tag, .company-verified-badge')) {
         return;
       }
       openCompanyProfile(card);
@@ -778,13 +815,6 @@ function bindCardInteractions(grid) {
       const card = btn.closest('.company-card');
       downloadCompanyProfilePdf(card, btn);
       btn.closest('.company-menu-dropdown')?.classList.remove('open');
-    });
-  });
-
-  grid.querySelectorAll('.company-star').forEach(star => {
-    star.addEventListener('click', (e) => {
-      e.stopPropagation();
-      star.classList.toggle('is-starred');
     });
   });
 

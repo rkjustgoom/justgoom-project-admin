@@ -35,12 +35,18 @@ class ProfileController extends Controller
 
         $profileDocuments = $profile->profileDocuments;
 
+        $completion = $this->profileService->completion($user);
+
         return view('front.users.profile', [
             'user' => $user,
             'profile' => $profile,
             'categories' => $categories,
             'subCategories' => $subCategories,
-            'completionPercent' => $this->profileService->completionPercent($user),
+            'completionPercent' => $completion['percent'],
+            'completionLevel' => $completion['level'],
+            'completionFilled' => $completion['filled'],
+            'completionTotal' => $completion['total'],
+            'documentStatus' => $profile->documentVerificationStatus(),
             'planName' => $this->profileService->planName($user),
             'previewUrl' => route('front.profile.show', $profile->slug),
             'countries' => Country::query()->orderBy('name')->get(['id', 'name']),

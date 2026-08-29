@@ -95,11 +95,54 @@
 @php
   $hasProfileCountry = filled(old('country', $profile->country ?? $user->country));
   $hasProfileState = filled(old('state', $profile->state ?? $user->state));
+  $starHint = match ($completionLevel) {
+    'complete' => 'Your star is green. Keep About sections updated.',
+    'medium' => 'Add more About sections (Team, Services, Products, and more) to reach a green star.',
+    default => 'Add Team, Services, Products, Projects, Documents, Videos, Blog or Ads to raise your star.',
+  };
+  $starTooltip = match ($completionLevel) {
+    'complete' => $completionPercent.'% complete. Green star: 6 or more About sections added (Team, Services, Products, Projects, Documents, Videos, Blog, Ads).',
+    'medium' => $completionPercent.'% complete. Yellow star: 3 to 5 About sections added.',
+    default => $completionPercent.'% complete. Red star: 0 to 2 About sections added. Add more to raise your rating.',
+  };
+  $docMeta = match ($documentStatus) {
+    'verified' => ['label' => 'Verified', 'hint' => 'Your company documents are approved.'],
+    'pending' => ['label' => 'Pending', 'hint' => 'Documents uploaded. Waiting for admin review.'],
+    'unapproved' => ['label' => 'Unapproved', 'hint' => 'Documents were not approved. Please update and resubmit.'],
+    default => ['label' => 'Unverified', 'hint' => 'Upload company documents below to get verified.'],
+  };
 @endphp
 <div class="user-content">
-      <div class="user-toolbar">
-        <p class="user-text-muted">Profile completion required for Free Plan onboarding — <strong class="user-text-accent">{{ $completionPercent }}%</strong> complete</p>
-        <a href="{{ $previewUrl }}" target="_blank" class="user-btn user-btn-default">Preview Public Profile</a>
+      <div class="profile-status-notice is-{{ $completionLevel }}">
+        <div class="profile-status-notice-inner">
+          <div class="profile-status-star-block">
+            <div class="profile-status-star" tabindex="0" data-tooltip="{{ $starTooltip }}" aria-label="{{ $starTooltip }}"><i class="fa fa-star" aria-hidden="true"></i></div>
+            <div class="profile-status-star-copy">
+              <span class="profile-status-kicker">Star rating</span>
+              <strong>{{ $completionPercent }}% complete</strong>
+              <p>{{ $completionFilled }}/{{ $completionTotal }} About sections added. {{ $starHint }}</p>
+            </div>
+          </div>
+          <div class="profile-status-doc-block is-{{ $documentStatus }}">
+            <div class="profile-status-doc-icon" aria-hidden="true">
+              @if($documentStatus === 'verified')
+                <i class="fa fa-check-circle"></i>
+              @elseif($documentStatus === 'pending')
+                <i class="fa fa-hourglass-half"></i>
+              @elseif($documentStatus === 'unapproved')
+                <i class="fa fa-times-circle"></i>
+              @else
+                <i class="fa fa-shield"></i>
+              @endif
+            </div>
+            <div class="profile-status-star-copy">
+              <span class="profile-status-kicker">Documents</span>
+              <strong>{{ $docMeta['label'] }}</strong>
+              <p>{{ $docMeta['hint'] }}</p>
+            </div>
+          </div>
+          <a href="{{ $previewUrl }}" target="_blank" class="user-btn user-btn-default profile-status-preview"><i class="fa fa-external-link" aria-hidden="true"></i> Preview Public Profile</a>
+        </div>
       </div>
 
       @if($errors->any())
@@ -289,7 +332,7 @@
 
           <div class="profile-section" id="profileDocumentsSection">
             <h3 class="profile-section-title">Documents</h3>
-            <p class="profile-section-desc">Add identity and business documents. You can save your profile without documents, or add several of each type.</p>
+            <p class="profile-section-desc">Upload identity and business documents. After upload the status is Pending until an admin verifies them. Changing a document sends it back to Pending.</p>
 
             <div class="profile-subsection" id="profileIndividualSection">
               <h4 class="profile-subsection-title">Individual</h4>
